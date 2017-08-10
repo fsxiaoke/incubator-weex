@@ -57,7 +57,7 @@ public class WXComponentFactory {
     }
     sComponentTypes.get(instance.getInstanceId()).add(node.getType());
 
-    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getType());
+    IFComponentHolder holder = WXComponentRegistry.getComponent(node.getType(),instance);
     if (holder == null) {
       if (WXEnvironment.isApkDebugable()) {
         String tag = "WXComponentFactory error type:[" +
@@ -65,7 +65,7 @@ public class WXComponentFactory {
         WXLogUtils.e(tag);
       }
       //For compatible reason of JS framework, unregistered type will be treated as container.
-      holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER);
+      holder = WXComponentRegistry.getComponent(WXBasicComponentType.CONTAINER,instance);
       if(holder == null){
         throw new WXRuntimeException("Container component not found.");
       }

@@ -51,6 +51,11 @@ public class ExternalLoaderComponentHolder implements IFComponentHolder {
   public void loadIfNonLazy() {
   }
 
+  @Override
+  public Class getClassIns() {
+    return mClass;
+  }
+
   private synchronized boolean generate(){
     if(mClass==null){
       return false;

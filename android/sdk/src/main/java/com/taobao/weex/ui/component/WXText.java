@@ -41,7 +41,7 @@ public class WXText extends WXComponent<WXTextView> {
   /**
    * The default text size
    **/
-  public static final int sDEFAULT_SIZE = 32;
+  public static int sDEFAULT_SIZE = 32;
 
   public static class Creator implements ComponentCreator {
 

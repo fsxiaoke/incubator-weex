@@ -78,7 +78,10 @@ public class TypeModuleFactory<T extends WXModule> implements ModuleFactory<T> {
   public T buildInstance() throws IllegalAccessException, InstantiationException {
     return mClazz.newInstance();
   }
-
+  @Override
+  public Class getClassIns(){
+    return mClazz;
+  }
   @Override
   public String[] getMethods() {
     if (mMethodMap == null) {

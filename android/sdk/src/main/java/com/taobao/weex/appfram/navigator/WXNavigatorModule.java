@@ -36,6 +36,8 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.common.WXModule;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.HashMap;
+
 
 public class WXNavigatorModule extends WXModule {
 
@@ -46,9 +48,12 @@ public class WXNavigatorModule extends WXModule {
     public static final String CALLBACK_RESULT = "result";
     public static final String CALLBACK_MESSAGE = "message";
 
+    public final static String PARAMS = "params";
+    public final static String Key_is_from_weex = "is_from_weex";
     private final static String INSTANCE_ID = "instanceId";
     private final static String TAG = "Navigator";
-    private final static String WEEX = "com.taobao.android.intent.category.WEEX";
+    public final static String WEEX = "com.taobao.android.intent.category.WEEX";
+    public final static String WEEX_Action = "com.taobao.android.intent.action.WEEX";
     private final static String URL = "url";
 
     @JSMethod(uiThread = true)
@@ -126,8 +131,9 @@ public class WXNavigatorModule extends WXModule {
                     if (TextUtils.isEmpty(scheme)) {
                         builder.scheme(Constants.Scheme.HTTP);
                     }
-                    Intent intent = new Intent(Intent.ACTION_VIEW, builder.build());
+                    Intent intent = new Intent(WEEX_Action, builder.build());
                     intent.addCategory(WEEX);
+                    intent.putExtra(PARAMS,(HashMap)jsonObject.getInnerMap());
                     intent.putExtra(INSTANCE_ID, mWXSDKInstance.getInstanceId());
                     mWXSDKInstance.getContext().startActivity(intent);
                     if (callback != null) {
