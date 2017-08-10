@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.bridge;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -32,8 +34,10 @@ import com.taobao.weex.dom.WXDomModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.utils.WXLogUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,7 +52,7 @@ public class WXModuleManager {
   /**
    * module class object dictionary
    */
-  private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
+  private static Map<String, List<ModuleFactory>> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
 
@@ -76,9 +80,9 @@ public class WXModuleManager {
         .post(new Runnable() {
       @Override
       public void run() {
-        if (sModuleFactoryMap.containsKey(moduleName)) {
-          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
-        }
+//        if (sModuleFactoryMap.containsKey(moduleName)) {
+//          WXLogUtils.w("WXComponentRegistry Duplicate the Module name: " + moduleName);
+//        }
 
         if (global) {
           try {
@@ -106,15 +110,22 @@ public class WXModuleManager {
     if (factory == null) {
       return false;
     }
-
-    try {
-      sModuleFactoryMap.put(moduleName, factory);
-    }catch (ArrayStoreException e){
-      e.printStackTrace();
-      //ignore:
-      //may throw this exception:
-      //java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
+    List<ModuleFactory> list=sModuleFactoryMap.get(moduleName);
+    if (list==null){
+      list=new ArrayList<>();
+      try {
+        list.add(factory);
+        sModuleFactoryMap.put(moduleName, list);
+      }catch (ArrayStoreException e){
+        e.printStackTrace();
+        //ignore:
+        //may throw this exception:
+        //java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
+      }
+    }else {
+      list.add(factory);
     }
+
     return true;
   }
 
@@ -124,18 +135,40 @@ public class WXModuleManager {
     WXSDKManager.getInstance().registerModules(modules);
     return true;
   }
-
+  static ModuleFactory findFactory(WXSDKInstance instance,List<ModuleFactory> factorys){
+    ModuleFactory ret=null;
+    do {
+      if (instance==null||factorys==null||factorys.size()==0){
+        break;
+      }
+      if (factorys.size()==1){
+        ret=factorys.get(0);
+        break;
+      }
+      ClassLoader l=instance.getContext().getClass().getClassLoader();
+      for (ModuleFactory fac :
+              factorys) {
+        if (fac.getClassIns().getClassLoader().equals(l)){
+          ret=fac;
+          break;
+        }
+      }
+    }while (false);
+    return ret;
+  }
   static Object callModuleMethod(final String instanceId, String moduleStr, String methodStr, JSONArray args) {
-    ModuleFactory factory = sModuleFactoryMap.get(moduleStr);
-    if(factory == null){
+    List<ModuleFactory> factorys = sModuleFactoryMap.get(moduleStr);
+    if(factorys == null||factorys.size()==0){
       WXLogUtils.e("[WXModuleManager] module factory not found.");
       return null;
     }
+    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    ModuleFactory factory=findFactory(instance,factorys);
     final WXModule wxModule = findModule(instanceId, moduleStr,factory);
     if (wxModule == null) {
       return null;
     }
-    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+
     wxModule.mWXSDKInstance = instance;
 
     final Invoker invoker = factory.getMethodInvoker(methodStr);
@@ -366,8 +399,8 @@ public class WXModuleManager {
 
   public static void reload(){
     if (sModuleFactoryMap != null && sModuleFactoryMap.size() > 0) {
-      for (Map.Entry<String, ModuleFactory> entry : sModuleFactoryMap.entrySet()) {
-        registerJSModule(entry.getKey(), entry.getValue());
+      for (Map.Entry<String, List<ModuleFactory>> entry : sModuleFactoryMap.entrySet()) {
+        registerJSModule(entry.getKey(), entry.getValue().get(0));
       }
     }
   }

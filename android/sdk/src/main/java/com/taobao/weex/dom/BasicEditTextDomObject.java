@@ -75,6 +75,9 @@ public class BasicEditTextDomObject extends WXDomObject {
       String fontFamily = null;
       if (getStyles().containsKey(Constants.Name.FONT_SIZE)) {
         fontSize = WXStyle.getFontSize(getStyles(),getViewPortWidth());
+        if (Float.compare(WXTextDomObject.s_fontSizeRate,1)!=0){
+          fontSize=(int)(fontSize*WXTextDomObject.s_fontSizeRate);
+        }
       }
 
       if (getStyles().containsKey(Constants.Name.FONT_FAMILY)) {

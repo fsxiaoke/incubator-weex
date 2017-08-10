@@ -125,6 +125,11 @@ public class SimpleComponentHolder implements IFComponentHolder{
     }
   }
 
+  @Override
+  public Class getClassIns() {
+    return mClz;
+  }
+
   private synchronized void generate(){
     if(WXEnvironment.isApkDebugable()) {
       WXLogUtils.d(TAG, "Generate Component:" + mClz.getSimpleName());

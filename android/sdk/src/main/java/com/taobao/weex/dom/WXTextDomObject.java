@@ -61,7 +61,7 @@ import static com.taobao.weex.dom.WXStyle.UNSET;
  * text is done by {@link Layout}.
  */
 public class WXTextDomObject extends WXDomObject {
-
+  public static float s_fontSizeRate=1;
   /**
    * Command object for setSpan
    */
@@ -262,6 +262,9 @@ public class WXTextDomObject extends WXDomObject {
       }
       if (style.containsKey(Constants.Name.FONT_SIZE)) {
         mFontSize = WXStyle.getFontSize(style,getViewPortWidth());
+        if (Float.compare(s_fontSizeRate,1)!=0){
+          mFontSize=(int)(mFontSize*s_fontSizeRate);
+        }
       }
       if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
         mFontWeight = WXStyle.getFontWeight(style);
