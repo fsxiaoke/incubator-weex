@@ -7,3 +7,21 @@ project(":weex_sdk").projectDir=new File("sdk")
 
 include ":commons"
 include ":weex_debug"
+
+
+def modifyLibVersion(projectName, newVersion) {
+    File settings = new File(gradle.FS_DIR + "/libconfig.cfg")
+    String content = FileUtil.getFileStr(settings)
+    String reg = "\"$projectName\":\\s*\".*?\\..*?\""
+    String mycode = "\"$projectName\":\"$newVersion\""
+    println(reg + " " + mycode)
+    content = content.replaceAll(reg, mycode)
+    FileUtil.writeToFile(content.getBytes("utf-8"), settings)
+}
+
+gradle.ext.modifyLibVersion = this.&modifyLibVersion
+gradle.ext.mavenUrl = "http://maven.firstshare.cn/artifactory/libs-release-local"
+gradle.ext.mavenDevUrl = "http://maven.firstshare.cn/artifactory/libs-snapshot-local"
+gradle.ext.mavenUserName = "deployer"
+gradle.ext.mavenPwd = "fxiaoke"
+gradle.ext.FS_DIR="F:\\master"
