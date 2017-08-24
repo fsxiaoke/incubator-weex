@@ -45,6 +45,11 @@ public class ComponentHolderTest {
       }
 
       @Override
+      public Class getClassIns() {
+        return null;
+      }
+
+      @Override
       public Invoker getPropertyInvoker(String name) {
         return null;
       }

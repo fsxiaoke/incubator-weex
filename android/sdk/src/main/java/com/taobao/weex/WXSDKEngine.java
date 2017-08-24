@@ -46,6 +46,7 @@ import com.taobao.weex.common.TypeModuleFactory;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.disk.FsLruDiskCache;
 import com.taobao.weex.dom.BasicEditTextDomObject;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.dom.WXCellDomObject;
@@ -57,6 +58,7 @@ import com.taobao.weex.dom.WXScrollerDomObject;
 import com.taobao.weex.dom.WXSwitchDomObject;
 import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.http.WXStreamModule;
+import com.taobao.weex.log.FsMMapWriter;
 import com.taobao.weex.ui.ExternalLoaderComponentHolder;
 import com.taobao.weex.ui.IExternalComponentGetter;
 import com.taobao.weex.ui.IFComponentHolder;
@@ -95,6 +97,7 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,6 +156,16 @@ public class WXSDKEngine {
       if (mIsInit) {
         return;
       }
+      WXLogUtils.s_logcache=new FsLruDiskCache();
+      WXLogUtils.s_logcache.config(WXLogUtils.s_logcache.new Config().setCount(10).setSize(20*1024*1024)).init(WXLogUtils.getLogPath());
+
+      WXLogUtils.s_logwriter = new FsMMapWriter();
+      try {
+        WXLogUtils.s_logwriter.start(WXLogUtils.getLogPath(),application.getPackageName());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
       long start = System.currentTimeMillis();
       WXEnvironment.sSDKInitStart = start;
       doInitInternal(application,config);
