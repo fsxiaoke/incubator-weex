@@ -147,7 +147,11 @@ public class WXSDKEngine {
     }
   }
   public static void setLogLevel(String level){
-    WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
+    try {
+      WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
+    }catch (IllegalArgumentException e){
+      WXLogUtils.e(Log.getStackTraceString(e));
+    }
   }
   /**
    *
