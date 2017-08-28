@@ -142,7 +142,7 @@ public class WXLogUtils {
     }
   }
   static boolean canWriteFclog(LogLevel loglevel){
-    return WXEnvironment.sLogLevel.compare(loglevel)>0;
+    return WXEnvironment.sLogLevel.compare(loglevel)>=0;
   }
   private static LogLevel getLogLevel(String level) {
     switch (level.trim()){
