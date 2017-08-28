@@ -28,7 +28,7 @@ public class FsMMapWriterTest {
         WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
         FsMMapWriter.s_MIN_mmapSize=512;
         writer= new FsMMapWriter();
-        writer.start("./testdata","FsMMapWriterTest",512);
+        writer.start("./testdata","com.facishare.fsneice",512);
     }
 
     @Test

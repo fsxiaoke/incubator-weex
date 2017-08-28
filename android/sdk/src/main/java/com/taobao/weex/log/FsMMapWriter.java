@@ -174,8 +174,12 @@ public class FsMMapWriter implements ILogWriter {
         File lastTarget=null;
         for (File f :
                 files) {
-            if (f.getName().startsWith(hopefile)){
-                lastTarget=f;
+            try{
+                if (f.getName().split("_")[0].equals(logfilePrefix)){
+                    lastTarget=f;
+                }
+            }catch (Exception e){
+
             }
         }
         String targetfile=null;
