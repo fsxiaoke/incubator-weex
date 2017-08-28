@@ -3,6 +3,9 @@ package com.taobao.weex.log;
 import android.os.Handler;
 import android.os.HandlerThread;
 
+import com.taobao.weex.disk.FsLazyLruDiskCache;
+import com.taobao.weex.utils.WXLogUtils;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +19,7 @@ import java.util.Date;
 
 /**
  * Created by lid on 2017/8/23.
- * 采用内存映射文件异步写入，速度快
+ * 采用内存映射文件写入，速度快
  * 每2M一个日志文件，写满为止，当达到最大size时会自动生成一个新的日志文件
  * 首次使用先调用start，之后外部只需要writelog即可，内部负责自动切换文件
  */
@@ -39,6 +42,9 @@ public class FsMMapWriter implements ILogWriter {
     Handler workerHandler;
     byte[] lockerMbb=new byte[0];
     int pendingCount;
+    long mmapSize=-1;
+    public static long s_MIN_mmapSize=100*1024;
+    public static long s_Default_mmapSize=1024*1024*2;
     public FsMMapWriter(){
         workerThread=new HandlerThread("FsMMapWriter");
         workerThread.start();
@@ -65,7 +71,11 @@ public class FsMMapWriter implements ILogWriter {
             closeIO(mfc);
         }
         mfc=mraf.getChannel();
-        mbb=mfc.map(FileChannel.MapMode.READ_WRITE,0,1024*1024*2);
+        if (mmapSize==-1){
+            mmapSize=s_Default_mmapSize;
+        }else {
+        }
+        mbb=mfc.map(FileChannel.MapMode.READ_WRITE,0,mmapSize);
         ensureMbb();
 //        boolean ret=ensureMbb();
 //        if (!ret){
@@ -123,9 +133,12 @@ public class FsMMapWriter implements ILogWriter {
      * @throws IOException
      */
     @Override
-    public synchronized void start(String path/*log dir*/,String logfilePrefix) throws IOException {
+    public synchronized void start(String path/*log dir*/,String logfilePrefix,long mmapSize) throws IOException {
         if (path==null){
             throw new IOException("path is null");
+        }
+        if (mmapSize<s_MIN_mmapSize){
+            throw new IOException("file size is too small");
         }
         File root=new File(path);
         if (root.exists()){
@@ -168,9 +181,12 @@ public class FsMMapWriter implements ILogWriter {
         String targetfile=null;
         if (lastTarget!=null){
             targetfile=lastTarget.getAbsolutePath();
+            WXLogUtils.s_logcache.updateItem(targetfile);
         }else {
             targetfile=path+File.separator+hopefile+dateAppend+".dat";
+            WXLogUtils.s_logcache.addItem(targetfile);
         }
+        this.mmapSize=mmapSize;
         open(targetfile);
     }
 
@@ -184,7 +200,7 @@ public class FsMMapWriter implements ILogWriter {
         do {
             byte[] content;
             try {
-                content=(line+"\n").getBytes("utf-8");
+                content=(line).getBytes("utf-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
                 ret=true;//到此处日志会丢失
@@ -201,6 +217,7 @@ public class FsMMapWriter implements ILogWriter {
                 }else{
                     newf=generateNewFileName();
                 }
+
                 try {
                     open(newf);
                 } catch (IOException e) {
@@ -208,19 +225,20 @@ public class FsMMapWriter implements ILogWriter {
                     ret=true;//到此处日志会丢失
                     break;
                 }
+                WXLogUtils.s_logcache.addItem(newf);
             }
             final byte[] toWrite=content;
-            workerHandler.post(new Runnable() {
-                @Override
-                public void run() {
+//            workerHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
 //                    synchronized (lockerMbb){
                         if (mbb!=null){
                             mbb.put(toWrite);
                         }
 //                    }
                     pendingCount=0;
-                }
-            });
+//                }
+//            });
             ret=true;
         }while (false);
         return ret;
@@ -234,14 +252,19 @@ public class FsMMapWriter implements ILogWriter {
             int lastIdx=mCurFile.lastIndexOf("_");
             if (lastIdx!=-1){
                 String postfixStr=mCurFile.substring(lastIdx+1);
-                int lastidxDot=postfixStr.lastIndexOf("\\.");
+                int lastidxDot=postfixStr.lastIndexOf(".");
                 if (lastidxDot!=-1){
                     String filepostfix=postfixStr.substring(lastidxDot+1);
                     try {
-                        Long.valueOf(postfixStr.substring(0,lastidxDot));
-                        ret=mCurFile.substring(0,lastIdx)+"_"+System.currentTimeMillis()+"."+filepostfix;
+                        String tspostfix=postfixStr.substring(0,lastidxDot);
+                        Long.valueOf(tspostfix);
+                        if (tspostfix.length()!=13){
+                            ret=mCurFile.substring(0,mCurFile.lastIndexOf("."))+"_"+System.currentTimeMillis()+"."+filepostfix;
+                        }else{
+                            ret=mCurFile.substring(0,lastIdx)+"_"+System.currentTimeMillis()+"."+filepostfix;
+                        }
                     }catch (NumberFormatException e){
-                        ret=mCurFile.substring(0,mCurFile.lastIndexOf("\\."))+"_"+System.currentTimeMillis()+"."+filepostfix;
+                        ret=mCurFile.substring(0,mCurFile.lastIndexOf("."))+"_"+System.currentTimeMillis()+"."+filepostfix;
                     }
                 }else{
                     try {
@@ -252,9 +275,9 @@ public class FsMMapWriter implements ILogWriter {
                     }
                 }
             }else{
-                int lastdot=mCurFile.lastIndexOf("\\.");
+                int lastdot=mCurFile.lastIndexOf(".");
                 if (lastdot!=-1){
-                    ret=mCurFile.substring(0,mCurFile.lastIndexOf("\\."))+"_"+System.currentTimeMillis()+"."+mCurFile.substring(lastdot+1);
+                    ret=mCurFile.substring(0,mCurFile.lastIndexOf("."))+"_"+System.currentTimeMillis()+"."+mCurFile.substring(lastdot+1);
                 }else{
                     ret=mCurFile+"_"+System.currentTimeMillis();
                 }

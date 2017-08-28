@@ -1,11 +1,14 @@
 package com.taobao.weex.log;
 
 import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXSDKEngine;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLooper;
@@ -22,8 +25,10 @@ public class FsMMapWriterTest {
     }
     @Before
     public void setUp() throws Exception {
+        WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+        FsMMapWriter.s_MIN_mmapSize=512;
         writer= new FsMMapWriter();
-        writer.start("./testdata","FsMMapWriterTest");
+        writer.start("./testdata","FsMMapWriterTest",512);
     }
 
     @Test
@@ -33,10 +38,18 @@ public class FsMMapWriterTest {
 
     @Test
     public void writelog() throws Exception {
-        writer.writelog("i love you");
-        getLooper().idle();
-        writer.writelog("i love you111");
-        getLooper().idle();
-    }
+        String test1=fillLetter("ABCD\n");
+        writer.writelog(test1);
+        String test2=fillLetter("EFGH\n");
+        writer.writelog(test2);
 
+        writer.writelog("i love you111\n");
+    }
+    String fillLetter(String l){
+        String ret="";
+        for (int i=0;i<100;i++){
+            ret+=l;
+        }
+        return ret;
+    }
 }

@@ -8,6 +8,6 @@ import java.io.IOException;
  */
 
 public interface ILogWriter {
-    void start(String path/*log dir*/,String logfilePrefix) throws IOException;
+    void start(String path/*log dir*/,String logfilePrefix,long mmapSize) throws IOException;
     boolean writelog(String line);
 }

@@ -46,7 +46,7 @@ import com.taobao.weex.common.TypeModuleFactory;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.common.WXInstanceWrap;
 import com.taobao.weex.common.WXModule;
-import com.taobao.weex.disk.FsLruDiskCache;
+import com.taobao.weex.disk.FsLazyLruDiskCache;
 import com.taobao.weex.dom.BasicEditTextDomObject;
 import com.taobao.weex.dom.TextAreaEditTextDomObject;
 import com.taobao.weex.dom.WXCellDomObject;
@@ -156,12 +156,12 @@ public class WXSDKEngine {
       if (mIsInit) {
         return;
       }
-      WXLogUtils.s_logcache=new FsLruDiskCache();
+      WXLogUtils.s_logcache=new FsLazyLruDiskCache();
       WXLogUtils.s_logcache.config(WXLogUtils.s_logcache.new Config().setCount(10).setSize(20*1024*1024)).init(WXLogUtils.getLogPath());
 
       WXLogUtils.s_logwriter = new FsMMapWriter();
       try {
-        WXLogUtils.s_logwriter.start(WXLogUtils.getLogPath(),application.getPackageName());
+        WXLogUtils.s_logwriter.start(WXLogUtils.getLogPath(),application.getPackageName(),FsMMapWriter.s_Default_mmapSize);
       } catch (IOException e) {
         e.printStackTrace();
       }

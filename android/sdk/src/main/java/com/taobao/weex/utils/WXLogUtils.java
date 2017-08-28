@@ -25,8 +25,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.disk.FsLruDiskCache;
+import com.taobao.weex.disk.FsLazyLruDiskCache;
 import com.taobao.weex.log.FsMMapWriter;
+import com.taobao.weex.log.ILogWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class WXLogUtils {
-  public static FsLruDiskCache s_logcache;
+  public static FsLazyLruDiskCache s_logcache;
   public static final String WEEX_TAG = "weex";
   public static final String WEEX_PERF_TAG = "weex_perf";
 
@@ -51,7 +52,7 @@ public class WXLogUtils {
   private static StringBuilder builder = new StringBuilder(50);
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
 
-  public static FsMMapWriter s_logwriter;
+  public static ILogWriter s_logwriter;
   static {
     clazzMaps.put(CLAZZ_NAME_DEBUG_TOOL, loadClass(CLAZZ_NAME_DEBUG_TOOL));
     clazzMaps.put(CLAZZ_NAME_LOG_UTIL, loadClass(CLAZZ_NAME_LOG_UTIL));
@@ -304,8 +305,8 @@ public class WXLogUtils {
             .append("\u0001").append(Process.myPid()).append("-").append(Process.myTid())
             .append("\u0001").append(logLevel)
             .append("\u0001").append(tag)
-            .append("\u0001").append(log.replaceAll("\n|\r", "\u0002"));
-//            .append("\n");
+            .append("\u0001").append(log.replaceAll("\n|\r", "\u0002"))
+            .append("\n");
     return builder.toString();
   }
   static void writeFcLog(String line){

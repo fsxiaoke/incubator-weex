@@ -54,3 +54,5 @@ doc/.deploy*/
 # release
 apache_release_temp
 android/playground/app/pages/
+android/sdk/testdata - 副本/
+android/sdk/testdata/

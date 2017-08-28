@@ -8,12 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -26,10 +27,10 @@ import java.util.concurrent.TimeUnit;
  * 缺点：对cache的evict操作可能会不太及时，每次业务init时，会做一次全量evict，此时会根据lastModified去evict
  *
  * 该类不负责文件内容的存取，但是负责删除，同时也给业务使用者提供了删除回调，供使用者二次确认是否可以删除
- * 一个key可能会对于多个文件，删除时会将key对应的所有文件全部删除
+ * 一个key可能会对应多个文件，删除时会将key对应的所有文件全部删除
  */
 
-public class FsLruDiskCache {
+public class FsLazyLruDiskCache {
     public interface IKeyGenerater{
         /**外部如果设置了该接口，在addItem时会调用该方法，如果没设置，默认key就是文件名
          * @param path
@@ -43,6 +44,11 @@ public class FsLruDiskCache {
          * 如果返回false，就不删除了，返回true就删除该entry
          */
         boolean toEvict(String path/*dir or file*/,long size, long createtime,long lastmodifytime);
+    }
+    public FsLazyLruDiskCache(){
+    }
+    public FsLazyLruDiskCache(ExecutorService exe){
+        executorService=exe;
     }
     public class Config{
         long size=Invalid_Int;//最大Cache Size
@@ -64,9 +70,20 @@ public class FsLruDiskCache {
         long createtime;
         long lastmodifytime;
         long lastupdatetime;
+
+        @Override
+        public boolean equals(Object obj) {
+            boolean ret=false;
+            Entry target=(Entry)obj;
+            if ((target.path==null&&this.path==null)||
+                    (target.path!=null&&this.path!=null&&this.path.equals(target.path))){
+                ret=true;
+            }
+            return ret;
+        }
     }
     static final int Invalid_Int=-1;
-
+    static int s_updatelimit=300000;
     LinkedHashMap mlruEntrys=new LinkedHashMap<String,List<Entry>>(0,0.75f,true);
 
 
@@ -76,13 +93,13 @@ public class FsLruDiskCache {
     File mrootPath;
     long mcurTotalSize;
     long mcurTotalCount;
-    final ThreadPoolExecutor executorService =
+    ExecutorService executorService =
             new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 
     private final Callable<Void> cleanupCallable = new Callable<Void>() {
         public Void call() throws Exception {
-            synchronized (FsLruDiskCache.this) {
+            synchronized (FsLazyLruDiskCache.this) {
                 trimToSize();
                 trimToFileCount();
             }
@@ -92,13 +109,19 @@ public class FsLruDiskCache {
     private void trimToFileCount() throws IOException {
         while (mcurTotalCount > mConfig.count) {
             Map.Entry<String, List<Entry>> toEvict = (Map.Entry<String, List<Entry>>)mlruEntrys.entrySet().iterator().next();
-            removeKey(toEvict.getKey(),true);
+            boolean b=removeKey(toEvict.getKey(),true);
+            if (!b){
+                break;
+            }
         }
     }
     private void trimToSize() throws IOException {
         while (mcurTotalSize > mConfig.size) {
             Map.Entry<String, List<Entry>> toEvict = (Map.Entry<String, List<Entry>>)mlruEntrys.entrySet().iterator().next();
-            removeKey(toEvict.getKey(),true);
+            boolean b=removeKey(toEvict.getKey(),true);
+            if (!b){
+                break;
+            }
         }
     }
     class CalcCallable implements Callable<Void>{
@@ -107,7 +130,7 @@ public class FsLruDiskCache {
             mEntry=en;
         }
         public Void call() throws Exception {
-            synchronized (FsLruDiskCache.this) {
+            synchronized (FsLazyLruDiskCache.this) {
                 File f=new File(mEntry.path);
                 mEntry.lastmodifytime=f.lastModified();
                 mEntry.lastupdatetime=System.currentTimeMillis();
@@ -125,7 +148,7 @@ public class FsLruDiskCache {
      * @param path
      */
     public synchronized void init(String path){
-        if (TextUtils.isEmpty(path)){
+        if (TextUtils.isEmpty(path)||mrootPath!=null){
             return;
         }
         mrootPath=new File(path);
@@ -174,17 +197,17 @@ public class FsLruDiskCache {
     /**先调用config，再调用init
      * @param
      */
-    public FsLruDiskCache config(Config con){
+    public FsLazyLruDiskCache config(Config con){
         mConfig=con;
         return this;
     }
 
-    public FsLruDiskCache setEvictListerner(IEvictListerner mel) {
+    public FsLazyLruDiskCache setEvictListerner(IEvictListerner mel) {
         this.mel = mel;
         return this;
     }
 
-    public FsLruDiskCache setKeyGenerater(IKeyGenerater mkg) {
+    public FsLazyLruDiskCache setKeyGenerater(IKeyGenerater mkg) {
         this.mkg = mkg;
         return this;
     }
@@ -198,7 +221,7 @@ public class FsLruDiskCache {
      * @param sync
      * @return
      */
-    public synchronized boolean addItem(String path/*dir or file*/,boolean sync){
+    private synchronized boolean addItem(String path/*dir or file*/,boolean sync){
         boolean ret=false;
         do {
             if (mrootPath==null){
@@ -208,9 +231,10 @@ public class FsLruDiskCache {
             if (!f.exists()){
                 break;
             }
-            if (!f.getParentFile().equals(mrootPath)){
+            if (!f.getParentFile().getAbsolutePath().equals(mrootPath.getAbsolutePath())){
                 throw new RuntimeException("you must add file in cache dir");
             }
+            path=f.getAbsolutePath();
             String key=getkey(path);
             List myentrys=(List)mlruEntrys.get(key);
             if (myentrys==null){
@@ -221,7 +245,10 @@ public class FsLruDiskCache {
             en.path=path;
             en.createtime=Invalid_Int;
             en.lastmodifytime=f.lastModified();
-            mlruEntrys.put(key,en);
+            if (myentrys.contains(en)){
+                break;
+            }
+            myentrys.add(en);
             mcurTotalCount++;
             if (sync){
                 en.lastupdatetime=System.currentTimeMillis();
@@ -245,6 +272,8 @@ public class FsLruDiskCache {
     public synchronized boolean removeItem(String path/*dir or file*/){
         boolean ret=false;
         do {
+            File f= new File(path);
+            path=f.getAbsolutePath();
             String key=getkey(path);
             ret=removeKey(key,false);
 
@@ -278,8 +307,10 @@ public class FsLruDiskCache {
                     File f=new File(en.path);
                     WXFileUtils.deleteDir(f);
                 }
+                ret=true;
+            }else{
+
             }
-            ret=true;
         }while (false);
         return ret;
     }
@@ -296,18 +327,21 @@ public class FsLruDiskCache {
             if (!f.exists()){
                 break;
             }
+            path=f.getAbsolutePath();
             String key=getkey(path);
             Entry en=getEntry(key,path);
             if (en==null){
                 break;
             }
             long now=System.currentTimeMillis();
-            if ((now-en.lastupdatetime)>300000){
+            if ((now-en.lastupdatetime)>s_updatelimit){
                 CalcCallable calcEntry= new CalcCallable();
                 calcEntry.setEntry(en);
                 executorService.submit(calcEntry);
+                ret=true;
+            }else {
+
             }
-            ret=true;
         }while (false);
         return ret;
     }
