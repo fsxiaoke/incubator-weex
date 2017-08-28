@@ -26,6 +26,7 @@ public class FsMMapWriterTest {
     @Before
     public void setUp() throws Exception {
         WXSDKEngine.initialize(RuntimeEnvironment.application,new InitConfig.Builder().build());
+        WXSDKEngine.setLogLevel("debug");
         FsMMapWriter.s_MIN_mmapSize=512;
         writer= new FsMMapWriter();
         writer.start("./testdata","com.facishare.fsneice",512);

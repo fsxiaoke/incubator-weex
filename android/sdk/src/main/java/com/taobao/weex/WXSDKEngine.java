@@ -93,6 +93,7 @@ import com.taobao.weex.ui.module.WXMetaModule;
 import com.taobao.weex.ui.module.WXModalUIModule;
 import com.taobao.weex.ui.module.WXTimerModule;
 import com.taobao.weex.ui.module.WXWebViewModule;
+import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
@@ -145,7 +146,9 @@ public class WXSDKEngine {
       return mIsInit;
     }
   }
-
+  public static void setLogLevel(String level){
+    WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
+  }
   /**
    *
    * @param application

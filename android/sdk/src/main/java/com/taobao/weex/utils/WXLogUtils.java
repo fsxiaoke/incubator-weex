@@ -91,7 +91,9 @@ public class WXLogUtils {
       writeConsoleLog(level.getName(), msg);
       sendLog(level, msg);
     }
-    writeFcLog(getFormatLog(tag,level.getName().substring(0,1).toUpperCase(),msg));
+    if (canWriteFclog(level)){
+      writeFcLog(getFormatLog(tag,level.getName().substring(0,1).toUpperCase(),msg));
+    }
   }
 
   public static void i(String msg) {
@@ -135,9 +137,13 @@ public class WXLogUtils {
       }
       sendLog(LogLevel.DEBUG, tag + ":" + msg);
     }
-    writeFcLog(getFormatLog(tag,LogLevel.DEBUG.getName().substring(0,1).toUpperCase(),msg));
+    if (canWriteFclog(LogLevel.DEBUG)){
+      writeFcLog(getFormatLog(tag,LogLevel.DEBUG.getName().substring(0,1).toUpperCase(),msg));
+    }
   }
-
+  static boolean canWriteFclog(LogLevel loglevel){
+    return WXEnvironment.sLogLevel.compare(loglevel)>0;
+  }
   private static LogLevel getLogLevel(String level) {
     switch (level.trim()){
       case "__ERROR":
