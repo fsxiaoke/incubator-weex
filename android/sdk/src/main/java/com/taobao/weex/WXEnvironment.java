@@ -25,6 +25,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 import com.taobao.weappplus_sdk.BuildConfig;
 import com.taobao.weex.common.WXConfig;
@@ -77,12 +78,13 @@ public class WXEnvironment {
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
   private static boolean isApkDebug = true;
+  private static String appVersionName;
   public static boolean isPerf = false;
 
   public static boolean sShow3DLayer=true;
 
   private static Map<String, String> options = new HashMap<>();
-
+  private static Map<String, String> configs = new HashMap<>();
   /**
    * dynamic
    */
@@ -94,24 +96,26 @@ public class WXEnvironment {
    * @return map contains system information.
    */
   public static Map<String, String> getConfig() {
-    Map<String, String> configs = new HashMap<>();
-    configs.put(WXConfig.os, OS);
-    configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.devId, DEV_Id);
-    configs.put(WXConfig.sysVersion, SYS_VERSION);
-    configs.put(WXConfig.sysModel, SYS_MODEL);
-    configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
-    configs.put(WXConfig.logLevel,sLogLevel.getName());
-    try {
-      options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
-    }catch (NullPointerException e){
-      //There is little chance of NullPointerException as sApplication may be null.
-      WXLogUtils.e("WXEnvironment scale Exception: ", e);
+    if (configs.size()==0){
+      configs.put(WXConfig.os, OS);
+      configs.put(WXConfig.appVersion, getAppVersionName());
+      configs.put(WXConfig.devId, DEV_Id);
+      configs.put(WXConfig.sysVersion, SYS_VERSION);
+      configs.put(WXConfig.sysModel, SYS_MODEL);
+      configs.put(WXConfig.weexVersion, String.valueOf(WXSDK_VERSION));
+      configs.put(WXConfig.logLevel,sLogLevel.getName());
+      try {
+        options.put(WXConfig.scale, Float.toString(sApplication.getResources().getDisplayMetrics().density));
+      }catch (NullPointerException e){
+        //There is little chance of NullPointerException as sApplication may be null.
+        WXLogUtils.e("WXEnvironment scale Exception: ", e);
+      }
+      configs.putAll(options);
+      if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
+        configs.put(WXConfig.appName, sApplication.getPackageName());
+      }
     }
-    configs.putAll(options);
-    if(configs!=null&&configs.get(WXConfig.appName)==null && sApplication!=null){
-       configs.put(WXConfig.appName, sApplication.getPackageName());
-    }
+
     return configs;
   }
 
@@ -119,17 +123,19 @@ public class WXEnvironment {
    * Get the version of the current app.
    */
   private static String getAppVersionName() {
-    String versionName = "";
-    PackageManager manager;
-    PackageInfo info = null;
-    try {
-      manager = sApplication.getPackageManager();
-      info = manager.getPackageInfo(sApplication.getPackageName(), 0);
-      versionName = info.versionName;
-    } catch (Exception e) {
-      WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
+    if (TextUtils.isEmpty(appVersionName)){
+      PackageManager manager;
+      PackageInfo info = null;
+      try {
+        manager = sApplication.getPackageManager();
+        info = manager.getPackageInfo(sApplication.getPackageName(), 0);
+        appVersionName = info.versionName;
+      } catch (Exception e) {
+        WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
+      }
     }
-    return versionName;
+
+    return appVersionName;
   }
 
   public static Map<String, String> getCustomOptions() {
