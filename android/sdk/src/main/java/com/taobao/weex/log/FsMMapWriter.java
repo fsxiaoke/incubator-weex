@@ -202,6 +202,9 @@ public class FsMMapWriter implements ILogWriter {
     public synchronized boolean writelog(String line) {
         boolean ret=false;
         do {
+            if (mbb==null){
+                break;
+            }
             byte[] content;
             try {
                 content=(line).getBytes("utf-8");
