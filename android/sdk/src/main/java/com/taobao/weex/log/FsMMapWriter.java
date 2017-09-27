@@ -155,33 +155,37 @@ public class FsMMapWriter implements ILogWriter {
         String dateAppend="_"+(d.getYear()+1900)+d.getMonth()+d.getDate();
         String hopefile=logfilePrefix;
         File[] files=root.listFiles();
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File o1, File o2) {
-                long f1=o1.lastModified();
-                long f2=o2.lastModified();
-                int ret=0;
-                if (f1==f2){
-                    ret=0;
-                }else if (f1<f2){
-                    ret=-1;
-                }else if (f1>f2){
-                    ret=1;
-                }
-                return ret;
-            }
-        });
         File lastTarget=null;
-        for (File f :
-                files) {
-            try{
-                if (f.getName().split("_")[0].equals(logfilePrefix)){
-                    lastTarget=f;
+        if (files!=null&&files.length>0){
+            Arrays.sort(files, new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    long f1=o1.lastModified();
+                    long f2=o2.lastModified();
+                    int ret=0;
+                    if (f1==f2){
+                        ret=0;
+                    }else if (f1<f2){
+                        ret=-1;
+                    }else if (f1>f2){
+                        ret=1;
+                    }
+                    return ret;
                 }
-            }catch (Exception e){
+            });
 
+            for (File f :
+                    files) {
+                try{
+                    if (f.getName().split("_")[0].equals(logfilePrefix)){
+                        lastTarget=f;
+                    }
+                }catch (Exception e){
+
+                }
             }
         }
+
         String targetfile=null;
         if (lastTarget!=null){
             targetfile=lastTarget.getAbsolutePath();
