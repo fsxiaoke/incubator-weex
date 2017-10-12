@@ -492,7 +492,12 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mRendered = true;
 
     if (TextUtils.isEmpty(mBundleUrl)) {
-      mBundleUrl = pageName;
+      String url = (String)options.get("bundleUrl");
+      if(url != null && !TextUtils.isEmpty(url)){
+        mBundleUrl = url;
+      }else{
+        mBundleUrl = pageName;
+      }
     }
   }
 
