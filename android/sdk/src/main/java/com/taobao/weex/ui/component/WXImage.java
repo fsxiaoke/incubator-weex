@@ -242,7 +242,7 @@ public class WXImage extends WXComponent<ImageView> {
     super.recycled();
 
     if (getInstance().getImgLoaderAdapter() != null) {
-      getInstance().getImgLoaderAdapter().setImage(null, mHost,
+      getInstance().getImgLoaderAdapter().setImage(getInstance(), null, mHost,
               null, null);
     } else {
       if (WXEnvironment.isApkDebugable()) {
@@ -298,7 +298,7 @@ public class WXImage extends WXComponent<ImageView> {
 
       IWXImgLoaderAdapter imgLoaderAdapter = getInstance().getImgLoaderAdapter();
       if (imgLoaderAdapter != null) {
-        imgLoaderAdapter.setImage(rewrited.toString(), getHostView(),
+        imgLoaderAdapter.setImage(getInstance(), rewrited.toString(), getHostView(),
             getDomObject().getAttrs().getImageQuality(), imageStrategy);
       }
   }

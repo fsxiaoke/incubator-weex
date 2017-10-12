@@ -19,7 +19,7 @@
 package com.taobao.weex.adapter;
 
 import android.widget.ImageView;
-
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXImageQuality;
 
@@ -28,5 +28,5 @@ import com.taobao.weex.dom.WXImageQuality;
  */
 public interface IWXImgLoaderAdapter {
 
-  void setImage(String url, ImageView view, WXImageQuality quality, WXImageStrategy strategy);
+  void setImage(WXSDKInstance instance, String url, ImageView view, WXImageQuality quality, WXImageStrategy strategy);
 }
