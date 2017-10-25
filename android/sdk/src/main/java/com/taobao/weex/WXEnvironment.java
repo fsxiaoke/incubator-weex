@@ -44,6 +44,7 @@ public class WXEnvironment {
   public static final String SYS_VERSION = android.os.Build.VERSION.RELEASE;
   public static final String SYS_MODEL = android.os.Build.MODEL;
   public static final String ENVIRONMENT = "environment";
+  public static final String WEEX_CURRENT_KEY = "wx_current_url";
   /*********************
    * Global config
    ***************************/
@@ -65,7 +66,7 @@ public class WXEnvironment {
    */
   public static boolean sDebugMode = false;
   public static String sDebugWsUrl = "";
-  public static boolean sDebugServerConnectable = true;
+  public static boolean sDebugServerConnectable = false;
   public static boolean sRemoteDebugMode = false;
   public static String sRemoteDebugProxyUrl = "";
   public static long sJSLibInitTime = 0;
@@ -84,6 +85,10 @@ public class WXEnvironment {
   public static boolean sShow3DLayer=true;
 
   private static Map<String, String> options = new HashMap<>();
+  static {
+    options.put(WXConfig.os, OS);
+    options.put(WXConfig.osName, OS);
+  }
   private static Map<String, String> configs = new HashMap<>();
   /**
    * dynamic
@@ -99,6 +104,7 @@ public class WXEnvironment {
     if (configs.size()==0){
       configs.put(WXConfig.os, OS);
       configs.put(WXConfig.appVersion, getAppVersionName());
+    configs.put(WXConfig.cacheDir, getAppCacheFile());
       configs.put(WXConfig.devId, DEV_Id);
       configs.put(WXConfig.sysVersion, SYS_VERSION);
       configs.put(WXConfig.sysModel, SYS_MODEL);
@@ -137,6 +143,21 @@ public class WXEnvironment {
 
     return appVersionName;
   }
+
+  /**
+   *
+   * @return string cache file
+   */
+  private static String getAppCacheFile() {
+    String cache = "";
+    try {
+      cache = sApplication.getApplicationContext().getCacheDir().getPath();
+    } catch (Exception e) {
+      WXLogUtils.e("WXEnvironment getAppCacheFile Exception: ", e);
+    }
+    return cache;
+  }
+
 
   public static Map<String, String> getCustomOptions() {
     return options;
@@ -234,12 +255,16 @@ public class WXEnvironment {
     if (context == null) {
       return null;
     }
-    String cachePath;
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-            || !Environment.isExternalStorageRemovable()) {
-      cachePath = context.getExternalCacheDir().getPath();
-    } else {
-      cachePath = context.getCacheDir().getPath();
+    String cachePath = null;
+    try {
+      if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+              || !Environment.isExternalStorageRemovable()) {
+        cachePath = context.getExternalCacheDir().getPath();
+      } else {
+        cachePath = context.getCacheDir().getPath();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     return cachePath;
   }

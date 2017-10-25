@@ -24,7 +24,7 @@ chai.use(sinonChai)
 
 import Vm from '../../../../frameworks/legacy/vm'
 import { Document } from '../../../../runtime/vdom'
-import { init as resetTaskHandler } from '../../../../runtime/task-center'
+import { init as resetTaskHandler } from '../../../../runtime/bridge/TaskCenter'
 import Differ from '../../../../frameworks/legacy/app/differ'
 
 const oriCallNative = global.callNative
@@ -1043,7 +1043,7 @@ describe('generate virtual dom for sub vm', () => {
     expect(sub.event.click).is.a.function
 
     const spy = customComponentMap.foo.methods.handleClick
-    sub.event.click(1, 2, 3)
+    sub.event.click.handler(1, 2, 3)
     expect(spy.args.length).eql(1)
     expect(spy.args[0]).eql([1, 2, 3])
 
@@ -1658,7 +1658,7 @@ describe('generate dom actions', () => {
     expect(doc.body.event.click).is.a.function
     expect(handler.args.length).eql(0)
     doc.body.fireEvent('click')
-    expect(handler.args.length).eql(1)
+    expect(handler.args.length).eql(0)
   })
 
   it('received actions for a template with if & repeat', () => {

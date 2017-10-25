@@ -53,55 +53,52 @@ public class StickyHeaderHelper {
     mHeaderComps.put(component.getRef(),component);
     if(mCurrentStickyRef != null){
       WXCell cell = mHeaderComps.get(mCurrentStickyRef);
-      if(component.getScrollPositon() > cell.getScrollPositon()){
+      if(cell ==null || component.getScrollPositon() > cell.getScrollPositon()){
         mCurrentStickyRef = component.getRef();
       }
     }else{
       mCurrentStickyRef = component.getRef();
     }
-    showSticky();
-  }
 
-  /**
-   * Bring component with bigest pos to Front
-   */
-  private void showSticky() {
-    if(mCurrentStickyRef==null){
-      WXLogUtils.e("Current Sticky ref is null.");
-      return;
-    }
-
-    WXCell headComponent = mHeaderComps.get(mCurrentStickyRef);
-    final View headerView = headComponent.getRealView();
-    if (headerView == null) {
-      WXLogUtils.e("Sticky header's real view is null.");
-      return;
-    }
-    View header = mHeaderViews.get(headComponent.getRef());
-    if( header != null){
-      //already there
-      header.bringToFront();
-    }else {
-      mHeaderViews.put(headComponent.getRef(), headerView);
-      //record translation, it should not change after transformation
-      final float translationX = headerView.getTranslationX();
-      final float translationY = headerView.getTranslationY();
-      headComponent.removeSticky();
-
-      ViewGroup existedParent;
-      if ((existedParent = (ViewGroup) headerView.getParent()) != null) {
-        existedParent.removeView(headerView);
+    {
+      if(mCurrentStickyRef==null){
+        WXLogUtils.e("Current Sticky ref is null.");
+        return;
       }
-      mParent.addView(headerView);
-      //recover translation, sometimes it will be changed on fling
-      headerView.setTranslationX(translationX);
-      headerView.setTranslationY(translationY);
 
-    }
-    if (headComponent.getDomObject().getEvents().contains("sticky")) {
-      headComponent.fireEvent("sticky");
+      WXCell headComponent = mHeaderComps.get(mCurrentStickyRef);
+      final View headerView = headComponent.getRealView();
+      if (headerView == null) {
+        WXLogUtils.e("Sticky header's real view is null.");
+        return;
+      }
+      View header = mHeaderViews.get(headComponent.getRef());
+      if( header != null){
+        //already there
+        header.bringToFront();
+      }else {
+        mHeaderViews.put(headComponent.getRef(), headerView);
+        //record translation, it should not change after transformation
+        final float translationX = headerView.getTranslationX();
+        final float translationY = headerView.getTranslationY();
+        headComponent.removeSticky();
+
+        ViewGroup existedParent;
+        if ((existedParent = (ViewGroup) headerView.getParent()) != null) {
+          existedParent.removeView(headerView);
+        }
+        mParent.addView(headerView);
+        //recover translation, sometimes it will be changed on fling
+        headerView.setTranslationX(translationX);
+        headerView.setTranslationY(translationY);
+
+      }
+      if (headComponent.getDomObject().getEvents().contains("sticky")) {
+        headComponent.fireEvent("sticky");
+      }
     }
   }
+
 
   public void notifyStickyRemove(WXCell compToRemove) {
     if (compToRemove == null)

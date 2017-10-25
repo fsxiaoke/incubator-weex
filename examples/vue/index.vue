@@ -8,14 +8,16 @@
       var root = typeof window === 'object' ? 'vue-web/vue' : 'vue'
 
       return {
-        items: [ 
+        items: [           
           // common
-          {name: root + '/syntax/hello-world', title: 'Hello World'},
+          {name: root + '/hello', title: 'Hello World'},
           {name: root + '/style/index', title: 'Common Style'},
           {name: root + '/animation', title: 'Animation'},
+          {name: root + '/transition', title: 'Transition'},
 
           // component
           {name: root + '/components/text', title: 'Text'},
+          {name: root + '/iconfont', title: 'iconfont'},
           {name: root + '/components/image', title: 'Image'},
           {name: root + '/components/input', title: 'Input'},
           {name: root + '/components/scroller', title: 'Scroller'},
@@ -33,8 +35,10 @@
           // module
           {name: root + '/modules/instance-api', title: 'Instance API'},
           {name: root + '/modules/modal', title: 'Modal'},
+          {name: root + '/modules/webSocket', title: 'WebSocket'},
           {name: root + '/modules/stream', title: 'Stream'},
           {name: root + '/modules/storage',title:'Storage'},
+          {name: root + '/modules/picker',title:'picker'},
           // {name: 'module/clipboard', title: 'Clipboard'}, // 0.8 , developing
 
           // showcase
@@ -42,6 +46,8 @@
           {name: root + '/showcase/progress', title: 'Progress Bar'},
           {name: root + '/showcase/itemlist', title: 'List (Advanced)'},
           {name: root + '/showcase/calculator', title: 'Calculator'},
+          {name: root + '/showcase/tap-penetrate', title: 'TapPenetrate'},
+          {name: root + '/showcase/a-node-click', title: 'ANodeClick'},
           // {name: root + '/showcase/minesweeper', title: 'Minesweeper'},
           // {name: root + '/showcase/ui', title: 'UI Gallery'},
           // {name: root + '/showcase/dropdown/dropdown-demo', title: 'Dropdown'}

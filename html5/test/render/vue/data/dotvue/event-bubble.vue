@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="ct">
     <bar @click="click"></bar>
-    <text>{{tracker}}</text>
+    <text class="txt">{{tracker}}</text>
   </div>
 </template>
 
@@ -15,7 +15,9 @@
     },
     methods: {
       click (e) {
-        this.tracker += ' > component-bar'
+        if (this.tracker.indexOf(' > component-bar') === -1) {
+          this.tracker += ' > component-bar'
+        }
       }
     },
     components: {

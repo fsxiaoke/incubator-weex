@@ -82,7 +82,7 @@ version: 2.1
 
 ## 事件
 
-- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/vue/98ee340348d7cc3e6fbfe68dbaef1eed)
+- `load`: <sup class="api-version">v0.8+</sup>：当图片加载完成时触发。目前在 Android、iOS 上支持，H5 暂不支持。[示例](http://dotwe.org/vue/e291159ac60b35dcd4994638a78d54ad)
 
   - 事件对象
     - `success`: 当图片成功加载时为`true`，否则为`false`
@@ -98,6 +98,30 @@ version: 2.1
   - `disappear`
 
   查看 [通用事件](../common-event.html)
+
+## 组件方法
+  <sup class="api-version">v0.16.0+</sup>
+  
+  - save：保存当前图片到本地
+    - 参数    
+      回调函数作为方法入参，接收保存结果.
+      ```
+     	var image = this.$refs.imageRef; // image 是之前已经定义过的ref
+  		image.save(function(result) {
+  			console.log(JSON.stringify(result))
+		}); 
+    	```
+    - 异步返回的数据描述
+     ```
+      	{
+    		"success" : true/false, // 保存成功或失败
+    		"errorDesc": "errordesc" // 在success 为false的情况会返回
+     	}
+     	```
+    - 说明
+      对于 iOS 系统需要添加 `NSPhotoLibraryAddUsageDescription`相册访问权限, iOS 11 需要再添加一个`NSPhotoLibraryAddUsageDescription`权限, [查看更多iOS系统权限](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html)
+      
+ [试一试](http://dotwe.org/vue/fadcd44a7031943ff0feaaf1895df414)
 
 ## 约束
 

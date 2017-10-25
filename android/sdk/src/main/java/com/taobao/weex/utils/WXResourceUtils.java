@@ -22,7 +22,7 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
+import android.util.Pair;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -358,6 +358,10 @@ public class WXResourceUtils {
         break;
     }
     return points;
+  }
+
+  public static boolean isNamedColor(String name) {
+    return colorMap.containsKey(name);
   }
 
   enum ColorConvertHandler {

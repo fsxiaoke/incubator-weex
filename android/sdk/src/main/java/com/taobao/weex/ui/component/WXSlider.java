@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
-
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
@@ -45,7 +44,6 @@ import com.taobao.weex.ui.view.gesture.WXGestureType;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXUtils;
 import com.taobao.weex.utils.WXViewUtils;
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -62,6 +60,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   Map<String, Object> params = new HashMap<>();
   private float offsetXAccuracy = 0.1f;
+  private int initIndex = -1;
+  private boolean keepIndex = false;
 
   public static class Creator implements ComponentCreator {
     public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -130,7 +130,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
    */
   @Override
   public LayoutParams getChildLayoutParams(WXComponent child,View childView, int width, int height, int left, int right, int top, int bottom) {
-    ViewGroup.LayoutParams lp = childView.getLayoutParams();
+    ViewGroup.LayoutParams lp = childView == null ? null : childView.getLayoutParams();
     if (lp == null) {
       lp = new FrameLayout.LayoutParams(width, height);
     } else {
@@ -163,8 +163,8 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public boolean containsGesture(WXGestureType WXGestureType) {
-    //TODO Slider don't support any gesture for now.
-    return false;
+    //Enable gesture for slider
+    return super.containsGesture(WXGestureType);
   }
 
   @Override
@@ -183,8 +183,14 @@ public class WXSlider extends WXVContainer<FrameLayout> {
     }
     mAdapter.addPageView(view);
     hackTwoItemsInfiniteScroll();
-
-    mViewPager.setCurrentItem(0);
+    if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
+      mViewPager.setCurrentItem(initIndex);
+      initIndex = -1;
+    } else {
+      if (!keepIndex) {
+        mViewPager.setCurrentItem(0);
+      }
+    }
     if (mIndicator != null) {
       mIndicator.getHostView().forceLayout();
       mIndicator.getHostView().requestLayout();
@@ -284,6 +290,9 @@ public class WXSlider extends WXVContainer<FrameLayout> {
         boolean scrollable = WXUtils.getBoolean(param, true);
         setScrollable(scrollable);
         return true;
+      case Constants.Name.KEEP_INDEX:
+        this.keepIndex = WXUtils.getBoolean(param, false);
+        return true;
     }
     return super.setProperty(key, param);
   }
@@ -340,6 +349,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
       if (index >= mAdapter.getRealCount() || index < 0) {
+        initIndex = index;
         return;
       }
       mViewPager.setCurrentItem(index);

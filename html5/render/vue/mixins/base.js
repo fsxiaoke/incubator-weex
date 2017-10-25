@@ -19,23 +19,9 @@
 import {
   getThrottleLazyload,
   watchAppear,
-  toCSSText
+  triggerDisappear,
+  extend
 } from '../utils'
-
-import {
-  tagBeforeCreate,
-  // tagMounted,
-  tagRootMounted,
-  tagFirstScreen,
-  tagBeforeUpdate,
-  tagUpdated,
-  tagBegin,
-  tagEnd
-} from '../utils/perf'
-
-import { extractComponentStyle } from '../core'
-
-const scrollableTypes = ['scroller', 'list']
 
 let lazyloadWatched = false
 function watchLazyload () {
@@ -52,90 +38,50 @@ function watchLazyload () {
   })
 }
 
+let warned = false
+const notePage = 'https://gist.github.com/MrRaindrop/5a805a067146609e5cfd4d64d775d693#file-weex-vue-render-config-for-vue-loader-js'
+function warnProcessStyle () {
+  if (!warned) {
+    warned = true
+    const page = window._process_style_note_page || notePage
+    console.warn(`[vue-render]: you should add vue-loader config with $processStyle to enable inline styles's `
+      + `normalization. see ${page} If you already did this, please ignore this message.`)
+  }
+}
+
 export default {
   beforeCreate () {
     if (!lazyloadWatched) {
       watchLazyload()
     }
-    if (process.env.NODE_ENV === 'development') {
-      tagBeforeCreate()
-    }
   },
 
   mounted () {
-    if (this.$options._componentTag === 'image') {
-      global._has_image_in_first_screen = true
-    }
-    if (this === this.$root) {
-      tagRootMounted()
-      if (!global._has_image_in_first_screen) {
-        tagFirstScreen()
-      }
-    }
     if (!weex._root) {
       weex._root = this.$root.$el
       weex._root.classList.add('weex-root')
     }
-    watchAppear(this)
+
+    // give warning for not using $processStyle in vue-loader config.
+    if (!warned && !window._style_processing_added) {
+      warnProcessStyle()
+    }
+
+    // bind attrs to $el.
+    let i, j
+    if (this.$el && (i = j = this.$vnode) && (i = i.data) && (j = j.componentOptions)) {
+      this.$el.attrs = extend({}, i.attrs, j.propsData)
+    }
+    watchAppear(this, true)
   },
 
-  beforeUpdate () {
-    if (process.env.NODE_ENV === 'development') {
-      tagBeforeUpdate()
-    }
-  },
-
-  updated () {
-    if (process.env.NODE_ENV === 'development') {
-      tagUpdated()
-    }
-    function remergeStyle (vm) {
-      const style = extractComponentStyle(vm)
-      const el = vm.$el
-      if (style && el && el.nodeType !== 8) {
-        vm.$el.style.cssText += toCSSText(style)
-      }
-    }
-    const children = this.$children
-    if (children) {
-      children.forEach((childVm) => {
-        this.$nextTick(function () {
-          remergeStyle(childVm)
-        })
-      })
-    }
-    watchAppear(this)
+  destroyed () {
+    triggerDisappear(this)
   },
 
   methods: {
-    _getScopeIds () {
-      const arr = []
-      let ctx = this
-      let scopeId
-      while (ctx) {
-        scopeId = ctx.$options._scopeId
-        scopeId && arr.push(scopeId)
-        ctx = ctx.$options.parent
-      }
-      return arr
-    },
-
-    _getParentScroller () {
-      let parent = this
-      while (parent && scrollableTypes.indexOf(parent.$options._componentTag) <= -1) {
-        parent = parent.$options.parent
-      }
-      return parent
-    },
-
     _fireLazyload (el) {
-      if (process.env.NODE_ENV === 'development') {
-        tagBegin('base._fireLazyload')
-      }
-      getThrottleLazyload(16)()
-      if (process.env.NODE_ENV === 'development') {
-        tagEnd('base._fireLazyload')
-      }
+      getThrottleLazyload(25)()
     }
   }
 }

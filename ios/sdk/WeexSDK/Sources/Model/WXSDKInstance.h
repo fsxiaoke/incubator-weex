@@ -20,7 +20,8 @@
 #import <UIKit/UIKit.h>
 #import "WXComponent.h"
 #import "WXJSExceptionInfo.h"
-@class WXResourceRequest;
+#import "WXResourceResponse.h"
+#import "WXResourceRequest.h"
 
 extern NSString *const bundleUrlOptionKey;
 
@@ -67,6 +68,11 @@ extern NSString *const bundleUrlOptionKey;
  * The unique id to identify current weex instance.
  **/
 @property (nonatomic, strong) NSString *instanceId;
+
+/**
+ * Which indicates current instance needs to be prerender or not,default value is false.
+ **/
+@property (nonatomic, assign) BOOL needPrerender;
 
 /**
  * The state of current instance.
@@ -134,6 +140,13 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 @property (nonatomic, copy) void (^onFailed)(NSError *error);
 
 /**
+ *  The callback triggered when js occurs runtime error while executing.
+ *
+ *  @return A block that takes a WXJSExceptionInfo argument, which is the exception info
+ **/
+@property (nonatomic, copy) void (^onJSRuntimeException)(WXJSExceptionInfo * jsException);
+
+/**
  *  The callback triggered when the instacne executes scrolling .
  *
  *  @return A block that takes a CGPoint argument, which is content offset of the scroller
@@ -146,6 +159,12 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
  * @return A block that takes a CGRect argument, which is the rect rendered
  **/
 @property (nonatomic, copy) void (^onRenderProgress)(CGRect renderRect);
+
+/**
+ * The callback triggered when the bundleJS request finished in the renderWithURL.
+ * @return A block that takes response which the server response,request which send to server,data which the server returned and an error
+ */
+@property (nonatomic, copy) void(^onJSDownloadedFinish)(WXResourceResponse *response,WXResourceRequest *request,NSData *data, NSError* error);
 
 /**
  *  the frame of current instance.
@@ -252,6 +271,9 @@ typedef NS_ENUM(NSInteger, WXErrorCode) {//error.code
 
 /**
  * fire module event;
+ * @param module which module you fire event to
+ * @param eventName the event name
+ * @param params event params
  */
 - (void)fireModuleEvent:(Class)module eventName:(NSString *)eventName params:(NSDictionary*)params;
 

@@ -38,6 +38,15 @@ public interface IWXBridge extends IWXObject {
    */
   int initFramework(String framework, WXParams params);
 
+
+  /**
+   * init Weex
+   *
+   * @param framework assets/main.js
+   * @return
+   */
+  int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean onSdcard);
+
   /**
    * execute javascript function
    */
@@ -65,4 +74,27 @@ public interface IWXBridge extends IWXObject {
   Object callNativeModule(String instanceId, String module, String method,  byte [] arguments,  byte [] options);
 
   void callNativeComponent(String instanceId, String componentRef, String method,  byte [] arguments,  byte [] options);
+
+  int callCreateBody(String instanceId, String tasks, String callback);
+
+  int callUpdateFinish(String instanceId,  byte [] tasks, String callback);
+
+  int callCreateFinish(String instanceId,  byte [] tasks, String callback);
+
+  int callRefreshFinish(String instanceId,  byte [] tasks, String callback);
+
+  int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback);
+
+  int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback);
+
+  int callRemoveElement(String instanceId, String ref, String callback);
+
+  int callMoveElement(String instanceId, String ref, String parentref, String index, String callback);
+
+  int callAddEvent(String instanceId, String ref, String event, String callback);
+
+  int callRemoveEvent(String instanceId, String ref, String event, String callback);
+
+  void reportServerCrash(String instanceId, String crashFile);
+
 }

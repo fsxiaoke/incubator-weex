@@ -20,7 +20,6 @@
 #import "WXBridgeContext.h"
 #import "WXBridgeProtocol.h"
 #import "WXJSCoreBridge.h"
-#import "WXDebugLoggerBridge.h"
 #import "WXLog.h"
 #import "WXUtility.h"
 #import "WXModuleFactory.h"
@@ -39,6 +38,8 @@
 #import "WXModuleMethod.h"
 #import "WXCallJSMethod.h"
 #import "WXSDKInstance_private.h"
+#import "WXPrerenderManager.h"
+#import "WXTracingManager.h"
 
 #define SuppressPerformSelectorLeakWarning(Stuff) \
 do { \
@@ -51,7 +52,7 @@ _Pragma("clang diagnostic pop") \
 @interface WXBridgeContext ()
 
 @property (nonatomic, strong) id<WXBridgeProtocol>  jsBridge;
-@property (nonatomic, strong) WXDebugLoggerBridge *devToolSocketBridge;
+@property (nonatomic, strong) id<WXBridgeProtocol> devToolSocketBridge;
 @property (nonatomic, assign) BOOL  debugJS;
 //store the methods which will be executed from native to js
 @property (nonatomic, strong) NSMutableDictionary   *sendQueue;
@@ -102,6 +103,15 @@ _Pragma("clang diagnostic pop") \
     return _jsBridge;
 }
 
+- (NSInteger)checkInstance:(WXSDKInstance *)instance
+{
+    if (!instance) {
+        WXLogInfo(@"instance not found, maybe already destroyed");
+        return FALSE;
+    }
+    return TRUE;
+}
+
 - (void)registerGlobalFunctions
 {
     __weak typeof(self) weakSelf = self;
@@ -113,8 +123,144 @@ _Pragma("clang diagnostic pop") \
         // Temporary here , in order to improve performance, will be refactored next version.
         WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
         
-        if (!instance) {
-            WXLogInfo(@"instance not found, maybe already destroyed");
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addElement" options:nil];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:elementData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"addElement" options:@{@"threadName":WXTDOMThread}];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallCreateBody:^NSInteger(NSString *instanceId, NSDictionary *bodyData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTJSBridgeThread}];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager createRoot:bodyData];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:bodyData[@"ref"] className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createBody" options:@{@"threadName":WXTDOMThread}];
+            
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallRemoveElement:^NSInteger(NSString *instanceId, NSString *ref) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeElement" options:nil];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager removeComponent:ref];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"removeElement" options:@{@"threadName":WXTDOMThread}];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallMoveElement:^NSInteger(NSString *instanceId,NSString *ref,NSString *parentRef,NSInteger index) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"moveElement" options:nil];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager moveComponent:ref toSuper:parentRef atIndex:index];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallUpdateAttrs:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *attrsData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTJSBridgeThread}];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager updateAttributes:attrsData forComponent:ref];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"updateAttrs" options:@{@"threadName":WXTDOMThread}];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallUpdateStyle:^NSInteger(NSString *instanceId,NSString *ref,NSDictionary *stylesData) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"updateStyles" options:@{@"threadName":WXTJSBridgeThread}];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager updateStyles:stylesData forComponent:ref];
+            
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallAddEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
             return -1;
         }
         
@@ -124,7 +270,54 @@ _Pragma("clang diagnostic pop") \
                 return;
             }
             [manager startComponentTasks];
-            [manager addComponent:elementData toSupercomponent:parentRef atIndex:index appendingInTree:NO];
+            [manager addEvent:event toComponent:ref];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"addEvent" options:nil];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallRemoveEvent:^NSInteger(NSString *instanceId,NSString *ref,NSString *event) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [manager startComponentTasks];
+            [manager removeEvent:event fromComponent:ref];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:ref className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"removeEvent" options:nil];
+        });
+        
+        return 0;
+    }];
+    
+    [_jsBridge registerCallCreateFinish:^NSInteger(NSString *instanceId) {
+        
+        // Temporary here , in order to improve performance, will be refactored next version.
+        WXSDKInstance *instance = [WXSDKManager instanceForID:instanceId];
+        
+        if(![weakSelf checkInstance:instance]) {
+            return -1;
+        }
+        [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTJSCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTJSBridgeThread}];
+        WXPerformBlockOnComponentThread(^{
+            WXComponentManager *manager = instance.componentManager;
+            if (!manager.isValid) {
+                return;
+            }
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingBegin functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+            [manager startComponentTasks];
+            [manager createFinish];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:WXTDomCall phase:WXTracingEnd functionName:@"createFinish" options:@{@"threadName":WXTDOMThread}];
+            
         });
         
         return 0;
@@ -139,7 +332,11 @@ _Pragma("clang diagnostic pop") \
             return nil;
         }
         
-        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+        WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
+        if(![moduleName isEqualToString:@"dom"] && instance.needPrerender){
+            [WXPrerenderManager storePrerenderModuleTasks:method forUrl:instance.scriptURL.absoluteString];
+            return nil;
+        }
         return [method invoke];
     }];
     
@@ -196,7 +393,6 @@ _Pragma("clang diagnostic pop") \
         WXLogInfo(@"instance already destroyed, task ignored");
         return -1;
     }
-    
     for (NSDictionary *task in tasks) {
         NSString *methodName = task[@"method"];
         NSArray *arguments = task[@"args"];
@@ -204,9 +400,12 @@ _Pragma("clang diagnostic pop") \
             NSString *ref = task[@"ref"];
             WXComponentMethod *method = [[WXComponentMethod alloc] initWithComponentRef:ref methodName:methodName arguments:arguments instance:instance];
             [method invoke];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:task[@"ref"] className:nil name:task[@"component"] phase:WXTracingBegin functionName:task[@"method"] options:nil];
         } else {
             NSString *moduleName = task[@"module"];
-            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments instance:instance];
+            NSDictionary *options = task[@"options"];
+            WXModuleMethod *method = [[WXModuleMethod alloc] initWithModuleName:moduleName methodName:methodName arguments:arguments options:options instance:instance];
+            [WXTracingManager startTracingWithInstanceId:instanceId ref:nil className:nil name:task[@"module"] phase:WXTracingBegin functionName:task[@"method"] options:@{@"threadName":WXTJSBridgeThread}];
             [method invoke];
         }
     }
@@ -242,7 +441,7 @@ _Pragma("clang diagnostic pop") \
     } else {
         args = @[instance, temp, options ?: @{}];
     }
-
+    WX_MONITOR_INSTANCE_PERF_START(WXFirstScreenJSFExecuteTime, [WXSDKManager instanceForID:instance]);
     WX_MONITOR_INSTANCE_PERF_START(WXPTJSCreateInstance, [WXSDKManager instanceForID:instance]);
     [self callJSMethod:@"createInstance" args:args];
     WX_MONITOR_INSTANCE_PERF_END(WXPTJSCreateInstance, [WXSDKManager instanceForID:instance]);
@@ -301,7 +500,7 @@ _Pragma("clang diagnostic pop") \
     WXAssertParam(script);
     
     WX_MONITOR_PERF_START(WXPTFrameworkExecute);
-    
+
     [self.jsBridge executeJSFramework:script];
     
     WX_MONITOR_PERF_END(WXPTFrameworkExecute);
@@ -430,7 +629,9 @@ _Pragma("clang diagnostic pop") \
 
 - (void)connectToWebSocket:(NSURL *)url
 {
-    _devToolSocketBridge = [[WXDebugLoggerBridge alloc] initWithURL:url];
+    if (NSClassFromString(@"WXDebugLoggerBridge")) {
+        _devToolSocketBridge = [[NSClassFromString(@"WXDebugLoggerBridge") alloc] initWithURL:url];
+    }
 }
 
 - (void)logToWebSocket:(NSString *)flag message:(NSString *)message

@@ -22,6 +22,7 @@
 #import "WXDefine.h"
 #import "WXType.h"
 #import "WXLog.h"
+#import "WXSDKInstance.h"
 
 // The default screen width which helps us to calculate the real size or scale in different devices.
 static const CGFloat WXDefaultScreenWidth = 750.0;
@@ -80,40 +81,46 @@ do {\
     }\
 }while(0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 /**
  * @abstract execute asynchronous action block on the main thread.
  *
  */
-extern void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockOnMainThread( void (^ _Nonnull block)());
 
 /**
  * @abstract execute synchronous action block on the main thread.
  *
  */
-extern void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
+void WXPerformBlockSyncOnMainThread( void (^ _Nonnull block)());
 
 /**
  * @abstract execute action block on the specific thread.
  *
  */
-extern void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
+void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *_Nonnull thread);
 
 /**
  * @abstract swizzling methods.
  *
  */
-extern void WXSwizzleInstanceMethod(_Nonnull Class className, _Nonnull SEL original, _Nonnull SEL replaced);
+void WXSwizzleInstanceMethod(_Nonnull Class className, _Nonnull SEL original, _Nonnull SEL replaced);
 
-extern void WXSwizzleInstanceMethodWithBlock(_Nonnull Class className, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
+void WXSwizzleInstanceMethodWithBlock(_Nonnull Class className, _Nonnull SEL original, _Nonnull id block, _Nonnull SEL replaced);
 
-extern _Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
+_Nonnull SEL WXSwizzledSelectorForSelector(_Nonnull SEL selector);
+    
+#ifdef __cplusplus
+}
+#endif
 
 @interface WXUtility : NSObject
 
 + (void)performBlock:(void (^_Nonnull)())block onThread:(NSThread *_Nonnull)thread;
 
-+ (void)setNotStat:(BOOL)notStat;
-+ (BOOL)notStat;
 /**
  * @abstract Returns the environment of current application, you can get some necessary properties such as appVersion、sdkVersion、appName etc.
  *
@@ -433,5 +440,23 @@ BOOL WXFloatGreaterThanWithPrecision(CGFloat a,CGFloat b,double precision);
  *
  */
 + (NSString *_Nullable)returnKeyType:(UIReturnKeyType)type;
+
+/**
+ *  @abstract custorm monitor info
+ *
+ */
++ (void)customMonitorInfo:(WXSDKInstance *_Nullable)instance key:(NSString * _Nonnull)key value:(id _Nonnull)value;
+
+/**
+ *  @abstract format to base64 dictionary
+ *
+ */
++ (NSDictionary *_Nonnull)dataToBase64Dict:(NSData *_Nullable)data;
+
+/**
+ *  @abstract format to data
+ *
+ */
++ (NSData *_Nonnull)base64DictToData:(NSDictionary *_Nullable)base64Dict;
 
 @end

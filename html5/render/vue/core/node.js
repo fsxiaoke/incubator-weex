@@ -17,13 +17,15 @@
  * under the License.
  */
 
+import { isArray } from '../utils'
+
 /**
  * remove text nodes in the nodes array.
  * @param  {Array} nodes
  * @return {Array} nodes without text nodes.
  */
 export function trimTextVNodes (vnodes) {
-  if (Array.isArray(vnodes)) {
+  if (isArray(vnodes)) {
     return vnodes.filter(vnode => !!vnode.tag)
   }
   return vnodes
@@ -51,46 +53,110 @@ function getListeners (vnode, evt) {
   return handlers
 }
 
-const supportedEvents = [
-  'click', 'longpress', 'appear', 'disappear',
-  // 'touchstart', 'touchmove', 'touchend',
-  'panstart', 'panmove', 'panend', 'swipe', 'longpress'
-]
+/**
+ * Instead of vue's invoker, this function should check if the binding function
+ * has a _weex_hook flag. If there is one, the handler should not be triggered.
+ * @param {Array | Function} fns
+ */
+export function applyFns (fns, ...args) {
+  if (Array.isArray(fns)) {
+    const cloned = fns.slice()
+    const len = cloned.length
+    for (let i = 0; i < len; i++) {
+      const fn = cloned[i]
+      if (fn._weex_hook) {
+        continue
+      }
+      fn.apply(null, args)
+    }
+  }
+  else {
+    if (!fns._weex_hook) {
+      fns.apply(null, args)
+    }
+  }
+}
+
 /**
  * emit native events to enable v-on.
  * @param {VComponent} context: which one to emit a event on.
- * @param {array} extras: extra events.
+ * @param {array | object} events: extra events. You can pass in multiple arguments here.
  */
-export function createEventMap (context, extras = []) {
+export function createEventMap (context, ...events) {
   const eventMap = {}
-  supportedEvents.concat(extras).forEach(name => {
-    eventMap[name] = function (e) {
-      // no original bubbling.
-      e.stopPropagation()
-      // but should trigger the closest parent which has bound the
-      // event handler.
-      let vm = context
-      while (vm) {
-        const ons = getListeners(vm.$vnode, name)
-        const len = ons.length
-        let idx = 0
-        while (idx < len) {
-          let on = ons[idx]
-          if (on && on.fn) {
-            on = on.fn
+  /**
+   * Bind some original type event to your specified type event handler.
+   * e.g. bind 'tap' event to 'click' event listener: bindFunc('tap')('click').
+   * Or bind certian event with your specified handler: bindFunc('click', someFunction)
+   */
+  const bindFunc = (originalType) => {
+    return listenTo => {
+      let handler
+      const evtName = originalType || listenTo
+      if (typeof listenTo === 'function') {
+        handler = listenTo
+      }
+      else if (typeof listenTo === 'string') {
+        handler = function (e) {
+          /**
+           * use '_triggered' to control actural bubbling (allow original bubbling).
+           */
+          if (e._triggered) {
+            return
           }
-          on && on.call(vm, e)
-          idx++
+          /**
+           * trigger the closest parent which has bound event handlers.
+           */
+          let vm = context
+          while (vm) {
+            const ons = getListeners(vm._vnode || vm.$vnode, listenTo)
+            const len = ons.length
+            if (len > 0) {
+              let idx = 0
+              while (idx < len) {
+                const on = ons[idx]
+                applyFns(on.fns, e)
+                idx++
+              }
+              // once a parent node (or self node) has triggered the handler, then
+              // it stops bubbling immediately, and a '_triggered' object is set.
+              e._triggered = {
+                el: vm.$el
+              }
+              return
+            }
+            vm = vm.$parent
+          }
         }
+        // flag to distinguish from user-binding listeners.
+        handler._weex_hook = true
+      }
+      if (!eventMap[evtName]) {
+        eventMap[evtName] = []
+      }
+      eventMap[evtName].push(handler)
+    }
+  }
 
-        // once a parent node (or self node) has triggered the handler,
-        // then it stops bubble immediately.
-        if (len > 0) {
-          return
+  /**
+   * component's extra event bindings. This is mostly for the needs of component's
+   * own special behaviours. These handlers will be processed after the user's
+   * corresponding event handlers.
+   */
+  if (events) {
+    const len = events.length
+    for (let i = 0; i < len; i++) {
+      const extra = events[i]
+      if (isArray(extra)) {
+        extra.forEach(bindFunc())
+      }
+      else if (typeof extra === 'object') {
+        for (const key in extra) {
+          bindFunc(key)(extra[key])
         }
-        vm = vm.$parent
       }
     }
-  })
+  }
+
   return eventMap
 }

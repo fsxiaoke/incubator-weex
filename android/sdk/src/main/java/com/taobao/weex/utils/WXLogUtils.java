@@ -44,13 +44,13 @@ public class WXLogUtils {
   public static final String WEEX_TAG = "weex";
   public static final String WEEX_PERF_TAG = "weex_perf";
 
-  public static boolean isShowLineNumber = false;
-
   private static final String CLAZZ_NAME_DEBUG_TOOL = "com.taobao.weex.WXDebugTool";
   private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
 
   private static StringBuilder builder = new StringBuilder(50);
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
+  private static JsLogWatcher jsLogWatcher;
+  private static LogWatcher sLogWatcher;
 
   public static ILogWriter s_logwriter;
   static {
@@ -75,7 +75,7 @@ public class WXLogUtils {
     if (WXEnvironment.isApkDebugable() || WXEnvironment.isPerf()) {
       builder.setLength(0);
       builder.append("[render time]").append(type).append(":").append(time);
-      Log.d(WEEX_PERF_TAG, getLineNumber() + builder.substring(0));
+      Log.d(WEEX_PERF_TAG, builder.substring(0));
       writeConsoleLog("debug", builder.substring(0));
     }
   }
@@ -86,16 +86,18 @@ public class WXLogUtils {
 
   private static void log(String tag, String msg, LogLevel level){
     if (WXEnvironment.isApkDebugable() && msg != null && WXEnvironment.sLogLevel.compare(level) >= 0) {
-      msg = getLineNumber() + msg;
       Log.println(level.getPriority(),tag, msg);
       writeConsoleLog(level.getName(), msg);
       sendLog(level, msg);
+    }
+    if (sLogWatcher != null) {
+      sLogWatcher.onLog(level.getName(), tag, msg);
     }
     if (canWriteFclog(level)){
       writeFcLog(getFormatLog(tag,level.getName().substring(0,1).toUpperCase(),msg));
     }
   }
-
+  
   public static void i(String msg) {
     i(WEEX_TAG,msg);
   }
@@ -120,10 +122,32 @@ public class WXLogUtils {
     d(tag,new String(msg));
   }
 
+  public static void wtf(String msg){
+    wtf(WEEX_TAG, msg);
+  }
+
   public static void d(String tag, String msg) {
+    if (!TextUtils.isEmpty(msg) && !TextUtils.isEmpty(tag)) {
+      log(tag, msg, LogLevel.DEBUG);
+    }
+
     if (WXEnvironment.isApkDebugable() && !TextUtils.isEmpty(msg) && WXEnvironment.sLogLevel.compare(LogLevel.DEBUG) >= 0) {
-      msg = getLineNumber() + msg;
       Log.d(tag, msg);
+
+      if ("jsLog".equals(tag) && jsLogWatcher != null) {
+        if (msg.endsWith("__DEBUG")) {
+          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__DEBUG", ""));
+        } else if (msg.endsWith("__INFO")) {
+          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__INFO", ""));
+        } else if (msg.endsWith("__WARN")) {
+          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__WARN", ""));
+        } else if (msg.endsWith("__ERROR")) {
+          jsLogWatcher.onJsLog(Log.DEBUG, msg.replace("__ERROR", ""));
+        } else {
+          jsLogWatcher.onJsLog(Log.DEBUG, msg);
+        }
+      }
+
       /** This log method will be invoked from jni code, so try to extract loglevel from message. **/
       writeConsoleLog("debug", tag + ":" + msg);
       if(msg.contains(" | __")){
@@ -136,6 +160,7 @@ public class WXLogUtils {
         }
       }
       sendLog(LogLevel.DEBUG, tag + ":" + msg);
+      log(tag, msg, LogLevel.DEBUG);
     }
     if (canWriteFclog(LogLevel.DEBUG)){
       writeFcLog(getFormatLog(tag,LogLevel.DEBUG.getName().substring(0,1).toUpperCase(),msg));
@@ -176,6 +201,10 @@ public class WXLogUtils {
     log(tag, msg,LogLevel.ERROR);
   }
 
+  public static void wtf(String tag, String msg){
+    log(tag, msg, LogLevel.WTF);
+  }
+
   /**
    * 'p' for 'Performance', use {@link #WEEX_PERF_TAG}
    * @param msg
@@ -211,6 +240,12 @@ public class WXLogUtils {
   public static void e(String prefix, Throwable e) {
     if (WXEnvironment.isApkDebugable()) {
       e(prefix + getStackTrace(e));
+    }
+  }
+
+  public static void wtf(String prefix, Throwable e){
+    if (WXEnvironment.isApkDebugable()) {
+      wtf(prefix + getStackTrace(e));
     }
   }
 
@@ -286,23 +321,20 @@ public class WXLogUtils {
     }
   }
 
-  /**
-   * Why the index is 2 ?
-   * StackTrace:
-   * 0 = com.taobao.weex.utils.WXLogUtils.getLineNumber
-   * 1 = com.taobao.weex.utils.WXLogUtils#x
-   * 2 = the actual caller
-   * …… more stack trace element
-   * */
-  private static String getLineNumber() {
-    if (!isShowLineNumber) {
-      return "";
-    }
-    StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    final int index = 2;
-    String className = stackTrace[index].getFileName();
-    int lineNum = stackTrace[index].getLineNumber();
-    return "(" + className + ":" + lineNum + ") ";
+  public static void setJsLogWatcher(JsLogWatcher watcher) {
+    jsLogWatcher = watcher;
+  }
+
+  public static void setLogWatcher(LogWatcher watcher) {
+    sLogWatcher = watcher;
+  }
+
+  public interface JsLogWatcher {
+    void onJsLog(int level, String log);
+  }
+
+  public interface LogWatcher {
+    void onLog(String level, String tag, String msg);
   }
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   public static String getFormatLog(String tag, String logLevel, String log) {

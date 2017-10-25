@@ -20,9 +20,11 @@ package com.taobao.weex.dom;
 
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.dom.action.Actions;
+import com.taobao.weex.dom.action.TraceableAction;
 
 /**
  * Handler for dom operations.
@@ -49,8 +51,12 @@ public class WXDomHandler implements Handler.Callback {
     Object obj = msg.obj;
     WXDomTask task = null;
 
-    if (obj instanceof WXDomTask) {
+    if (obj != null && obj instanceof WXDomTask) {
       task = (WXDomTask) obj;
+      Object action = ((WXDomTask) obj).args.get(0);
+      if (action != null && action instanceof TraceableAction) {
+        ((TraceableAction) action).mDomQueueTime = SystemClock.uptimeMillis() - msg.getWhen();
+      }
     }
 
     if (!mHasBatch) {
@@ -71,6 +77,9 @@ public class WXDomHandler implements Handler.Callback {
 
         mWXDomManager.batch();
         mHasBatch = false;
+        break;
+      case MsgType.WX_CONSUME_RENDER_TASKS:
+        mWXDomManager.consumeRenderTask(task.instanceId);
         break;
       default:
         break;
@@ -114,6 +123,7 @@ public class WXDomHandler implements Handler.Callback {
 
     public static final int WX_EXECUTE_ACTION = 0xfe;
     public static final int WX_DOM_BATCH = 0xff;
+    public static final int WX_CONSUME_RENDER_TASKS = 0xfa;
 
     @Deprecated
     public static final int WX_COMPONENT_SIZE= 0xff1;

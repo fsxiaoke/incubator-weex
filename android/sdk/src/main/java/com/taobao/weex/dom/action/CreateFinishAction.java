@@ -18,15 +18,37 @@
  */
 package com.taobao.weex.dom.action;
 
+import com.taobao.weex.LayoutFinishListener;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRenderStrategy;
+import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.DOMActionContext;
 import com.taobao.weex.dom.RenderActionContext;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 
 /**
  * Created by sospartan on 02/03/2017.
  */
 
 final class CreateFinishAction extends AbstractLayoutFinishAction {
+
+  @Override
+  public void executeDom(DOMActionContext context) {
+    super.executeDom(context);
+    final WXSDKInstance instance = context.getInstance();
+    final LayoutFinishListener listener;
+    if(instance != null && (listener = instance.getLayoutFinishListener()) != null) {
+      WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(WXThread.secure(new Runnable() {
+        @Override
+        public void run() {
+          listener.onLayoutFinish(instance);
+        }
+      }),0);
+    }
+  }
+
   @Override
   public void executeRender(RenderActionContext context) {
     WXSDKInstance instance = context.getInstance();
@@ -34,5 +56,9 @@ final class CreateFinishAction extends AbstractLayoutFinishAction {
       instance.onCreateFinish();
     }
     instance.onRenderSuccess(mLayoutWidth, mLayoutHeight);
+    if (WXTracing.isAvailable()) {
+      double renderTime = Stopwatch.millisUntilNow(context.getInstance().mRenderStartNanos);
+      submitPerformance("renderFinish", "X", instance.getInstanceId(), renderTime, System.currentTimeMillis());
+    }
   }
 }

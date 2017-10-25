@@ -20,11 +20,16 @@ package com.taobao.weex.dom;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.common.WXRuntimeException;
 import com.taobao.weex.common.WXThread;
+import com.taobao.weex.dom.action.AbstractAddElementAction;
+import com.taobao.weex.dom.action.TraceableAction;
+import com.taobao.weex.tracing.Stopwatch;
+import com.taobao.weex.tracing.WXTracing;
 import com.taobao.weex.ui.WXRenderManager;
 import com.taobao.weex.utils.WXUtils;
 
@@ -133,6 +138,14 @@ public final class WXDomManager {
     }
   }
 
+  void consumeRenderTask(String instanceId) {
+    throwIfNotDomThread();
+    DOMActionContextImpl context = mDomRegistries.get(instanceId);
+    if(context != null) {
+      context.consumeRenderTasks();
+    }
+  }
+
   private void throwIfNotDomThread(){
     if (!isDomThread()) {
       throw new WXRuntimeException("dom operation must be done in dom thread");
@@ -151,8 +164,22 @@ public final class WXDomManager {
         return;
       }
     }
+    long domStart = System.currentTimeMillis();
+    long domNanos = System.nanoTime();
     action.executeDom(context);
+    if (WXTracing.isAvailable()) {
+      domNanos = System.nanoTime() - domNanos;
+      if (!(action instanceof AbstractAddElementAction) && action instanceof TraceableAction) {
+        WXTracing.TraceEvent domExecuteEvent = WXTracing.newEvent("DomExecute", context.getInstanceId(), ((TraceableAction) action).mTracingEventId);
+        domExecuteEvent.duration = Stopwatch.nanosToMillis(domNanos);
+        domExecuteEvent.ts = domStart;
+        domExecuteEvent.submit();
+      }
+    }
+  }
 
+  public DOMActionContext getDomContext(String instanceId){
+     return mDomRegistries.get(instanceId);
   }
 
   /**
@@ -182,4 +209,14 @@ public final class WXDomManager {
     msg.obj = task;
     sendMessageDelayed(msg, delay);
   }
+
+  public void postRenderTask(@NonNull String instanceId) {
+    Message msg = Message.obtain();
+    msg.what = WXDomHandler.MsgType.WX_CONSUME_RENDER_TASKS;
+    WXDomTask task = new WXDomTask();
+    task.instanceId = instanceId;
+    msg.obj = task;
+    sendMessage(msg);
+  }
+
 }

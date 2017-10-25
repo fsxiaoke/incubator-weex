@@ -109,7 +109,10 @@
         [dict addEntriesFromDictionary:params];
     }
     
-    [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:self.ref type:eventName params:dict domChanges:domChanges];
+    NSArray *handlerArguments = [self _paramsForEvent:eventName];
+    NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
+    
+    [[WXSDKManager bridgeMgr] fireEvent:self.weexInstance.instanceId ref:ref type:eventName params:dict domChanges:domChanges handlerArguments:handlerArguments];
 }
 
 - (void)addEvent:(NSString *)addEventName
@@ -169,6 +172,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_ADD_EVENT(touchmove, addTouchMoveEvent)
     WX_ADD_EVENT(touchend, addTouchEndEvent)
     WX_ADD_EVENT(touchcancel, addTouchCancelEvent)
+    WX_ADD_EVENT(accessibilityMagicTap, addAccessibilityMagicTapEvent)
     
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = YES;
@@ -197,7 +201,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     WX_REMOVE_EVENT(touchmove, removeTouchMoveEvent)
     WX_REMOVE_EVENT(touchend, removeTouchEndEvent)
     WX_REMOVE_EVENT(touchcancel, removeTouchCancelEvent)
-    
+    WX_REMOVE_EVENT(accessibilityMagicTap, removeAccessibilityMagicTapEvent)
     if(_isListenPseudoTouch) {
         self.touchGesture.listenPseudoTouch = NO;
     }
@@ -256,6 +260,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     [self checkRemoveTouchGesture];
 }
 
+#pragma mark - Accessibility Event
+
+- (void)addAccessibilityMagicTapEvent
+{
+    _accessibilityMagicTapEvent = YES;
+}
+
+- (void)removeAccessibilityMagicTapEvent
+{
+    _accessibilityMagicTapEvent = NO;
+}
+
 #pragma mark - Click Event
 
 - (void)addClickEvent
@@ -271,6 +287,12 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_tapGesture) {
         _tapGesture.delegate = nil;
+        if ([self isViewLoaded]) {
+            if ([self.view.gestureRecognizers containsObject:_tapGesture]) {
+                [self.view removeGestureRecognizer:_tapGesture];
+            }
+        }
+        [_tapGesture removeTarget:self action:@selector(onClick:)];
         _tapGesture = nil;
     }
 }
@@ -342,13 +364,22 @@ if ([removeEventName isEqualToString:@#eventName]) {\
   
     for (UISwipeGestureRecognizer *recognizer in _swipeGestures) {
         recognizer.delegate = nil;
+        if([self isViewLoaded]) {
+            if ([[self.view gestureRecognizers] containsObject:recognizer]) {
+                [self.view removeGestureRecognizer:recognizer];
+            }
+        }
+        [recognizer removeTarget:self action:@selector(onSwipe:)];
     }
-    
     _swipeGestures = nil;
 }
 
 - (void)onSwipe:(UISwipeGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     UISwipeGestureRecognizerDirection direction = gesture.direction;
     
     NSString *directionString;
@@ -367,6 +398,7 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             break;
         default:
             directionString = @"unknown";
+            break;
     }
     
     CGPoint screenLocation = [gesture locationInView:self.view.window];
@@ -390,12 +422,22 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_longPressGesture) {
         _longPressGesture.delegate = nil;
+        if ([self isViewLoaded]) {
+            if([[self.view gestureRecognizers] containsObject:_longPressGesture]) {
+                [self.view removeGestureRecognizer:_longPressGesture];
+            }
+        }
+        [_longPressGesture removeTarget:self action:@selector(onLongPress:)];
         _longPressGesture = nil;
     }
 }
 
 - (void)onLongPress:(UILongPressGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         CGPoint screenLocation = [gesture locationInView:self.view.window];
         CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
@@ -450,6 +492,10 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)onPan:(UIPanGestureRecognizer *)gesture
 {
+    if (![self isViewLoaded]) {
+        return;
+    }
+    
     CGPoint screenLocation = [gesture locationInView:self.view.window];
     CGPoint pageLoacation = [gesture locationInView:self.weexInstance.rootView];
     NSString *eventName;
@@ -472,16 +518,17 @@ if ([removeEventName isEqualToString:@#eventName]) {\
              eventName = @"panmove";
         }
         state = @"move";
+    } else if (gesture.state == UIGestureRecognizerStateCancelled) {
+        state = @"cancel";
     }
-    
     
     CGPoint translation = [_panGesture translationInView:self.view];
     
-    if (_listenHorizontalPan && fabs(translation.y) <= fabs(translation.x)) {
+    if (_listenHorizontalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) <= fabs(translation.x))) {
         [self fireEvent:@"horizontalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
-    if (_listenVerticalPan && fabs(translation.y) > fabs(translation.x)) {
+    if (_listenVerticalPan && (gesture.state != UIGestureRecognizerStateBegan || fabs(translation.y) > fabs(translation.x))) {
         [self fireEvent:@"verticalpan" params:@{@"state":state, @"changedTouches":resultTouch ? @[resultTouch] : @[]}];
     }
         
@@ -526,7 +573,15 @@ if ([removeEventName isEqualToString:@#eventName]) {\
         && !_listenPanStart && !_listenPanMove && !_listenPanEnd
         && !_listenHorizontalPan && !_listenVerticalPan
         ) {
+        
+        if ([self isViewLoaded]) {
+            if ([[self.view gestureRecognizers] containsObject:_panGesture]) {
+                [self.view removeGestureRecognizer:_panGesture];
+            }
+        }
+        
         _panGesture.delegate = nil;
+        [_panGesture removeTarget:self action:@selector(onPan:)];
         _panGesture = nil;
     }
 }
@@ -592,6 +647,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 {
     if (_touchGesture && !_touchGesture.listenTouchStart && !_touchGesture.listenTouchMove && !_touchGesture.listenTouchEnd && !_touchGesture.listenTouchCancel && !_touchGesture.listenPseudoTouch) {
         _touchGesture.delegate = nil;
+        if ([self isViewLoaded]) {
+            if ([[self.view gestureRecognizers] containsObject:_touchGesture]) {
+                [self.view removeGestureRecognizer:_touchGesture];
+            }
+        }
         _touchGesture = nil;
     }
 }
@@ -616,16 +676,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
+    NSString * panGestureRecog = [NSString stringWithFormat:@"%@%@%@%@%@%@",@"UIScrollV", @"iewPanG", @"estur",@"eRecog",@"nize",@"r"];
+    NSString * textTap = [NSString stringWithFormat:@"%@%@%@%@%@",@"UITe",@"xtTa",@"pReco",@"gniz",@"er"];
     // trigger touches
     if ([gestureRecognizer isKindOfClass:[WXTouchGestureRecognizer class]]) {
         return YES;
     }
     // swipe and scroll
-    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(@"UIScrollViewPanGestureRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UISwipeGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass:NSClassFromString(panGestureRecog)]) {
         return YES;
     }
     // onclick and textviewInput
-    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(@"UITextTapRecognizer")]) {
+    if ([gestureRecognizer isKindOfClass:[UITapGestureRecognizer class]] && [otherGestureRecognizer isKindOfClass: NSClassFromString(textTap)]) {
         return YES;
     }
     
@@ -736,7 +798,20 @@ if ([removeEventName isEqualToString:@#eventName]) {\
             touch.wx_identifier = @(_touchIdentifier++);
         }
         NSDictionary *resultTouch = [_component touchResultWithScreenLocation:screenLocation pageLocation:pageLocation identifier:touch.wx_identifier];
-        [resultTouches addObject:resultTouch];
+        NSMutableDictionary * mutableResultTouch = [resultTouch mutableCopy];
+        
+        if (WX_SYS_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
+            float value = touch.force*60;
+            float maxValue = touch.maximumPossibleForce*60;
+            if (touch.maximumPossibleForce) {
+                // the forece value will be range 1 from 0.
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:value/maxValue] forKey:@"force"];
+            }else {
+                [mutableResultTouch setObject:[NSNumber numberWithFloat:0.0] forKey:@"force"];
+            }
+        }
+        
+        [resultTouches addObject:mutableResultTouch];
     }
     
     [_component fireEvent:eventName params:@{@"changedTouches":resultTouches ?: @[]}];

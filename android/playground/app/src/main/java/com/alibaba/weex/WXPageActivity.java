@@ -132,7 +132,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     Log.e("TestScript_Guide mUri==", mUri.toString());
     initUIAndData();
 
-    if(WXPAGE.equals(mUri.getScheme())) {
+    if(WXPAGE.equals(mUri.getScheme())||
+       TextUtils.equals("true",mUri.getQueryParameter("_wxpage"))) {
       mUri = mUri.buildUpon().scheme("http").build();
       loadWXfromService(mUri.toString());
       startHotRefresh();
@@ -512,6 +513,8 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
     mReceiver = new RefreshBroadcastReceiver();
     IntentFilter filter = new IntentFilter();
     filter.addAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH);
+    filter.addAction(IWXDebugProxy.ACTION_INSTANCE_RELOAD);
+
     registerReceiver(mReceiver, filter);
   }
 
@@ -573,12 +576,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   public class RefreshBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      if (IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+      if (IWXDebugProxy.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
+              IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+        // String myUrl = intent.getStringExtra("url");
+        // Log.e("WXPageActivity", "RefreshBroadcastReceiver reload onReceive ACTION_DEBUG_INSTANCE_REFRESH mBundleUrl:" + myUrl + " mUri:" + mUri);
+
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
-            loadWXfromService(mUri.toString());
+            String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
+            String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
+            // Log.e("WXPageActivity", "loadWXfromService reload url:" + url);
+            loadWXfromService(url);
           } else {
+            // Log.e("WXPageActivity", "loadWXfromLocal reload from local url:" + mUri.toString());
             loadWXfromLocal(true);
           }
         }

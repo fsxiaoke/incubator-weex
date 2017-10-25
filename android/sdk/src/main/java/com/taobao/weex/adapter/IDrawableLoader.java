@@ -20,14 +20,22 @@
 package com.taobao.weex.adapter;
 
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 
 public interface IDrawableLoader {
 
-  public interface DrawableTarget {
+  interface DrawableTarget {
 
-    void setDrawable(Drawable drawable, boolean resetBounds);
   }
 
-  public void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
+  interface StaticTarget extends DrawableTarget{
+    void setDrawable(@Nullable Drawable drawable, boolean resetBounds);
+  }
+
+  interface AnimatedTarget extends DrawableTarget{
+    void setAnimatedDrawable(@Nullable Drawable drawable);
+  }
+
+  void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
 }
 

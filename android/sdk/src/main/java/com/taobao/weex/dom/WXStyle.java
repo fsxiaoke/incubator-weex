@@ -71,18 +71,28 @@ public class WXStyle implements Map<String, Object>,Cloneable {
    * text-decoration
    **/
   public static WXTextDecoration getTextDecoration(Map<String, Object> style) {
-    Object obj = style.get(Constants.Name.TEXT_DECORATION);
-    if (obj == null) {
-      return WXTextDecoration.NONE;
+    Object obj;
+    WXTextDecoration ret;
+    if (style == null || (obj = style.get(Constants.Name.TEXT_DECORATION)) == null) {
+      ret = WXTextDecoration.NONE;
+    } else {
+      String textDecoration = obj.toString();
+      switch (textDecoration) {
+        case "underline":
+          ret = WXTextDecoration.UNDERLINE;
+          break;
+        case "line-through":
+          ret = WXTextDecoration.LINETHROUGH;
+          break;
+        case "none":
+          ret = WXTextDecoration.NONE;
+          break;
+        default:
+          ret = WXTextDecoration.INVALID;
+          break;
+      }
     }
-    String textDecoration = obj.toString();
-    if (textDecoration.equals("underline")) {
-      return WXTextDecoration.UNDERLINE;
-    }
-    if (textDecoration.equals("line-through")) {
-      return WXTextDecoration.LINETHROUGH;
-    }
-    return WXTextDecoration.NONE;
+    return ret;
   }
 
   public static String getTextColor(Map<String, Object> style) {
@@ -335,23 +345,6 @@ public class WXStyle implements Map<String, Object>,Cloneable {
   public float getBorderWidth(int viewport) {
     return WXUtils.getFloatByViewport(get(Constants.Name.BORDER_WIDTH), viewport);
   }
-
-  public float getBorderRightWidth() {
-    return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH);
-  }
-
-  public float getBorderTopWidth() {
-    return getBorderWidth(Constants.Name.BORDER_TOP_WIDTH);
-  }
-
-  public float getBorderBottomWidth() {
-    return getBorderWidth(Constants.Name.BORDER_BOTTOM_WIDTH);
-  }
-
-  public float getBorderLeftWidth() {
-    return getBorderWidth(Constants.Name.BORDER_LEFT_WIDTH);
-  }
-
 
   public float getBorderRightWidth(int viewport) {
     return getBorderWidth(Constants.Name.BORDER_RIGHT_WIDTH, viewport);

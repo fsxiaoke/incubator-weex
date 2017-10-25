@@ -64,15 +64,15 @@
 
 @end
 
-
-@interface WXSection : NSObject<NSCopying>
+// WXText is a non-public is not permitted
+@interface WXSectionComponent : NSObject<NSCopying>
 
 @property (nonatomic, strong) WXHeaderComponent *header;
 @property (nonatomic, strong) NSMutableArray<WXCellComponent *> *rows;
 
 @end
 
-@implementation WXSection
+@implementation WXSectionComponent
 
 - (instancetype)init
 {
@@ -85,7 +85,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    WXSection *newSection = [[[self class] allocWithZone:zone] init];
+    WXSectionComponent *newSection = [[[self class] allocWithZone:zone] init];
     newSection.header = _header;
     newSection.rows = [_rows mutableCopyWithZone:zone];
     
@@ -100,6 +100,8 @@
 
 @interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
 
+@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
+
 @end
 
 @implementation WXListComponent
@@ -107,9 +109,9 @@
     __weak UITableView * _tableView;
 
     // Only accessed on component thread
-    NSMutableArray<WXSection *> *_sections;
+    NSMutableArray<WXSectionComponent *> *_sections;
     // Only accessed on main thread
-    NSMutableArray<WXSection *> *_completedSections;
+    NSMutableArray<WXSectionComponent *> *_completedSections;
     NSUInteger _previousLoadMoreRowNumber;
     
     BOOL _isUpdating;
@@ -245,7 +247,7 @@
     if ([subcomponent isKindOfClass:[WXHeaderComponent class]] || _sections.count <= indexPath.section) {
         // conditions to insert section: insert a header or insert first cell of table view
         // this will be updated by recycler's update controller in the future
-        WXSection *insertSection = [WXSection new];
+        WXSectionComponent *insertSection = [WXSectionComponent new];
         BOOL keepScrollPosition = NO;
         if ([subcomponent isKindOfClass:[WXHeaderComponent class]]) {
             WXHeaderComponent *header = (WXHeaderComponent*)subcomponent;
@@ -254,7 +256,7 @@
         }
         
         NSUInteger insertIndex = indexPath.section;
-        WXSection *reloadSection;
+        WXSectionComponent *reloadSection;
         if (insertIndex > 0 && insertIndex <= _sections.count
             && [subcomponent isKindOfClass:[WXHeaderComponent class]]) {
             // insert a header in the middle, one section may divide into two
@@ -269,8 +271,8 @@
         }
     
         [_sections insertObject:insertSection atIndex:insertIndex];
-        WXSection *completedInsertSection = [insertSection copy];
-        WXSection *completedReloadSection;
+        WXSectionComponent *completedInsertSection = [insertSection copy];
+        WXSectionComponent *completedReloadSection;
         if (reloadSection) {
             completedReloadSection = [reloadSection copy];
         }
@@ -279,24 +281,33 @@
             WXLogDebug(@"Insert section:%ld", (unsigned long)insertIndex);
             
             [UIView performWithoutAnimation:^{
-                [_tableView beginUpdates];
                 
-                [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
-                if (completedReloadSection) {
-                    WXLogDebug(@"Reload section:%lu", insertIndex - 1);
-                    _completedSections[insertIndex - 1] = completedReloadSection;
+                @try {
+                    [_tableView beginUpdates];
+                    
+                    [_completedSections insertObject:completedInsertSection atIndex:insertIndex];
+                    if (completedReloadSection) {
+                        WXLogDebug(@"Reload section:%lu", (unsigned long)(insertIndex - 1));
+                        _completedSections[insertIndex - 1] = completedReloadSection;
+                    }
+                    
+                    [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+                    
+                    if (completedReloadSection) {
+                        [_tableView reloadSections:[NSIndexSet indexSetWithIndex:insertIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
+                    }
+                    
+                    [_tableView endUpdates];
+                } @catch (NSException *exception) {
+                    WXLogError(@"list insert component occurs exception %@", exception);
+                } @finally {
+                     // nothing
                 }
                 
-                [self _insertTableViewSectionAtIndex:insertIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
-                
-                if (completedReloadSection) {
-                    [_tableView reloadSections:[NSIndexSet indexSetWithIndex:insertIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
-                }
-                
-                [_tableView endUpdates];
             }];
             
         }];
+        
     }
 }
 
@@ -333,37 +344,62 @@
 
 - (void)headerDidRemove:(WXHeaderComponent *)header
 {
-    NSUInteger deleteIndex = [self indexForHeader:header sections:_sections];
+    NSUInteger headerIndex = [self indexForHeader:header sections:_sections];
     // this will be updated by recycler's update controller in the future
-    WXSection *deleteSection = _sections[deleteIndex];
-    WXSection *reloadSection;
-    if (deleteIndex > 0 && deleteSection.rows.count > 0) {
+    WXSectionComponent *headerSection = _sections[headerIndex];
+    WXSectionComponent *reloadSection;
+    NSUInteger reloadIndex = -1;
+    BOOL isDeleteSection = NO;
+    if (headerIndex == 0 && headerSection.rows.count > 0) {
+        // delete a header in the first section and the section still has cells
+        // reload the first section
+        reloadIndex = 0;
+        reloadSection = _sections[reloadIndex];
+        _sections[reloadIndex].header = nil;
+    } else if (headerIndex > 0 && headerSection.rows.count > 0) {
         // delete a header in the middle, two sections merge into one
-        // so the one section need to be reloaded
-        reloadSection = _sections[deleteIndex - 1];
-        reloadSection.rows = [[reloadSection.rows arrayByAddingObjectsFromArray:deleteSection.rows] mutableCopy];
+        // so one section need to be deleted and the other should be relo
+        isDeleteSection = YES;
+        reloadIndex = headerIndex - 1;
+        reloadSection = _sections[reloadIndex];
+        reloadSection.rows = [[reloadSection.rows arrayByAddingObjectsFromArray:headerSection.rows] mutableCopy];
+        [_sections removeObjectAtIndex:headerIndex];
+    } else {
+        // delete a header with no cell in that section
+        // just delete the section
+        isDeleteSection = YES;
+        [_sections removeObjectAtIndex:headerIndex];
     }
     
-    [_sections removeObjectAtIndex:deleteIndex];
-    WXSection *completedReloadSection;
+    WXSectionComponent *completedReloadSection;
     if (reloadSection) {
         completedReloadSection = [reloadSection copy];
     }
     BOOL keepScrollPosition = header.keepScrollPosition;
     
     [self.weexInstance.componentManager _addUITask:^{
-        WXLogDebug(@"delete section:%ld", deleteIndex);
-        [_completedSections removeObjectAtIndex:deleteIndex];
+        if (isDeleteSection) {
+            WXLogDebug(@"delete section:%zd", headerIndex);
+            [_completedSections removeObjectAtIndex:headerIndex];
+        }
+        
+        if (reloadIndex == 0 && !isDeleteSection) {
+            _completedSections[reloadIndex].header = nil;
+        }
+        
         if (completedReloadSection) {
-            WXLogDebug(@"Reload section:%ld", deleteIndex - 1);
-            _completedSections[deleteIndex - 1] = completedReloadSection;
+            WXLogDebug(@"Reload section:%zd", reloadIndex);
+            _completedSections[reloadIndex] = completedReloadSection;
         }
         
         [UIView performWithoutAnimation:^{
             [_tableView beginUpdates];
-            [self _deleteTableViewSectionAtIndex:deleteIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+            if (isDeleteSection) {
+                [self _deleteTableViewSectionAtIndex:headerIndex keepScrollPosition:keepScrollPosition animation:UITableViewRowAnimationNone];
+            }
+            
             if (completedReloadSection) {
-                [_tableView reloadSections:[NSIndexSet indexSetWithIndex:deleteIndex - 1] withRowAnimation:UITableViewRowAnimationNone];
+                [_tableView reloadSections:[NSIndexSet indexSetWithIndex:reloadIndex] withRowAnimation:UITableViewRowAnimationNone];
             }
             
             [_tableView endUpdates];
@@ -408,9 +444,13 @@
     NSIndexPath *indexPath = [self indexPathForSubIndex:index];
 
     NSInteger sectionNum = indexPath.section;
+    if (sectionNum >= [_sections count] || sectionNum < 0) {
+        // try to protect sectionNum out of range.
+        return;
+    }
     NSInteger row = indexPath.row;
     NSMutableArray *sections = _sections;
-    WXSection *section = sections[sectionNum];
+    WXSectionComponent *section = sections[sectionNum];
     WXAssert(section, @"no section found for section number:%ld", sectionNum);
     NSMutableArray *completedSections;
     BOOL isReload = [section.rows containsObject:cell];
@@ -478,6 +518,10 @@
     
     NSIndexPath *fromIndexPath = [self indexPathForCell:cell sections:_sections];
     NSIndexPath *toIndexPath = [self indexPathForSubIndex:index];
+    if (toIndexPath.row > [_sections[toIndexPath.section].rows count] || toIndexPath.row < 0) {
+        WXLogError(@"toIndexPath %@ is out of range as the current is %lu",toIndexPath ,(unsigned long)[_sections[toIndexPath.section].rows count]);
+        return;
+    }
     [self removeCellForIndexPath:fromIndexPath withSections:_sections];
     [self insertCell:cell forIndexPath:toIndexPath withSections:_sections];
     
@@ -568,7 +612,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    WXHeaderComponent *header = ((WXSection *)_completedSections[section]).header;
+    WXHeaderComponent *header = ((WXSectionComponent *)[_completedSections wx_safeObjectAtIndex:section]).header;
     if (header) {
         return header.calculatedFrame.size.height;
     } else {
@@ -576,9 +620,30 @@
     }
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [super scrollViewDidScroll:scrollView];
+    if ([[_tableView indexPathsForVisibleRows] count] > 0) {
+        NSIndexPath *topCellPath = [[_tableView indexPathsForVisibleRows] objectAtIndex:0];
+        if (self.currentTopVisibleSection != topCellPath.section) {
+            if (self.currentTopVisibleSection) {
+                WXSectionComponent *removeSection = [_sections wx_safeObjectAtIndex:self.currentTopVisibleSection];
+                if (removeSection.header && [removeSection.header.events containsObject:@"unsticky"]) {
+                    [removeSection.header fireEvent:@"unsticky" params:nil];
+                }
+            }
+            self.currentTopVisibleSection = topCellPath.section;
+            WXSectionComponent *showSection = [_sections wx_safeObjectAtIndex:topCellPath.section];
+            if (showSection.header && [showSection.header.events containsObject:@"sticky"]) {
+                [showSection.header fireEvent:@"sticky" params:nil];
+            }
+        }
+    }
+}
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    WXHeaderComponent *header = ((WXSection *)_completedSections[section]).header;
+    WXHeaderComponent *header = ((WXSectionComponent *)_completedSections[section]).header;
     WXLogDebug(@"header view for section %ld:%@", (long)section, header.view);
     return header.view;
 }
@@ -592,7 +657,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return ((WXSection *)[_completedSections wx_safeObjectAtIndex:section]).rows.count;
+    return ((WXSectionComponent *)[_completedSections wx_safeObjectAtIndex:section]).rows.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -672,7 +737,7 @@
 
 - (WXCellComponent *)cellForIndexPath:(NSIndexPath *)indexPath
 {
-    WXSection *section = [_completedSections wx_safeObjectAtIndex:indexPath.section];
+    WXSectionComponent *section = [_completedSections wx_safeObjectAtIndex:indexPath.section];
     if (!section) {
         WXLogError(@"No section found for num:%ld, completed sections:%ld", (long)indexPath.section, (unsigned long)_completedSections.count);
         return nil;
@@ -689,7 +754,11 @@
 
 - (void)insertCell:(WXCellComponent *)cell forIndexPath:(NSIndexPath *)indexPath withSections:(NSMutableArray *)sections
 {
-    WXSection *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    WXSectionComponent *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    if (indexPath.row > [section.rows count] || indexPath.row < 0) {
+        WXLogError(@"inserting cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
+        return;
+    }
     WXAssert(section, @"inserting cell at indexPath:%@ section has not been inserted to list before, sections:%@", indexPath, sections);
     WXAssert(indexPath.row <= section.rows.count, @"inserting cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
     [section.rows insertObject:cell atIndex:indexPath.row];
@@ -697,16 +766,19 @@
 
 - (void)removeCellForIndexPath:(NSIndexPath *)indexPath withSections:(NSMutableArray *)sections
 {
-    WXSection *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    WXSectionComponent *section = [sections wx_safeObjectAtIndex:indexPath.section];
+    if (0 == [section.rows count]) {
+        return;
+    }
     WXAssert(section, @"Removing cell at indexPath:%@ has not been inserted to cell list before, sections:%@", indexPath, sections);
     WXAssert(indexPath.row < section.rows.count, @"Removing cell at indexPath:%@ outof range, sections:%@", indexPath, sections);
     [section.rows removeObjectAtIndex:indexPath.row];
 }
 
-- (NSIndexPath *)indexPathForCell:(WXCellComponent *)cell sections:(NSMutableArray<WXSection *> *)sections
+- (NSIndexPath *)indexPathForCell:(WXCellComponent *)cell sections:(NSMutableArray<WXSectionComponent *> *)sections
 {
     __block NSIndexPath *indexPath;
-    [sections enumerateObjectsUsingBlock:^(WXSection * _Nonnull section, NSUInteger sectionIndex, BOOL * _Nonnull sectionStop) {
+    [sections enumerateObjectsUsingBlock:^(WXSectionComponent * _Nonnull section, NSUInteger sectionIndex, BOOL * _Nonnull sectionStop) {
         [section.rows enumerateObjectsUsingBlock:^(WXCellComponent * _Nonnull row, NSUInteger rowIndex, BOOL * _Nonnull stop) {
             if (row == cell) {
                 indexPath = [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
@@ -719,10 +791,10 @@
     return indexPath;
 }
 
-- (NSUInteger)indexForHeader:(WXHeaderComponent *)header sections:(NSMutableArray<WXSection *> *)sections
+- (NSUInteger)indexForHeader:(WXHeaderComponent *)header sections:(NSMutableArray<WXSectionComponent *> *)sections
 {
     __block NSUInteger index;
-    [sections enumerateObjectsUsingBlock:^(WXSection * _Nonnull section, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
+    [sections enumerateObjectsUsingBlock:^(WXSectionComponent * _Nonnull section, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
         if (section.header == header) {
             index = sectionIndex;
             *stop = YES;

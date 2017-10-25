@@ -21,6 +21,7 @@
 #import "WXModuleFactory.h"
 #import "WXMonitor.h"
 #import "WXModuleProtocol.h"
+#import "WXAppMonitorProtocol.h"
 #import "WXAssert.h"
 #import "WXUtility.h"
 #import "WXSDKInstance_private.h"
@@ -32,10 +33,12 @@
 - (instancetype)initWithModuleName:(NSString *)moduleName
                         methodName:(NSString *)methodName
                          arguments:(NSArray *)arguments
+                           options:(NSDictionary *)options
                           instance:(WXSDKInstance *)instance
 {
     if (self = [super initWithMethodName:methodName arguments:arguments instance:instance]) {
         _moduleName = moduleName;
+        _options = options;
     }
     
     return self;
@@ -43,12 +46,15 @@
 
 - (NSInvocation *)invoke
 {
-    
     if (self.instance.needValidate) {
         id<WXValidateProtocol> validateHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXValidateProtocol)];
         if (validateHandler) {
-            WXModuleValidateResult* result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments];
-            if (result && !result.isSuccess) {
+            WXModuleValidateResult* result = nil;
+            if ([validateHandler respondsToSelector:@selector(validateWithWXSDKInstance:module:method:args:options:)]) {
+                result =  [validateHandler validateWithWXSDKInstance:self.instance module:self.moduleName method:self.methodName args:self.arguments options:self.options];
+            }
+
+            if (result==nil || !result.isSuccess) {
                 NSString *errorMessage = [result.error.userInfo  objectForKey:@"errorMsg"];
                 WXLogError(@"%@", errorMessage);
                 WX_MONITOR_FAIL(WXMTJSBridge, WX_ERR_INVOKE_NATIVE, errorMessage);
@@ -87,7 +93,8 @@
         }
         return nil;
     }
-    
+	
+    [self commitModuleInvoke];
     NSInvocation *invocation = [self invocationWithTarget:moduleInstance selector:selector];
     
     if (isSync) {
@@ -96,6 +103,15 @@
     } else {
         [self _dispatchInvocation:invocation moduleInstance:moduleInstance];
         return nil;
+    }
+}
+
+- (void)commitModuleInvoke
+{
+    id<WXAppMonitorProtocol> appMonitorHandler = [WXHandlerFactory handlerForProtocol:@protocol(WXAppMonitorProtocol)];
+    if ([appMonitorHandler respondsToSelector:@selector(commitAppMonitorAlarm:monitorPoint:success:errorCode:errorMsg:arg:)]) {
+        NSString * arg = [NSString stringWithFormat:@"%@.%@", self.moduleName, self.methodName];
+        [appMonitorHandler commitAppMonitorAlarm:@"weex" monitorPoint:@"invokeModule" success:NO errorCode:@"101" errorMsg:self.instance.pageName arg:arg];
     }
 }
 

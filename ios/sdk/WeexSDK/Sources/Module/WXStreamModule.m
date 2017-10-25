@@ -24,6 +24,7 @@
 #import "WXNetworkProtocol.h"
 #import "WXURLRewriteProtocol.h"
 #import "WXResourceLoader.h"
+#import "WXSDKEngine.h"
 
 @implementation WXStreamModule
 
@@ -31,6 +32,7 @@
 
 WX_EXPORT_METHOD(@selector(sendHttp:callback:))
 WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
+WX_EXPORT_METHOD(@selector(fetchWithArrayBuffer:options:callback:progressCallback:))
 
 - (void)fetch:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
 {
@@ -103,13 +105,25 @@ WX_EXPORT_METHOD(@selector(fetch:callback:progressCallback:))
     [loader start];
 }
 
+- (void)fetchWithArrayBuffer:(id)arrayBuffer options:(NSDictionary *)options callback:(WXModuleCallback)callback progressCallback:(WXModuleKeepAliveCallback)progressCallback
+{
+    NSMutableDictionary *newOptions = [options mutableCopy];
+    if([arrayBuffer isKindOfClass:[NSDictionary class]]){
+        NSData *sendData = [WXUtility base64DictToData:arrayBuffer];
+        if(sendData){
+            [newOptions setObject:sendData forKey:@"body"];
+        }
+    }
+    [self fetch:newOptions callback:callback progressCallback:progressCallback];
+}
+
 - (WXResourceRequest*)_buildRequestWithOptions:(NSDictionary*)options callbackRsp:(NSMutableDictionary*)callbackRsp
 {
     // parse request url
     NSString *urlStr = [options objectForKey:@"url"];
-    NSMutableString *newUrlStr = [urlStr mutableCopy];
-    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance, &newUrlStr)
-    urlStr = newUrlStr;
+    NSString *newURL = [urlStr copy];
+    WX_REWRITE_URL(urlStr, WXResourceTypeLink, self.weexInstance)
+    urlStr = newURL;
     
     if (!options || [WXUtility isBlankString:urlStr]) {
         [callbackRsp setObject:@(-1) forKey:@"status"];

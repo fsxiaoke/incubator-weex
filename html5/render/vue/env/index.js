@@ -19,8 +19,7 @@
 import '../styles/reset.css'
 import '../styles/base.css'
 
-// import 'lazyimg'
-import '../../browser/render/gesture'
+import '../lib/gesture'
 
 import '../../../shared/arrayFrom'
 import '../../../shared/objectAssign'
@@ -31,11 +30,7 @@ import 'core-js/modules/es6.string.iterator'
 import 'core-js/modules/web.dom.iterable'
 import 'core-js/modules/es6.promise'
 
-import modules from '../modules'
 import './global'
-
-// register built-in modules.
-global.weex.install(modules)
 
 export function setVue (vue) {
   if (!vue) {

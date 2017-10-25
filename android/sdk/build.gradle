@@ -1,7 +1,11 @@
 buildscript {
+    repositories {
+        mavenCentral()
+    }
 
     apply plugin: 'maven'
     dependencies {
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
     }
     
@@ -41,8 +45,13 @@ buildscript {
             
 }
 
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 ext.disableCov = project.hasProperty('disableCov') ? project.getProperty('disableCov') : 'false'
 if(!disableCov.toBoolean()){
@@ -51,8 +60,6 @@ if(!disableCov.toBoolean()){
         excludes = ['com/taobao/weex/dom/flex/**','com/taobao/weex/ui/view/refresh/circlebar/**']
     }
 }
-
-project.ext.set("androidTargetSDK",project.hasProperty('targetSDK') ? project.getProperty('targetSDK') as int : 21 )
 
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/quality/checkstyle.xml") // Where my checkstyle config is...
@@ -77,6 +84,12 @@ android {
     resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
+    copy {
+        from '../../pre-build'
+        into new File(projectDir,"assets")
+        include 'native-bundle-main.js'
+        rename('native-bundle-main.js','main.js')
+    }
     def line
     new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
     def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
@@ -100,8 +113,7 @@ android {
         buildConfigField "long", "ARMEABI_Size", "${ARMEABI_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-//        minSdkVersion 14
-//        targetSdkVersion project.androidTargetSDK
+
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
@@ -177,7 +189,14 @@ dependencies {
     testCompile 'org.powermock:powermock-module-testng:1.6.4'
     testCompile 'org.powermock:powermock-classloading-xstream:1.6.4'
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
-    testCompile 'org.robolectric:robolectric:3.0'
-    testCompile "org.robolectric:shadows-httpclient:3.0"
+    testCompile 'org.robolectric:robolectric:3.3.2'
+    testCompile "org.robolectric:shadows-httpclient:3.3.2"
     testCompile 'org.json:json:20160212'
+}
+if(file('../license/LICENSE').exists()){
+    license {
+        header = file('../license/LICENSE')
+        excludes(["com/taobao/weex/dom/flex/*.java"])
+    }
+    preBuild.dependsOn licenseFormat
 }

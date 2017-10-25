@@ -28,8 +28,10 @@ Weex SDK 只提供渲染，而不是其他的能力，如果你需要 像网络�
 
     ```object-c
     @implementation WXEventModule
+    
     @synthesize weexInstance;
-        WX_EXPORT_METHOD(@selector(openURL:callback))
+    WX_EXPORT_METHOD(@selector(openURL:callback:))
+    
     - (void)openURL:(NSString *)url callback:(WXModuleCallback)callback
     {
         NSString *newURL = url;
@@ -311,12 +313,12 @@ WeexSDK 0.9.5 之后支持了在 js 中直接调用 component 的方法，这里
 
   ```html
   <template>
-    <mycomponent id='mycomponent'></mycomponent>
+    <mycomponent ref='mycomponent'></mycomponent>
   </template>
   <script>
     module.exports = {
       created:function() {
-        this.$el('mycomponent').focus();
+        this.$refs.mycomponent.focus();
       }
     }
   </script>

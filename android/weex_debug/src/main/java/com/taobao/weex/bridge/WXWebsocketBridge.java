@@ -93,6 +93,14 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public int callCreateBody(String instanceId, String tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateBody(instanceId, tasks, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
     public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
         if (!mInit || mJsManager == null)
             return IWXBridge.INSTANCE_RENDERING_ERROR ;
@@ -101,7 +109,102 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     }
 
     @Override
+    public int callUpdateFinish(String instanceId, byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callUpdateFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callCreateFinish(String instanceId,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callCreateFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRefreshFinish(String instanceId,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRefreshFinish(instanceId, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateAttrs(String instanceId, String ref,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        if (tasks != null) {
+            mJsManager.callUpdateAttrs(instanceId, ref, new String(tasks), callback);
+        }
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callUpdateStyle(String instanceId, String ref,  byte [] tasks, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        if (tasks != null) {
+            mJsManager.callUpdateStyle(instanceId, ref, new String(tasks), callback);
+        }
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRemoveElement(String instanceId, String ref, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRemoveElement(instanceId, ref, callback);
+
+
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callMoveElement(String instanceId, String ref, String parentref, String index, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callMoveElement(instanceId, ref, parentref, index, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callAddEvent(String instanceId, String ref, String event, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callAddEvent(instanceId, ref, event, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
+    public int callRemoveEvent(String instanceId, String ref, String event, String callback) {
+        if (!mInit || mJsManager == null)
+            return IWXBridge.INSTANCE_RENDERING_ERROR ;
+        mJsManager.callRemoveEvent(instanceId, ref, event, callback);
+        return IWXBridge.INSTANCE_RENDERING;
+    }
+
+    @Override
     public int initFramework(String scriptsFramework,WXParams params) {
+        if (!mInit) {
+            return -1;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", "evalFramework");
+        ArrayList<String> args = new ArrayList<>();
+        args.add(scriptsFramework);
+        map.put("arguments", args);
+        WXWebSocketManager.getInstance().sendMessage(JSON.toJSONString(map));
+        return 0;
+    }
+
+    @Override
+    public int initFrameworkEnv(String scriptsFramework,WXParams params, String cacheDir, boolean onSdcard) {
         if (!mInit) {
             return -1;
         }
@@ -134,6 +237,12 @@ public class WXWebsocketBridge implements IWXBridge,WXWebSocketManager.JSDebugge
     public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
 
     }
+
+    @Override
+    public void reportServerCrash(String instanceId, String crashFile) {
+
+    }
+
 
     @Override
     public void onMessage(BufferedSource payload, WebSocket.PayloadType type) {

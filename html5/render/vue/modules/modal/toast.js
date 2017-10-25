@@ -20,42 +20,32 @@ const queue = []
 let isProcessing = false
 let toastWin
 const TOAST_WIN_CLASS_NAME = 'weex-toast'
+const TOAST_TRANSITION_DURATION = 0.4
 
 const DEFAULT_DURATION = 0.8
 
 function showToastWindow (msg, callback) {
-  const handleTransitionEnd = function () {
-    toastWin.removeEventListener('transitionend', handleTransitionEnd)
-    toastWin.removeEventListener('webkitTransitionEnd', handleTransitionEnd)
-    callback && callback()
-  }
   if (!toastWin) {
     toastWin = document.createElement('div')
-    toastWin.classList.add(TOAST_WIN_CLASS_NAME, 'hide')
+    toastWin.classList.add(TOAST_WIN_CLASS_NAME)
+    toastWin.classList.add('hide')
     document.body.appendChild(toastWin)
   }
   toastWin.textContent = msg
-  toastWin.addEventListener('transitionend', handleTransitionEnd)
-  toastWin.addEventListener('webkitTransitionEnd', handleTransitionEnd)
   setTimeout(function () {
     toastWin.classList.remove('hide')
-  }, 0)
+    callback && callback()
+  }, 16)
 }
 
 function hideToastWindow (callback) {
-  const handleTransitionEnd = function () {
-    toastWin.removeEventListener('transitionend', handleTransitionEnd)
-    toastWin.removeEventListener('webkitTransitionEnd', handleTransitionEnd)
-    callback && callback()
-  }
   if (!toastWin) {
     return
   }
-  toastWin.addEventListener('transitionend', handleTransitionEnd)
-  toastWin.addEventListener('webkitTransitionEnd', handleTransitionEnd)
+  toastWin.classList.add('hide')
   setTimeout(function () {
-    toastWin.classList.add('hide')
-  }, 0)
+    callback && callback()
+  }, TOAST_TRANSITION_DURATION * 1000)
 }
 
 export default {
