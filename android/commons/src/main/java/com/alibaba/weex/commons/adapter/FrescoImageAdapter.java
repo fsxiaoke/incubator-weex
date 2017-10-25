@@ -46,6 +46,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.WXImageStrategy;
@@ -57,7 +58,7 @@ public class FrescoImageAdapter implements IWXImgLoaderAdapter {
     }
 
     @Override
-    public void setImage(final String url, final ImageView view,
+    public void setImage(WXSDKInstance instance, final String url, final ImageView view,
                          WXImageQuality quality, WXImageStrategy strategy) {
 
         WXSDKManager.getInstance().postOnUiThread(new Runnable() {

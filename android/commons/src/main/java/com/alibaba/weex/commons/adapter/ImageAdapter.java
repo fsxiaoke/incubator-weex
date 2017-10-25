@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.WXImageStrategy;
@@ -36,7 +37,7 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
   }
 
   @Override
-  public void setImage(final String url, final ImageView view,
+  public void setImage(WXSDKInstance instance, final String url, final ImageView view,
                        WXImageQuality quality, final WXImageStrategy strategy) {
 
     WXSDKManager.getInstance().postOnUiThread(new Runnable() {
