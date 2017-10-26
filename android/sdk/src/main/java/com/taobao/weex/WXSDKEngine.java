@@ -557,7 +557,7 @@ public class WXSDKEngine {
       public void run() {
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(JS_FRAMEWORK_RELOAD));
       }
-    }, 0);
+    }, 1000);
   }
   public static void reload(final Context context, boolean remoteDebug) {
    reload(context,null,remoteDebug);

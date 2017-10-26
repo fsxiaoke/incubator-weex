@@ -1600,7 +1600,14 @@ public class WXBridgeManager implements Callback,BactchExecutor {
         }
 
         // extends initFramework
-        if(mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, installOnSdcard)==INIT_FRAMEWORK_OK){
+        int initrst=0;
+        if (WXEnvironment.sDebugMode){
+          initrst=mWXBridge.initFramework(framework,assembleDefaultOptions());
+        }else{
+          initrst=mWXBridge.initFrameworkEnv(framework, assembleDefaultOptions(), crashFile, installOnSdcard);
+        }
+
+        if(initrst==INIT_FRAMEWORK_OK){
           WXEnvironment.sJSLibInitTime = System.currentTimeMillis() - start;
           WXLogUtils.renderPerformanceLog("initFramework", WXEnvironment.sJSLibInitTime);
           WXEnvironment.sSDKInitTime = System.currentTimeMillis() - WXEnvironment.sSDKInitStart;
