@@ -967,7 +967,7 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
    * Do not use this method to add event, this only apply event already add to DomObject.
    * @param type
    */
-  public void addEvent(String type) {
+  public void addEvent(final String type) {
     if (TextUtils.isEmpty(type) || mAppendEvents.contains(type)) {
       return;
     }
@@ -981,7 +981,15 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
         public void onFocusChange(boolean hasFocus) {
           Map<String, Object> params = new HashMap<>();
           params.put("timeStamp", System.currentTimeMillis());
-          fireEvent(hasFocus ? Constants.Event.FOCUS : Constants.Event.BLUR, params);
+          String event=null;
+          if (type.equals(Constants.Event.FOCUS)&&hasFocus){
+            event=Constants.Event.FOCUS;
+          }else if (type.equals(Constants.Event.BLUR)&&!hasFocus){
+            event=Constants.Event.BLUR;
+          }
+          if(event!=null){
+            fireEvent(event, params);
+          }
         }
       });
     } else if (view != null &&

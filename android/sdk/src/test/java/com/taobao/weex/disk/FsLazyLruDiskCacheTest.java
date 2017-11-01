@@ -26,14 +26,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -43,7 +42,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Created by lid on 2017/8/25.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 public class FsLazyLruDiskCacheTest {
     FsLazyLruDiskCache cache;
@@ -152,7 +151,7 @@ public class FsLazyLruDiskCacheTest {
     }
     @Test
     public void add() throws Exception {
-        boolean b=cache.addItem("./testdata/2.dat");//该key在init时已经被添加�?
+        boolean b=cache.addItem("./testdata/2.dat");//该key在init时已经被添加
         Assert.assertFalse(b);
 
         File f= new File("./testdata/3.dat");

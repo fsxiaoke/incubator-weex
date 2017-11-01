@@ -25,7 +25,7 @@ import com.taobao.weex.WXSDKEngine;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -34,7 +34,7 @@ import org.robolectric.shadows.ShadowLooper;
 /**
  * Created by lid on 2017/8/24.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 public class FsMMapWriterTest {
     static FsMMapWriter writer;
