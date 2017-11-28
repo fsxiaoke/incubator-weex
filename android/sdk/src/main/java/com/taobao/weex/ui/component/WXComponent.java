@@ -29,6 +29,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.CallSuper;
 import android.support.annotation.CheckResult;
@@ -1440,6 +1441,9 @@ public abstract class  WXComponent<T extends View> implements IWXObject, IWXActi
   public void onActivityCreate() {
 
   }
+
+  public void onActivitySaveInstance(Bundle bundle){}
+  public void onActivityRestoreInstance(Bundle bundle){}
 
   public void onActivityStart() {
 
