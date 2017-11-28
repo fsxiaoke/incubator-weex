@@ -21,6 +21,7 @@ package com.taobao.weex.bridge;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -60,7 +61,7 @@ public class WXModuleManager {
   private static Map<String, List<ModuleFactory>> sModuleFactoryMap = new HashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
-
+  private static Map<String, Bundle> sActivityRestoreBundle = new HashMap<>();
   /**
    * monitor keys
    */
@@ -243,6 +244,9 @@ public class WXModuleManager {
         try {
           wxModule = factory.buildInstance();
           wxModule.setModuleName(moduleStr);
+          if (sActivityRestoreBundle.containsKey(instanceId)){
+            wxModule.onActivityRestoreInstance(sActivityRestoreBundle.get(instanceId));
+          }
         } catch (Exception e) {
           WXLogUtils.e(moduleStr + " module build instace failed.", e);
           return null;
@@ -272,7 +276,34 @@ public class WXModuleManager {
     }
 
   }
+  public static void onActivitySaveInstance(String instanceId,Bundle bundle){
 
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivitySaveInstance(bundle);
+        } else {
+          WXLogUtils.w("onActivitySaveInstance can not find the " + key + " module");
+        }
+      }
+    }
+  }
+  public static void onActivityRestoreInstance(String instanceId,Bundle bundle){
+    sActivityRestoreBundle.put(instanceId,bundle);
+    Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
+    if(modules!=null) {
+      for (String key : modules.keySet()) {
+        WXModule module = modules.get(key);
+        if (module != null) {
+          module.onActivityRestoreInstance(bundle);
+        } else {
+          WXLogUtils.w("onActivitySaveInstance can not find the " + key + " module");
+        }
+      }
+    }
+  }
   public static void onActivityStart(String instanceId){
 
     Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
@@ -331,6 +362,7 @@ public class WXModuleManager {
   }
 
   public static void onActivityDestroy(String instanceId){
+    sActivityRestoreBundle.remove(instanceId);
     Map<String, WXModule> modules = sInstanceModuleMap.get(instanceId);
     if(modules!=null) {
       for (String key : modules.keySet()) {

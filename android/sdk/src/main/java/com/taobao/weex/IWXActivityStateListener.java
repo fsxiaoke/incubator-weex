@@ -18,6 +18,8 @@
  */
 package com.taobao.weex;
 
+import android.os.Bundle;
+
 /**
  * Listener class for activity lifecycle
  */
@@ -26,6 +28,8 @@ package com.taobao.weex;
 public interface IWXActivityStateListener {
 
   void onActivityCreate();
+  void onActivitySaveInstance(Bundle bundle);
+  void onActivityRestoreInstance(Bundle bundle);
 
   void onActivityStart();
 

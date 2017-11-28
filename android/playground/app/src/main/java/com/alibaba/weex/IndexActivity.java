@@ -47,6 +47,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 
+import java.util.HashMap;
+
 public class IndexActivity extends AbstractWeexActivity {
 
   private static final String TAG = "IndexActivity";
@@ -147,6 +149,9 @@ public class IndexActivity extends AbstractWeexActivity {
         } else {
           startActivity(new Intent(this, CaptureActivity.class));
         }
+        break;
+      case R.id.action_getdata:
+        mInstance.fireGlobalEventCallback_sync("getSaveInstanceData",new HashMap<String, Object>());
         break;
       default:
         break;

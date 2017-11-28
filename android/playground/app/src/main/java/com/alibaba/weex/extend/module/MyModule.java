@@ -20,8 +20,11 @@ package com.alibaba.weex.extend.module;
 
 import android.widget.Toast;
 
+import com.alibaba.weex.WXPageActivity;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.WXModule;
+
+import java.util.Map;
 
 public class MyModule extends WXModule {
 
@@ -29,4 +32,9 @@ public class MyModule extends WXModule {
   public void printLog(String msg) {
     Toast.makeText(mWXSDKInstance.getContext(),msg,Toast.LENGTH_SHORT).show();
   }
+  @JSMethod(uiThread = false)
+  public void setSaveInstanceData(Map data) {
+    ((WXPageActivity)(mWXSDKInstance.getContext())).setSaveInstanceData(data);
+  }
+
 }

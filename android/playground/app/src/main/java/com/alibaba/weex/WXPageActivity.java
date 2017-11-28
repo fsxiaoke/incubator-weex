@@ -87,7 +87,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
   private BroadcastReceiver mReceiver;
   private Uri mUri;
   private HashMap mConfigMap = new HashMap<String, Object>();
-
+  private Map mSaveInstanceData;
   @Override
   public void onCreateNestInstance(WXSDKInstance instance, NestedContainer container) {
     Log.d(TAG, "Nested Instance created.");
@@ -162,7 +162,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       mWxAnalyzerDelegate.onStart();
     }
   }
-
+  public void setSaveInstanceData(Map data){
+    mSaveInstanceData=data;
+  }
   private void loadWXfromLocal(boolean reload) {
     if (reload && mInstance != null) {
       mInstance.destroy();
@@ -463,9 +465,9 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    if (!TextUtils.equals("file", mUri.getScheme())) {
+//    if (!TextUtils.equals("file", mUri.getScheme())) {
       getMenuInflater().inflate(R.menu.refresh, menu);
-    }
+//    }
     return true;
   }
 
@@ -483,7 +485,20 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         loadWXfromService(url);
         return true;
       }
+    }else if ( id == R.id.action_getdata) {
+      mInstance.fireGlobalEventCallback("getSaveInstanceData", new HashMap<String, Object>());
+      do {
+        if(mSaveInstanceData!=null&&mSaveInstanceData.size()>0){
+          break;
+        }
+        try {
+          Thread.sleep(10);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }while (true);
     }
+
     return super.onOptionsItemSelected(item);
   }
 

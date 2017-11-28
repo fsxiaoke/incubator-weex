@@ -19,6 +19,7 @@
 package com.taobao.weex.common;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
 
@@ -65,6 +66,9 @@ public abstract class WXModule implements IWXObject {
   public void onActivityCreate(){}
 
   public void onActivityStart(){}
+
+  public void onActivitySaveInstance(Bundle bundle){}
+  public void onActivityRestoreInstance(Bundle bundle){}
 
   public void onActivityPause(){}
 

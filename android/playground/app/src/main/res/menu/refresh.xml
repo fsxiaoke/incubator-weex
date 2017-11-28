@@ -24,4 +24,9 @@ under the License.
             android:icon="@drawable/ic_action_refresh"
             app:showAsAction="ifRoom"
             android:id="@+id/action_refresh"/>
+    <item
+        android:id="@+id/action_getdata"
+        android:title="获取数据"
+        android:icon="@drawable/ic_action_refresh"
+        app:showAsAction="ifRoom"/>
 </menu>

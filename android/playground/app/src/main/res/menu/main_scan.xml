@@ -24,4 +24,9 @@ under the License.
             android:title="扫码"
             android:icon="@drawable/ic_action_scan"
             app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_getdata"
+        android:title="获取数据"
+        android:icon="@drawable/ic_action_refresh"
+        app:showAsAction="ifRoom"/>
 </menu>

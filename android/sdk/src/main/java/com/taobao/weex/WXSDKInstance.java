@@ -27,6 +27,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -799,7 +800,20 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
     mGlobalEventReceiver=new WXGlobalEventReceiver(this);
     getContext().registerReceiver(mGlobalEventReceiver,new IntentFilter(WXGlobalEventReceiver.EVENT_ACTION));
   }
+  @Override
+  public void onActivitySaveInstance(Bundle bundle) {
 
+    WXModuleManager.onActivitySaveInstance(getInstanceId(),bundle);
+
+
+  }
+  @Override
+  public void onActivityRestoreInstance(Bundle bundle) {
+
+    WXModuleManager.onActivityRestoreInstance(getInstanceId(),bundle);
+
+
+  }
   @Override
   public void onActivityStart() {
 
