@@ -195,7 +195,7 @@ public class WXImage extends WXComponent<ImageView> {
 
   @WXComponentProp(name = Constants.Name.SRC)
   public void setSrc(String src) {
-    if (src == null) {
+    if (src == null||src.equals(this.mSrc)) {
       return;
     }
 
