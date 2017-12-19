@@ -19,23 +19,23 @@ buildscript {
                 snapshotRepository(url: gradle.mavenDevUrl) {
                     authentication(userName: gradle.mavenUserName, password: gradle.mavenPwd)
                 }
-
-
             }
         }
+
+
         doFirst {
             def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
             def verName = "1.0" + "_$suffix_ver"
             println("upload $project.name ver $verName")
             repositories.mavenDeployer.pom.version = "$verName"
-            repositories.mavenDeployer.pom.artifactId = "weex"
+            repositories.mavenDeployer.pom.artifactId = "$compileType"
             repositories.mavenDeployer.pom.groupId = "fs-android"
         }
         doLast {
             def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
             def verName = "1.0" + "_$suffix_ver"
-            println("save weex ver $verName")
-            gradle.modifyLibVersion("weex", verName)
+            println("save \"$compileType\" ver $verName")
+            gradle.modifyLibVersion("$compileType", verName)
         }
     }
 
@@ -84,12 +84,12 @@ android {
     resourcePrefix "weex"
 
     useLibrary 'org.apache.http.legacy'
-    copy {
-        from '../../pre-build'
-        into new File(projectDir,"assets")
-        include 'native-bundle-main.js'
-        rename('native-bundle-main.js','main.js')
-    }
+//    copy {
+//        from '../../pre-build'
+//        into new File(projectDir,"assets")
+//        include 'native-bundle-main.js'
+//        rename('native-bundle-main.js','main.js')
+//    }
     def line
     new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
     def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
