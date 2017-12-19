@@ -34,7 +34,7 @@ buildscript {
         doLast {
             def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
             def verName = "1.0" + "_$suffix_ver"
-            println("save \"$compileType\" ver $verName")
+            println("save $compileType ver $verName")
             gradle.modifyLibVersion("$compileType", verName)
         }
     }
