@@ -72,7 +72,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
-  private boolean mIgnoreNextOnInputEvent = false;
+  protected boolean mIgnoreNextOnInputEvent = false;
   protected TextWatcher mTextWatcher;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
@@ -213,9 +213,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
           @Override
           public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            if (mIgnoreNextOnInputEvent) {
-              mIgnoreNextOnInputEvent = false;
-            }
+//            if (mIgnoreNextOnInputEvent) {
+//              mIgnoreNextOnInputEvent = false;
+//            }
 
             if (mBeforeText.equals(s.toString())) {
               return;
