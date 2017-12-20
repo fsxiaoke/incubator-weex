@@ -20,6 +20,7 @@ package com.alibaba.weex.extend;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -105,6 +106,16 @@ public class PlayDebugAdapter implements IWXDebugAdapter {
 
     @Override
     public void onActivityCreate() {
+
+    }
+
+    @Override
+    public void onActivitySaveInstance(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityRestoreInstance(Bundle bundle) {
 
     }
 

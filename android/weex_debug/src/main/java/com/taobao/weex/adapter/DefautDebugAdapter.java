@@ -19,6 +19,7 @@
 package com.taobao.weex.adapter;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -89,6 +90,16 @@ public class DefautDebugAdapter implements IWXDebugAdapter {
 
     @Override
     public void onActivityCreate() {
+
+    }
+
+    @Override
+    public void onActivitySaveInstance(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityRestoreInstance(Bundle bundle) {
 
     }
 

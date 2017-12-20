@@ -151,7 +151,7 @@ public class IndexActivity extends AbstractWeexActivity {
         }
         break;
       case R.id.action_getdata:
-        mInstance.fireGlobalEventCallback_sync("getSaveInstanceData",new HashMap<String, Object>());
+        mInstance.fireGlobalEventCallback("getSaveInstanceData",new HashMap<String, Object>());
         break;
       default:
         break;

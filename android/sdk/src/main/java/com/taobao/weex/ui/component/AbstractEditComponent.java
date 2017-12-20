@@ -73,6 +73,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
   private boolean mIgnoreNextOnInputEvent = false;
+  protected TextWatcher mTextWatcher;
 
   public AbstractEditComponent(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, boolean isLazy) {
     super(instance, dom, parent, isLazy);
@@ -202,35 +203,40 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         }
       });
     } else if (type.equals(Constants.Event.INPUT)) {
-      text.addTextChangedListener(new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      if(mTextWatcher==null){
+        mTextWatcher=new TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-          if (mIgnoreNextOnInputEvent) {
-            mIgnoreNextOnInputEvent = false;
           }
 
-          if (mBeforeText.equals(s.toString())) {
-            return;
+          @Override
+          public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            if (mIgnoreNextOnInputEvent) {
+              mIgnoreNextOnInputEvent = false;
+            }
+
+            if (mBeforeText.equals(s.toString())) {
+              return;
+            }
+
+            mBeforeText = s.toString();
+
+            if (!mIgnoreNextOnInputEvent) {
+              fireEvent(Constants.Event.INPUT, s.toString());
+            }
           }
 
-          mBeforeText = s.toString();
+          @Override
+          public void afterTextChanged(Editable s) {
 
-          if (!mIgnoreNextOnInputEvent) {
-            fireEvent(Constants.Event.INPUT, s.toString());
           }
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-
-        }
-      });
+        };
+      }else{
+        text.removeTextChangedListener(mTextWatcher);
+      }
+      text.addTextChangedListener(mTextWatcher);
     }
 
     if (Constants.Event.RETURN.equals(type)) {
