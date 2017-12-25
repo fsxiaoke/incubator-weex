@@ -91,7 +91,7 @@ public class WXModalUIModule extends WXSDKEngine.DestroyableModule {
       toast.setDuration(duration);
       toast.setText(message);
     }
-    toast.setGravity(Gravity.CENTER, 0, 0);
+    toast.setGravity(Gravity.BOTTOM, 0, 0);
     toast.show();
   }
 
