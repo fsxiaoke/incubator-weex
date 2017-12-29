@@ -446,6 +446,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
     mIgnoreNextOnInputEvent = true;
     view.setText(value);
+    mIgnoreNextOnInputEvent=false;
     view.setSelection(value == null ? 0 : value.length());
   }
 
