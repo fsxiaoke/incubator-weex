@@ -280,7 +280,7 @@ public class WXImage extends WXComponent<ImageView> {
     if(mAutoRecycle){
       if(getHostView() != null){
         if (getInstance().getImgLoaderAdapter() != null) {
-          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+          getInstance().getImgLoaderAdapter().setImage(getInstance(),null, mHost, null, null);
         }
       }
     }
@@ -441,7 +441,7 @@ public class WXImage extends WXComponent<ImageView> {
   public void destroy() {
     if(getHostView() instanceof WXImageView){
       if (getInstance().getImgLoaderAdapter() != null) {
-          getInstance().getImgLoaderAdapter().setImage(null, mHost, null, null);
+          getInstance().getImgLoaderAdapter().setImage(getInstance(),null, mHost, null, null);
       }
     }
     super.destroy();
