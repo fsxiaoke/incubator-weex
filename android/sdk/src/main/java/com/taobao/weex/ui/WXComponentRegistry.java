@@ -20,7 +20,6 @@ package com.taobao.weex.ui;
 
 import android.text.TextUtils;
 
-import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
@@ -28,7 +27,6 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,7 +35,7 @@ import java.util.Objects;
  */
 public class WXComponentRegistry {
 
-  private static Map<String, List<IFComponentHolder>> sTypeComponentMap = new HashMap<>();
+  private static Map<String, IFComponentHolder> sTypeComponentMap = new HashMap<>();
   private static ArrayList<Map<String, Object>> sComponentInfos=new ArrayList<>();
 
   public static boolean registerComponent(final String type, final IFComponentHolder holder, final Map<String, Object> componentInfo) throws WXException {
@@ -73,14 +71,7 @@ public class WXComponentRegistry {
   private static boolean registerNativeComponent(String type, IFComponentHolder holder) throws WXException {
     try {
       holder.loadIfNonLazy();
-      List<IFComponentHolder> list=sTypeComponentMap.get(type);
-      if (list==null){
-        list=new ArrayList<>();
-        list.add(holder);
-        sTypeComponentMap.put(type, list);
-      }else{
-        list.add(holder);
-      }
+      sTypeComponentMap.put(type, holder);
     }catch (ArrayStoreException e){
       e.printStackTrace();
       //ignore: ArrayStoreException: java.lang.String cannot be stored in an array of type java.util.HashMap$HashMapEntry[]
@@ -95,28 +86,8 @@ public class WXComponentRegistry {
     return true;
   }
 
-  public static IFComponentHolder getComponent(String type, WXSDKInstance ins) {
-    IFComponentHolder ret=null;
-    do {
-      List<IFComponentHolder> list= sTypeComponentMap.get(type);
-      if(list==null||list.size()==0){
-        break;
-      }
-      if (list.size()==1){
-        ret=list.get(0);
-        break;
-      }
-      ClassLoader cl=ins.getContext().getClass().getClassLoader();
-      for (IFComponentHolder com :
-              list) {
-        if (com.getClassIns().getClassLoader().equals(cl)){
-          ret=com;
-          break;
-        }
-      }
-    }while (false);
-
-    return ret;
+  public static IFComponentHolder getComponent(String type) {
+    return sTypeComponentMap.get(type);
   }
 
   public static void reload(){
