@@ -58,6 +58,12 @@
     if (fabs(contentOffset.y) < 0.5) {
         contentOffset.y = 0;
     }
+    if (isnan(contentOffset.x)) {
+        contentOffset.x = 0;
+    }
+    if(isnan(contentOffset.y)) {
+        contentOffset.y = 0;
+    }
     
     [super setContentOffset:contentOffset];
 }
@@ -115,7 +121,7 @@
     NSUInteger _previousLoadMoreRowNumber;
     
     BOOL _isUpdating;
-    NSMutableArray<void(^)()> *_updates;
+    NSMutableArray<void(^)(void)> *_updates;
     NSTimeInterval _reloadInterval;
 }
 
@@ -155,6 +161,10 @@
     _tableView.delegate = self;
     _tableView.dataSource = self;
     _tableView.userInteractionEnabled = YES;
+    
+    _tableView.estimatedRowHeight = 0;
+    _tableView.estimatedSectionFooterHeight = 0;
+    _tableView.estimatedSectionHeaderHeight = 0;
 }
 
 - (void)viewWillUnload
@@ -543,10 +553,16 @@
             [self removeCellForIndexPath:fromIndexPath withSections:_completedSections];
             [self insertCell:cell forIndexPath:toIndexPath withSections:_completedSections];
             [UIView performWithoutAnimation:^{
-                [_tableView beginUpdates];
-                [_tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
-                [self handleAppear];
-                [_tableView endUpdates];
+                @try {
+                    [_tableView beginUpdates];
+                    [_tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+                    [self handleAppear];
+                    [_tableView endUpdates];
+                }@catch(NSException * exception){
+                    WXLogDebug(@"move cell exception: %@", [exception description]);
+                }@finally {
+                    // do nothing
+                }
             }];
         }
     }];
@@ -562,7 +578,7 @@
         _isUpdating = YES;
         NSArray *updates = [_updates copy];
         [_updates removeAllObjects];
-        for (void(^update)() in updates) {
+        for (void(^update)(void) in updates) {
             update();
         }
         [_tableView reloadData];
@@ -833,7 +849,7 @@
     return [NSIndexPath indexPathForRow:row inSection:section];
 }
 
-- (void)_performUpdates:(void(^)())updates withKeepScrollPosition:(BOOL)keepScrollPosition adjustmentBlock:(CGFloat(^)(NSIndexPath *topVisibleCell))adjustmentBlock
+- (void)_performUpdates:(void(^)(void))updates withKeepScrollPosition:(BOOL)keepScrollPosition adjustmentBlock:(CGFloat(^)(NSIndexPath *topVisibleCell))adjustmentBlock
 {
     CGFloat adjustment = 0;
     

@@ -173,7 +173,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
   }
 
   @Override
-  protected void addSubView(View view, int index) {
+  public void addSubView(View view, int index) {
     if (view == null || mAdapter == null) {
       return;
     }
@@ -220,6 +220,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityResume() {
+    super.onActivityResume();
     if (mViewPager != null && mViewPager.isAutoScroll()) {
       mViewPager.startAutoScroll();
     }
@@ -227,6 +228,7 @@ public class WXSlider extends WXVContainer<FrameLayout> {
 
   @Override
   public void onActivityStop() {
+    super.onActivityStop();
     if (mViewPager != null) {
       mViewPager.pauseAutoScroll();
     }

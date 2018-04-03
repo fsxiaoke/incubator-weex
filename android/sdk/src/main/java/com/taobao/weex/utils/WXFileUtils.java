@@ -20,6 +20,7 @@ package com.taobao.weex.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -197,4 +198,24 @@ public class WXFileUtils {
     }
   }
 
+  public static String base64Md5(String  template){
+    try {
+      if(template == null){
+        return  "";
+      }
+      return  base64Md5(template.getBytes("UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      return  "";
+    }
+  }
+
+  public static String base64Md5(byte[] bts){
+    try {
+      MessageDigest digest = MessageDigest.getInstance("MD5");
+      digest.update(bts);
+      return Base64.encodeToString(digest.digest(), Base64.NO_WRAP);
+    } catch (NoSuchAlgorithmException e) {;
+      return  "";
+    }
+  }
 }

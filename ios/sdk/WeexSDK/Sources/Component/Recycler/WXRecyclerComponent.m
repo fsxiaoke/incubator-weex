@@ -63,6 +63,21 @@ typedef enum : NSUInteger {
 
 - (void)setContentOffset:(CGPoint)contentOffset
 {
+    // FIXME: side effect caused by hooking _adjustContentOffsetIfNecessary.
+    // When UICollectionView is pulled down and finger releases，contentOffset will be set from -xxxx to about -0.5(greater than -0.5), then contentOffset will be reset to zero by calling _adjustContentOffsetIfNecessary.
+    // So hooking _adjustContentOffsetIfNecessary will always cause remaining 1px space between list's top and navigator.
+    // Demo: http://dotwe.org/895630945793a9a044e49abe39cbb77f
+    // Have to reset contentOffset to zero manually here.
+    if (fabs(contentOffset.y) < 0.5) {
+        contentOffset.y = 0;
+    }
+    if (isnan(contentOffset.x)) {
+        contentOffset.x = 0;
+    }
+    if(isnan(contentOffset.y)) {
+        contentOffset.y = 0;
+    }
+    
     [super setContentOffset:contentOffset];
 }
 
@@ -109,7 +124,6 @@ typedef enum : NSUInteger {
     if (self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance]) {
         [self _fillPadding];
         
-        
         if ([type isEqualToString:@"waterfall"] || (attributes[@"layout"] && [attributes[@"layout"] isEqualToString:@"multi-column"])) {
             // TODO: abstraction
             _layoutType = WXRecyclerLayoutTypeMultiColumn;
@@ -130,15 +144,14 @@ typedef enum : NSUInteger {
         _updateController.delegate = self;
         [self fixFlicker];
         
-        _dragController = [WXRecyclerDragController new];
-        _dragController.delegate = self;
         if ([attributes[@"draggable"] boolValue]) {
+            // lazy load
+            _dragController = [WXRecyclerDragController new];
+            _dragController.delegate = self;
             if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
                 _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
             }
             _dragController.isDragable = YES;
-        }else{
-            _dragController.isDragable = NO;
         }
     }
     
@@ -197,11 +210,15 @@ typedef enum : NSUInteger {
         BOOL needUpdateLayout = NO;
         
         if ([attributes[@"draggable"] boolValue]) {
+            if (!_dragController) {  // lazy load
+                _dragController = [WXRecyclerDragController new];
+                _dragController.delegate = self;
+            }
             if([attributes[@"dragTriggerType"]  isEqual: @"pan"]){
                 _dragController.dragTriggerType = WXRecyclerDragTriggerPan;
             }
             _dragController.isDragable = YES;
-        }else{
+        } else {
             _dragController.isDragable = NO;
         }
         

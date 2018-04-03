@@ -33,7 +33,7 @@
 #import <UIKit/UIScreen.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <coreText/CoreText.h>
+#import <CoreText/CoreText.h>
 #import "WXAppMonitorProtocol.h"
 
 #import "WXTextComponent.h"
@@ -41,7 +41,9 @@
 #define KEY_PASSWORD  @"com.taobao.Weex.123456"
 #define KEY_USERNAME_PASSWORD  @"com.taobao.Weex.weex123456"
 
-void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
+static BOOL threadSafeCollectionUsingLock = YES;
+
+void WXPerformBlockOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -54,7 +56,7 @@ void WXPerformBlockOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
+void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)(void))
 {
     if (!block) return;
     
@@ -67,7 +69,7 @@ void WXPerformBlockSyncOnMainThread(void (^ _Nonnull block)())
     }
 }
 
-void WXPerformBlockOnThread(void (^ _Nonnull block)(), NSThread *thread)
+void WXPerformBlockOnThread(void (^ _Nonnull block)(void), NSThread *thread)
 {
     [WXUtility performBlock:block onThread:thread];
 }
@@ -135,7 +137,17 @@ CGFloat WXFloorPixelValue(CGFloat value)
 
 @implementation WXUtility
 
-+ (void)performBlock:(void (^)())block onThread:(NSThread *)thread
++ (void)setThreadSafeCollectionUsingLock:(BOOL)usingLock
+{
+    threadSafeCollectionUsingLock = usingLock;
+}
+
++ (BOOL)threadSafeCollectionUsingLock
+{
+    return threadSafeCollectionUsingLock;
+}
+
++ (void)performBlock:(void (^)(void))block onThread:(NSThread *)thread
 {
     if (!thread || !block) return;
     
@@ -149,11 +161,10 @@ CGFloat WXFloorPixelValue(CGFloat value)
     }
 }
 
-+ (void)_performBlock:(void (^)())block
++ (void)_performBlock:(void (^)(void))block
 {
     block();
 }
-
 
 + (NSDictionary *)getEnvironment
 {

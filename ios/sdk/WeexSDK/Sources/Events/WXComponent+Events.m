@@ -26,6 +26,10 @@
 #import "WXUtility.h"
 #import "WXSDKManager.h"
 #import "WXSDKInstance_private.h"
+#import "WXDefine.h"
+#import "WXRecycleListComponent.h"
+#import "WXRecycleListDataManager.h"
+
 #import <objc/runtime.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
 #import "WXComponent+PseudoClassManagement.h"
@@ -108,6 +112,15 @@
     if (params) {
         [dict addEntriesFromDictionary:params];
     }
+    WXRecycleListComponent * recyleListComponent  = (WXRecycleListComponent*)[self getRecycleListComponent];
+    if (recyleListComponent) {
+        NSIndexPath * indexPath = [((UICollectionView*)recyleListComponent.view) indexPathForItemAtPoint:[self.view.superview
+                                                                                                          convertPoint:self.view.center toView:recyleListComponent.view]];
+        NSString * virtualComponentId = [recyleListComponent.dataManager virtualComponentIdWithIndexPath:indexPath];
+        if (virtualComponentId) {
+            dict[@"componentId"] = virtualComponentId;
+        }
+    }
     
     NSArray *handlerArguments = [self _paramsForEvent:eventName];
     NSString *ref = _templateComponent ? _templateComponent.ref  : self.ref;
@@ -154,6 +167,11 @@ if ([removeEventName isEqualToString:@#eventName]) {\
 
 - (void)_addEventOnMainThread:(NSString *)addEventName
 {
+    if (![self isViewLoaded]) {
+        //This action will be ignored While the view is loaded,
+        //then it will initEvent according to the records in _events
+        return;
+    }
     WX_ADD_EVENT(appear, addAppearEvent)
     WX_ADD_EVENT(disappear, addDisappearEvent)
     
@@ -707,6 +725,18 @@ if ([removeEventName isEqualToString:@#eventName]) {\
     resultTouch[@"identifier"] = identifier;
     
     return resultTouch;
+}
+
+// find virtual component's root component
+- (WXComponent*)getRecycleListComponent
+{
+    if ([self isKindOfClass:[WXRecycleListComponent class]]) {
+        return self;
+    }
+    if ([self.ref isEqualToString:WX_SDK_ROOT_REF]) {
+        return nil;
+    }
+    return [self.supercomponent getRecycleListComponent];
 }
 
 @end

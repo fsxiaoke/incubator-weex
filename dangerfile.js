@@ -37,7 +37,6 @@ const flowIgnorePaths = [
   'test',
   'build',
   'examples',
-  'doc',
   'android',
   'ios',
   'bin',
@@ -72,12 +71,12 @@ if (unFlowedFiles.length > 0) {
 // Error or Warn when delete public interface
 var isNotDanger = false;
 console.log('pr.title:'+danger.github.pr.title)
-if(!isNotDanger && danger.github.pr.title 
+if(!isNotDanger && danger.github.pr.title
   && danger.github.pr.title.match(/@notdanger/i)){
   isNotDanger = true;
 }
 console.log('pr.body:'+danger.github.pr.body)
-if(!isNotDanger && danger.github.pr.body 
+if(!isNotDanger && danger.github.pr.body
   && danger.github.pr.body.match(/@notdanger/i)){
   isNotDanger = true;
 }
@@ -122,7 +121,6 @@ async function checkBreakChange(file){
 
 var has_sdk_changes = false;
 var has_test_changes = false;
-var has_doc_changes = false;
 var filesToVerifySrcHeader = [];
 var fileCount = 0;
 
@@ -133,7 +131,6 @@ const type_ios_test = 3;
 const type_android_test = 4;
 const type_jsfm = 5;
 const type_jsfm_test = 6;
-const type_doc = 7;
 const type_ui_test = 8;
 
 const getFileType = file => {
@@ -146,13 +143,11 @@ const getFileType = file => {
   } else if (file.match(/android\/sdk\/src\/main\/java\/.+\.java/)) {
     return type_android_sdk;
   } else if (
-    file.match(/html5\/(shared|frameworks|render|runtime|services)\/.+\.js/)
+    file.match(/runtime\/.+\.js/)
   ) {
     return type_jsfm;
-  } else if (file.match(/html5\/test\/.+\.js/)) {
+  } else if (file.match(/test\/js-framework\/.+\.js/)) {
     return type_jsfm_test;
-  } else if (file.match(/doc\/\.+\.md/)) {
-    return type_doc;
   } else if(file.match(/test\/scripts\/.+\.js/) || file.match(/test\/pages\/.+\.vue/)){
     return type_ui_test
   }else{
@@ -176,7 +171,6 @@ const checkChangedFile = file => {
     fileType == type_ios_test ||
     fileType == type_jsfm_test ||
     fileType == type_ui_test
-  has_doc_changes = has_doc_changes || fileType == type_doc;
 
 };
 
@@ -228,11 +222,6 @@ if (has_sdk_changes && !has_test_changes) {
   // else fail("This PR modify SDK code. Please add/modify corresponding testcases. If it is ok, please comment about it. Or put '@notdanger' in you commit message.");
 }
 
-if (has_sdk_changes && !has_doc_changes) {
-  warn("This PR should update related documents as well. ");
-}
-
-
 //check ios copyright
 //see scripts/rh/header.template
 const copyright_header_components = [
@@ -250,7 +239,8 @@ const ignoreCopyrightVerifyPath = [
   'test',
   'packages',
   'pre-build',
-  'html5/test/case',
+  'runtime/frameworks/legacy/core',
+  'test/js\-framework/case',
   'android/playground/app/src/main/assets',
   'android/sdk/assets',
   'ios/playground/bundlejs',
@@ -273,6 +263,16 @@ filesToVerifySrcHeader.forEach(filepath => {
       return;
     }
   }
+
+  // check cn for source code
+  var reg = /[\u4e00-\u9FA5]+/;
+  var res = reg.test(content);
+  if(res){
+    console.error("Code file "+ filepath +" has cn source code.");
+    console.error("position " + reg.exec(content));
+    fail("Code file "+ filepath +" has cn source code.");
+    return ;
+  }
 });
 
 
@@ -281,15 +281,15 @@ filesToVerifySrcHeader.forEach(filepath => {
  * will be seperated to a danger plugin
  */
 
-console.log('findReviewer')
-schedule(new Promise((resolve, reject) => {
-  try {
-    findReviewer(resolve, reject)
-  } catch (e) {
-    console.log(e)
-    resolve()
-  }
-}));
+// console.log('findReviewer')
+// schedule(new Promise((resolve, reject) => {
+//   try {
+//     findReviewer(resolve, reject)
+//   } catch (e) {
+//     console.log(e)
+//     resolve()
+//   }
+// }));
 
 function findReviewer(resolve, reject) {
   var github = new GitHubApi({
@@ -307,11 +307,12 @@ function findReviewer(resolve, reject) {
     number: danger.github.pr.number,
     headers: {Accept: 'application/vnd.github.diff',"user-agent": "node.js"}
   }, function (err, result) {
-    console.log('parseDeleteAndNormalLines')
     if ("undefined" === typeof result || "undefined" === typeof result.data || err) {
+      console.log('result:'+result+', error:'+err);
       resolve()
       return
     }
+    console.log('result:'+result);
     parseDeleteAndNormalLines(result.data, fileToDeletedLinesMap, fileToNormalLinesMap)
     console.log('getContent')
     var promises = danger.git.modified_files.map(function(file) {
@@ -345,7 +346,7 @@ function getContent(url) {
         console.log('response:', response.statusCode)
         if (response.statusCode < 200 || response.statusCode > 299) {
           if (response.statusCode === 404  || response.statusCode === 502) {
-            // ignore this, probably a renamed file,or .so that can't blame 
+            // ignore this, probably a renamed file,or .so that can't blame
             return resolve('')
           }
           reject(new Error('Failed to load page, status code: ' + response.statusCode + ', '
@@ -366,21 +367,29 @@ function getContent(url) {
 
 function parseDeleteAndNormalLines(diffData, fileToDeletedLinesMap, fileToNormalLinesMap) {
   try {
+    console.log('parseDeleteAndNormalLines')
     var diffs = parseDiff(diffData)
-    diffs.forEach(diff => {
-      fileToDeletedLinesMap[diff.from] = [];
-      fileToNormalLinesMap[diff.from] = [];
-      diff.chunks.forEach(chunk => {
-        chunk.changes.forEach(change => {
-          if (change.del) {
-            fileToDeletedLinesMap[diff.from].push(change.ln)
-          }
-          if (change.normal) {
-            fileToNormalLinesMap[diff.from].push(change.ln1)
-          }
-        })
+    console.log('diffs:'+diffs)
+    if(diffs&&diffs instanceof Array){
+      diffs.forEach(diff => {
+        fileToDeletedLinesMap[diff.from] = [];
+        fileToNormalLinesMap[diff.from] = [];
+        if(diff&&diff.chunks&&diff.chunks instanceof Array){
+          diff.chunks.forEach(chunk => {
+            if(chunk&&chunk.changes&&chunk.changes instanceof Array){
+              chunk.changes.forEach(change => {
+                if (change&&change.del) {
+                  fileToDeletedLinesMap[diff.from].push(change.ln)
+                }
+                if (change&&change.normal) {
+                  fileToNormalLinesMap[diff.from].push(change.ln1)
+                }
+              })
+            }
+          })
+        }
       })
-    })
+    }
   } catch (error) {
     console.log(error)
   }
@@ -441,6 +450,7 @@ function findBlameReviewers(fileToDeletedLinesMap, fileToNormalLinesMap, fileToB
 
   console.log('blame point:', reviewers)
   var names = Object.keys(reviewers)
+  if(!names||!names instanceof Array||names.length<=0)return;
   names.sort((name1, name2) => {
     return reviewers[name1] > reviewers[name2] ? -1 : 1
   })
