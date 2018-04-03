@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -148,6 +149,14 @@ public class WXSDKEngine {
     synchronized(mLock) {
 
       return mIsInit && WXEnvironment.JsFrameworkInit;
+    }
+  }
+
+  public static void setLogLevel(String level){
+    try {
+      WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
+    }catch (IllegalArgumentException e){
+      WXLogUtils.e(Log.getStackTraceString(e));
     }
   }
 
