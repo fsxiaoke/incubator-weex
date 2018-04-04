@@ -76,7 +76,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   private List<TextView.OnEditorActionListener> mEditorActionListeners;
   private boolean mListeningKeyboard = false;
   private SoftKeyboardDetector.Unregister mUnregister;
-  private boolean mIgnoreNextOnInputEvent = false;
+  protected boolean mIgnoreNextOnInputEvent = false;
   private boolean mKeepSelectionIndex = false;
   private TextFormatter mFormatter = null;
   private List<TextWatcher> mTextChangedListeners;
