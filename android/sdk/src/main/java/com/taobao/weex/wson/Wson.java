@@ -51,7 +51,7 @@ public class Wson {
     /**
      * skip map null values
      * */
-    public static final boolean WriteMapNullValue = false;
+    public static final boolean WriteMapNullValue = true;
     /**
      * wson data type
      * */
