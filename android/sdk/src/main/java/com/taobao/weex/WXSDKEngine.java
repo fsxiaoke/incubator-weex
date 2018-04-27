@@ -104,7 +104,9 @@ import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WXSDKEngine {
@@ -145,9 +147,13 @@ public class WXSDKEngine {
   }
 
 
+  public static void setJsFrameworkInit(boolean init){
+    WXEnvironment.JsFrameworkInit=init;
+    initializeFinished();
+  }
+
   public static boolean isInitialized(){
     synchronized(mLock) {
-
       return mIsInit && WXEnvironment.JsFrameworkInit;
     }
   }
@@ -157,6 +163,29 @@ public class WXSDKEngine {
       WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
     }catch (IllegalArgumentException e){
       WXLogUtils.e(Log.getStackTraceString(e));
+    }
+  }
+
+  public static interface WxInitedListener{
+    void onWeexInited();
+  }
+
+  public static List<WxInitedListener> listenerList = new ArrayList<>();
+
+  public static void addWeexInitedListener(WxInitedListener listener){
+    listenerList.add(listener);
+  }
+
+  public static void removeWeexInitedListener(WxInitedListener listener){
+    listenerList.remove(listener);
+  }
+
+  private static void initializeFinished(){
+    if(isInitialized()){
+      for(WxInitedListener listener: listenerList){
+        listener.onWeexInited();
+      }
+      listenerList.clear();
     }
   }
 
@@ -195,6 +224,7 @@ public class WXSDKEngine {
       WXEnvironment.sSDKInitInvokeTime = System.currentTimeMillis()-start;
       WXLogUtils.renderPerformanceLog("SDKInitInvokeTime", WXEnvironment.sSDKInitInvokeTime);
       mIsInit = true;
+      initializeFinished();
     }
   }
 

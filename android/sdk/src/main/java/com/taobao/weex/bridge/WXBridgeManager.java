@@ -34,6 +34,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXRenderErrorCode;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
@@ -1811,7 +1812,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
 
           execRegisterFailTask();
-          WXEnvironment.JsFrameworkInit = true;
+          WXSDKEngine.setJsFrameworkInit(true);
+//          WXEnvironment.JsFrameworkInit = true;
           registerDomModule();
           String reinitInfo = "";
           if (reInitCount > 1) {
