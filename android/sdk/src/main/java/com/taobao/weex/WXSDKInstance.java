@@ -44,6 +44,7 @@ import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
+import com.taobao.weex.appfram.navigator.IActivityNavBarSetter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapter;
 import com.taobao.weex.bridge.EventResult;
 import com.taobao.weex.bridge.NativeInvokeHelper;
@@ -180,7 +181,14 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
 
   private int maxHiddenEmbedsNum = -1; //max hidden embed num, -1 standard for ulimit
 
+  IActivityNavBarSetter mctivityNavBarSetter;
+  public IActivityNavBarSetter getActivityNavBarSetter() {
+    return mctivityNavBarSetter;
+  }
 
+  public void setActivityNavBarSetter(IActivityNavBarSetter activityNavBarSetter) {
+    mctivityNavBarSetter=activityNavBarSetter;
+  }
   public boolean getismIsCommitedDomAtionExp() {
 	return mIsCommitedDomAtionExp;
   }

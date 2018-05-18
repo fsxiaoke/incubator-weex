@@ -112,8 +112,8 @@ public class WXNavigatorModule extends WXModule {
     public void push(String param, JSCallback callback) {
 
         if (!TextUtils.isEmpty(param)) {
-            if (WXSDKEngine.getActivityNavBarSetter() != null) {
-                if (WXSDKEngine.getActivityNavBarSetter().push(param)) {
+            if (mWXSDKInstance.getActivityNavBarSetter() != null) {
+                if (mWXSDKInstance.getActivityNavBarSetter().push(param)) {
                     if (callback != null) {
                         callback.invoke(MSG_SUCCESS);
                     }
@@ -135,6 +135,7 @@ public class WXNavigatorModule extends WXModule {
                     intent.addCategory(WEEX);
                     intent.putExtra(PARAMS,(HashMap)jsonObject.getInnerMap());
                     intent.putExtra(INSTANCE_ID, mWXSDKInstance.getInstanceId());
+                    intent.setPackage(mWXSDKInstance.getContext().getPackageName());
                     mWXSDKInstance.getContext().startActivity(intent);
                     if (callback != null) {
                         callback.invoke(MSG_SUCCESS);
