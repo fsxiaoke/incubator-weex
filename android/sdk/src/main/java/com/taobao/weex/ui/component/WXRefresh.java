@@ -24,6 +24,7 @@ import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXDomObject;
@@ -105,6 +106,12 @@ public class WXRefresh extends WXBaseRefresh implements WXSwipeLayout.WXOnRefres
     }
     return super.setProperty(key,param);
   }
+
+  @JSMethod
+  public void startRefresh() {
+    ((BaseBounceView)getParent().getHostView()).getSwipeLayout().startRefresh();
+  }
+
 
   @WXComponentProp(name = Constants.Name.DISPLAY)
   public void setDisplay(String display) {

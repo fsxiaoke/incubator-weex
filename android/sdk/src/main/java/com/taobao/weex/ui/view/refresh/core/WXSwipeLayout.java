@@ -543,6 +543,13 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     }
   }
 
+
+  public void startRefresh() {
+    mCurrentAction = PULL_REFRESH;
+    this.startRefresh((int) refreshViewHeight);
+  }
+
+
   /**
    * Start Refresh
    * @param headerViewHeight
@@ -607,6 +614,12 @@ public class WXSwipeLayout extends FrameLayout implements NestedScrollingParent,
     mCurrentAction = -1;
     //TODO updateLoadText
   }
+
+
+    public void startLoadMore() {
+        mCurrentAction = LOAD_MORE;
+        this.startLoadmore((int) loadingViewHeight);
+    }
 
   /**
    * Start loadmore
