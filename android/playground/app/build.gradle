@@ -96,7 +96,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     compile 'com.squareup.okio:okio:1.0.1'
-    compile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
+//    compile "com.alibaba:fastjson:${project.fastjsonLibVersion}"
     compile "com.android.support:support-v4:${project.supportLibVersion}"
     compile "com.android.support:appcompat-v7:${project.supportLibVersion}"
     compile "com.android.support:design:${project.supportLibVersion}"
