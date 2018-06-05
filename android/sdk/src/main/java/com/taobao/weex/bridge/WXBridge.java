@@ -37,7 +37,7 @@ class WXBridge implements IWXBridge {
 
   public static final String TAG = "WXBridge";
 
-  public static final boolean MULTIPROCESS = true;
+  public static boolean MULTIPROCESS = true;
 
   /**
    * Init JSFrameWork
