@@ -37,8 +37,6 @@ class WXBridge implements IWXBridge {
 
   public static final String TAG = "WXBridge";
 
-  public static boolean MULTIPROCESS = true;
-
   /**
    * Init JSFrameWork
    *
@@ -99,7 +97,7 @@ class WXBridge implements IWXBridge {
   public native void  updateGlobalConfig(String config);
 
   public int initFrameworkEnv(String framework, WXParams params, String cacheDir, boolean pieSupport){
-    if (MULTIPROCESS) {
+    if (WXEnvironment.MULTIPROCESS) {
       return initFrameworkMultiProcess(framework, params, cacheDir, pieSupport);
     } else {
       return  initFramework(framework, params);

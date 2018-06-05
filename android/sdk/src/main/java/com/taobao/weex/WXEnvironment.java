@@ -85,6 +85,7 @@ public class WXEnvironment {
   public static long sSDKInitTime =0;
 
   public static LogLevel sLogLevel = LogLevel.DEBUG;
+  public static boolean MULTIPROCESS = true;
   private static boolean isApkDebug = true;
   private static String appVersionName;
   public static boolean isPerf = false;

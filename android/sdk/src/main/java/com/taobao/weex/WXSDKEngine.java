@@ -157,7 +157,10 @@ public class WXSDKEngine {
       return mIsInit && WXEnvironment.JsFrameworkInit;
     }
   }
-
+  public static void setMultiProcess(boolean isM){
+    WXEnvironment.MULTIPROCESS=isM;
+    WXLogUtils.i("MultiProcess:"+isM);
+  }
   public static void setLogLevel(String level){
     try {
       WXEnvironment.sLogLevel= LogLevel.valueOf(level.toUpperCase());
