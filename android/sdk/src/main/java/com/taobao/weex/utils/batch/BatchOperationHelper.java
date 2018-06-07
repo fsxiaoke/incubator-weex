@@ -18,6 +18,9 @@
  */
 package com.taobao.weex.utils.batch;
 
+import android.util.Log;
+
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.batch.BactchExecutor;
 import com.taobao.weex.utils.batch.Interceptor;
 
@@ -44,6 +47,9 @@ public class BatchOperationHelper implements Interceptor {
   public synchronized boolean take(Runnable runnable) {
     if(isCollecting){
       sRegisterTasks.add(runnable);
+      if (runnable==null){
+        WXLogUtils.w("BatchOperationHelper::take runnable null "+ Log.getStackTraceString(new Exception("take null")));
+      }
       return true;
     }
     return false;
@@ -60,7 +66,11 @@ public class BatchOperationHelper implements Interceptor {
         Iterator<Runnable> iterator = sRegisterTasks.iterator();
         while(iterator.hasNext()){
           Runnable item = iterator.next();
-          item.run();
+          if (item!=null){
+            item.run();
+          }else {
+            WXLogUtils.w("BatchOperationHelper::flush:item null");
+          }
           iterator.remove();
         }
       }
