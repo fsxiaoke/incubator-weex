@@ -41,7 +41,7 @@ public class BatchOperationHelper implements Interceptor {
   }
 
   @Override
-  public boolean take(Runnable runnable) {
+  public synchronized boolean take(Runnable runnable) {
     if(isCollecting){
       sRegisterTasks.add(runnable);
       return true;
@@ -52,7 +52,7 @@ public class BatchOperationHelper implements Interceptor {
   /**
    * Post all tasks to executor. Can only be called once.
    */
-  public void flush(){
+  public synchronized void flush(){
     isCollecting = false;
     mExecutor.post(new Runnable() {
       @Override

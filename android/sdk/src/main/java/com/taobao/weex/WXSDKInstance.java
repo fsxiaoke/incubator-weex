@@ -516,7 +516,7 @@ public class WXSDKInstance implements IWXActivityStateListener,DomContext, View.
       } 
 	}
 
-	WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName);
+	WXLogUtils.d("WXSDKInstance", "Start render page: " + pageName+" url:"+mBundleUrl);
 
     if (WXTracing.isAvailable()) {
       WXTracing.TraceEvent traceEvent = WXTracing.newEvent("executeBundleJS", mInstanceId, -1);
