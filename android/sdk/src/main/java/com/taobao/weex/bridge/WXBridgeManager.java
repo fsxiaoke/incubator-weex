@@ -182,6 +182,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
   private Interceptor mInterceptor;
   private WXParams mInitParams;
 
+  byte[] mInterceptorLocker=new byte[0];
   private WXBridgeManager() {
     initWXBridge(WXEnvironment.sRemoteDebugMode);
     mJSThread = new WXThread("WeexJSBridgeThread", this);
@@ -310,9 +311,11 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   @Override
   public void post(Runnable r) {
-    if (mInterceptor != null && mInterceptor.take(r)) {
-      //task is token by the interceptor
-      return;
+    synchronized (mInterceptorLocker){
+      if (mInterceptor != null && mInterceptor.take(r)) {
+        //task is token by the interceptor
+        return;
+      }
     }
     if (mJSHandler == null) {
       return;
@@ -323,7 +326,9 @@ public class WXBridgeManager implements Callback, BactchExecutor {
 
   @Override
   public void setInterceptor(Interceptor interceptor) {
-    mInterceptor = interceptor;
+    synchronized (mInterceptorLocker){
+      mInterceptor = interceptor;
+    }
   }
 
   public void post(Runnable r, Object token) {
