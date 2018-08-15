@@ -83,30 +83,34 @@ public class IndexActivity extends AbstractWeexActivity {
       mTipView.setText(R.string.cpu_not_support_tip);
       return;
     }
-
-    if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
-    } else {
-      renderPageByURL(getIndexUrl());
-    }
+    loadTest();
+//    if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
+//      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
+//    } else {
+//      renderPageByURL(getIndexUrl());
+//    }
 
 
     mReloadReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
-        if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
-        } else {
-          renderPageByURL(getIndexUrl());
-        }
+//        if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
+//          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
+//        } else {
+//          renderPageByURL(getIndexUrl());
+//        }
+
+        loadTest();
         mProgressBar.setVisibility(View.VISIBLE);
       }
     };
 
     LocalBroadcastManager.getInstance(this).registerReceiver(mReloadReceiver, new IntentFilter(WXSDKEngine.JS_FRAMEWORK_RELOAD));
   }
-
+  void loadTest(){
+    renderPage(WXFileUtils.loadFileOrAsset("sdcard/facishare/test.js",getApplicationContext()),"test");
+  }
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
