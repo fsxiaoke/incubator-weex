@@ -31,6 +31,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.common.WXImageStrategy;
 import com.taobao.weex.dom.WXImageQuality;
+import com.taobao.weex.ui.IFComponentHolder;
 
 public class ImageAdapter implements IWXImgLoaderAdapter {
 
@@ -51,14 +52,14 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
           view.setImageBitmap(null);
           return;
         }
+        if (null != strategy){
+          recordImgLoadAction(strategy.instanceId);
+        }
+
         String temp = url;
         if (url.startsWith("//")) {
           temp = "http:" + url;
         }
-        if (view.getLayoutParams().width <= 0 || view.getLayoutParams().height <= 0) {
-          return;
-        }
-
 
         if(!TextUtils.isEmpty(strategy.placeHolder)){
           Picasso.Builder builder=new Picasso.Builder(WXEnvironment.getApplication());
@@ -77,6 +78,7 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
                     if(strategy.getImageListener()!=null){
                       strategy.getImageListener().onImageFinish(url,view,true,null);
                     }
+                    recordImgLoadResult(strategy.instanceId,true,null);
 
                     if(!TextUtils.isEmpty(strategy.placeHolder)){
                       ((Picasso) view.getTag(strategy.placeHolder.hashCode())).cancelRequest(view);
@@ -88,6 +90,7 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
                     if(strategy.getImageListener()!=null){
                       strategy.getImageListener().onImageFinish(url,view,false,null);
                     }
+                    recordImgLoadResult(strategy.instanceId,false,null);
                   }
                 });
       }
@@ -97,5 +100,20 @@ public class ImageAdapter implements IWXImgLoaderAdapter {
     }else {
       WXSDKManager.getInstance().postOnUiThread(runnable, 0);
     }
+  }
+  private void recordImgLoadAction(String instanceId){
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+    if (null == instance || instance.isDestroy()){
+      return;
+    }
+    instance.getApmForInstance().actionLoadImg();
+  }
+
+  private void recordImgLoadResult(String instanceId,boolean succeed,String errorCode){
+    WXSDKInstance instance = WXSDKManager.getInstance().getAllInstanceMap().get(instanceId);
+    if (null == instance || instance.isDestroy()){
+      return;
+    }
+    instance.getApmForInstance().actionLoadImgResult(succeed,errorCode);
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,15 +18,18 @@
  */
 package com.taobao.weex;
 
+import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
 import com.taobao.weex.adapter.IWXJSExceptionAdapter;
+import com.taobao.weex.adapter.IWXJsFileLoaderAdapter;
 import com.taobao.weex.adapter.IWXSoLoaderAdapter;
 import com.taobao.weex.adapter.IWXUserTrackAdapter;
 import com.taobao.weex.adapter.URIAdapter;
 import com.taobao.weex.appfram.storage.IWXStorageAdapter;
 import com.taobao.weex.appfram.websocket.IWebSocketAdapterFactory;
+import com.taobao.weex.performance.IApmGenerator;
 
 /**
  * Created by sospartan on 5/31/16.
@@ -42,6 +45,9 @@ public class InitConfig {
   private IWebSocketAdapterFactory webSocketAdapterFactory;
   private IWXJSExceptionAdapter mJSExceptionAdapter;
   private String framework;
+  private ClassLoaderAdapter classLoaderAdapter;
+  private IApmGenerator apmGenerater;
+  private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
 
   public IWXHttpAdapter getHttpAdapter() {
     return httpAdapter;
@@ -79,6 +85,23 @@ public class InitConfig {
     return webSocketAdapterFactory;
   }
 
+  public ClassLoaderAdapter getClassLoaderAdapter() {
+    return classLoaderAdapter;
+  }
+
+  public IApmGenerator getApmGenerater() {
+    return apmGenerater;
+  }
+
+  public IWXJsFileLoaderAdapter getJsFileLoaderAdapter() {
+    return jsFileLoaderAdapter;
+  }
+
+  public InitConfig setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
+    this.classLoaderAdapter = classLoaderAdapter;
+    return this;
+  }
+
   public IWXJSExceptionAdapter getJSExceptionAdapter() {
     return mJSExceptionAdapter;
   }
@@ -97,6 +120,10 @@ public class InitConfig {
     IWXJSExceptionAdapter mJSExceptionAdapter;
     String framework;
     IWebSocketAdapterFactory webSocketAdapterFactory;
+    ClassLoaderAdapter classLoaderAdapter;
+    IApmGenerator apmGenerater;
+    private IWXJsFileLoaderAdapter jsFileLoaderAdapter;
+
     public Builder(){
 
     }
@@ -151,6 +178,21 @@ public class InitConfig {
       return this;
     }
 
+    public Builder setClassLoaderAdapter(ClassLoaderAdapter classLoaderAdapter) {
+      this.classLoaderAdapter = classLoaderAdapter;
+      return this;
+    }
+
+    public Builder setApmGenerater(IApmGenerator apmGenerater){
+      this.apmGenerater =apmGenerater;
+      return this;
+    }
+
+    public Builder setJsFileLoaderAdapter(IWXJsFileLoaderAdapter jsFileLoaderAdapter) {
+      this.jsFileLoaderAdapter = jsFileLoaderAdapter;
+      return this;
+    }
+
     public InitConfig build(){
       InitConfig config =  new InitConfig();
       config.httpAdapter = this.httpAdapter;
@@ -163,6 +205,9 @@ public class InitConfig {
       config.mURIAdapter = this.mURIAdapter;
       config.webSocketAdapterFactory = this.webSocketAdapterFactory;
       config.mJSExceptionAdapter=this.mJSExceptionAdapter;
+      config.classLoaderAdapter = this.classLoaderAdapter;
+      config.apmGenerater = this.apmGenerater;
+      config.jsFileLoaderAdapter = this.jsFileLoaderAdapter;
       return config;
     }
   }
