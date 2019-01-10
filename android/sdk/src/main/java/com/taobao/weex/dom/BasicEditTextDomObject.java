@@ -19,8 +19,8 @@
 package com.taobao.weex.dom;
 
 import android.text.TextPaint;
+
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.flex.CSSConstants;
 import com.taobao.weex.dom.flex.CSSNode;
 import com.taobao.weex.dom.flex.MeasureOutput;
 import com.taobao.weex.ui.component.WXText;
