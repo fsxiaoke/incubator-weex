@@ -93,8 +93,8 @@ dependencies {
     debugCompile project(path: ':commons', configuration: 'debug')
     releaseCompile project(path: ':commons', configuration: 'release')
 
-    debugCompile project(path: ':weex_sdk', configuration: 'debug')
-    releaseCompile project(path: ':weex_sdk', configuration: 'release')
+//    debugCompile project(path: ':weex_sdk', configuration: 'debug')
+//    releaseCompile project(path: ':weex_sdk', configuration: 'release')
 
     //https://github.com/weexteam/weex-analyzer-android
     //Weex-Analyzer provides several convenient tools such as Memory Monitor
