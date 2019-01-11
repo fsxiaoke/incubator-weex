@@ -27,6 +27,5 @@ import java.util.Map;
  * Created by sospartan on 6/17/16.
  */
 public interface ModuleFactory<T extends WXModule> extends JavascriptInvokable {
-  Class getClassIns();
   T buildInstance() throws IllegalAccessException, InstantiationException;
 }

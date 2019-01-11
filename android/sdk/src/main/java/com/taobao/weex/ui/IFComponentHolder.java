@@ -28,7 +28,6 @@ public interface IFComponentHolder extends ComponentCreator,JavascriptInvokable 
 
     /** Prepare component if not a lazy load componnet.**/
     void loadIfNonLazy();
-    Class getClassIns();
     Invoker getPropertyInvoker(String name);
 
 }

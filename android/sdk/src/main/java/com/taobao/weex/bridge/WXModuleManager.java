@@ -60,7 +60,7 @@ public class WXModuleManager {
   /**
    * module class object dictionary
    */
-  private static Map<String, ModuleFactory> sModuleFactoryMap = new HashMap<>();
+  private static volatile ConcurrentMap<String, ModuleFactoryImpl> sModuleFactoryMap = new ConcurrentHashMap<>();
   private static Map<String, WXModule> sGlobalModuleMap = new HashMap<>();
   private static Map<String, WXDomModule> sDomModuleMap = new HashMap<>();
   private static Map<String, Bundle> sActivityRestoreBundle = new HashMap<>();
@@ -155,7 +155,6 @@ public class WXModuleManager {
       return null;
     }
     WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
-    ModuleFactory factory=findFactory(instance,factorys);
     final WXModule wxModule = findModule(instanceId, moduleStr,factory);
     if (wxModule == null) {
       return null;
