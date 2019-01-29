@@ -45,6 +45,7 @@ buildscript {
             repositories.mavenDeployer.pom.version = "$verName"
             repositories.mavenDeployer.pom.artifactId = "$compileType"
             repositories.mavenDeployer.pom.groupId = "fs-android"
+//            repositories.mavenDeployer.pom.packaging = "aar"
         }
         doLast {
             def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
@@ -55,7 +56,9 @@ buildscript {
     }
 
     artifacts {
+        archives (file(project.projectDir.absolutePath + "/build/outputs/aar/weex_sdk-release.aar"))
         archives file(project.projectDir.absolutePath + "/build/intermediates/bundles/release/classes.jar")
+
     }
             
 }
@@ -144,11 +147,11 @@ android {
             dest "${projectDir}/libs/armeabi/libweexcore.so"
             overwrite false
         }
-        download{
-            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
-            dest "${projectDir}/libs/x86/libweexcore.so"
-            overwrite false
-        }
+//        download{
+//            src 'https://gitbox.apache.org/repos/asf?p=incubator-weex.git;a=blob_plain;f=android/sdk/libs/x86/libweexcore.so;hb=refs/heads/master'
+//            dest "${projectDir}/libs/x86/libweexcore.so"
+//            overwrite false
+//        }
     }
 
     def ARMEABI_Size = new File(projectDir,"libs/armeabi/libweexcore.so").length();
@@ -173,7 +176,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi-v7a","armeabi","x86"
+            abiFilters "armeabi"
         }
 
         externalNativeBuild {
@@ -188,7 +191,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "ENABLE_TRACE", "false"
             consumerProguardFiles 'proguard-rules.pro'
