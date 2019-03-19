@@ -1572,6 +1572,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           if (strTrim.startsWith("// { \"framework\": \"Vue\" }") ||
                   strTrim.startsWith("// { \"framework\": \"vue\" }") ||
                   strTrim.startsWith("// {\"framework\" : \"Vue\"}") ||
+                  strTrim.startsWith("// { \"framework\": \"Vue\"}") ||
                   strTrim.startsWith("// {\"framework\" : \"vue\"}")) {
             return BundType.Vue;
           } else if (strTrim.startsWith("// { \"framework\": \"Rax\" }") ||

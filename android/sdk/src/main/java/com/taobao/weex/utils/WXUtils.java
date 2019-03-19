@@ -204,41 +204,43 @@ public class WXUtils {
   }
 
   public static int parseInt(String value) {
-    try {
-      if (!TextUtils.isEmpty(value) && !value.contains(".")) {
-        return Integer.parseInt(value);
-      }
-    } catch (NumberFormatException e) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(WXLogUtils.getStackTrace(e));
-      }
-    }
-    return 0;
+      return getInt(value);
+//    try {
+//      if (!TextUtils.isEmpty(value) && !value.contains(".")) {
+//        return Integer.parseInt(value);
+//      }
+//    } catch (NumberFormatException e) {
+//      if (WXEnvironment.isApkDebugable()) {
+//        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+//      }
+//    }
+//    return 0;
   }
 
   public static int parseInt(Object value) {
-    return parseInt(String.valueOf(value));
+    return getInt(value);
   }
 
   public static float parseFloat(Object value) {
-    return parseFloat(String.valueOf(value));
+    return getFloat(value);
   }
 
   public static float parseFloat(String value) {
-    try {
-      if (!TextUtils.isEmpty(value) && !TextUtils.equals(value, "null")) {
-        return Float.parseFloat(value);
-      } else {
-        if (WXEnvironment.isApkDebugable()) {
-          WXLogUtils.e("WXUtils parseFloat illegal value is " + value);
-        }
-      }
-    } catch (NumberFormatException e) {
-      if (WXEnvironment.isApkDebugable()) {
-        WXLogUtils.e(WXLogUtils.getStackTrace(e));
-      }
-    }
-    return 0;
+      return getFloat(value);
+//    try {
+//      if (!TextUtils.isEmpty(value) && !TextUtils.equals(value, "null")) {
+//        return Float.parseFloat(value);
+//      } else {
+//        if (WXEnvironment.isApkDebugable()) {
+//          WXLogUtils.e("WXUtils parseFloat illegal value is " + value);
+//        }
+//      }
+//    } catch (NumberFormatException e) {
+//      if (WXEnvironment.isApkDebugable()) {
+//        WXLogUtils.e(WXLogUtils.getStackTrace(e));
+//      }
+//    }
+//    return 0;
   }
 
   public static int getInt(Object value) {

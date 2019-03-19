@@ -2013,7 +2013,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
         if (resultStyles.keySet().contains(Constants.Name.WIDTH)) {
           getLayoutSize().setWidth(WXViewUtils.getRealPxByWidth(WXUtils.parseFloat(styles.getPesudoResetStyles().get(Constants.Name.WIDTH + Constants.PSEUDO.ACTIVE)), getViewPortWidth()));
         } else if (resultStyles.keySet().contains(Constants.Name.HEIGHT)){
-          getLayoutSize().setHeight(WXViewUtils.getRealPxByWidth(WXUtils.parseFloat(styles.getPesudoResetStyles().get(Constants.Name.HEIGHT + Constants.PSEUDO.ACTIVE)), getViewPortWidth()));
+          getLayoutSize().setHeight(WXViewUtils.getRealPxByWidth(WXUtils.getFloat(styles.getPesudoResetStyles().get(Constants.Name.HEIGHT + Constants.PSEUDO.ACTIVE)), getViewPortWidth()));
         }
       } else {
         if (null != mPseudoResetGraphicSize) {

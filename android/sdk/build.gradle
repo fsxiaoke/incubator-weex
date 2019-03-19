@@ -115,17 +115,17 @@ android {
 //        rename('native-bundle-main.js','main.js')
 //    }
     def line
-    new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
+//    new File(projectDir,"assets/main.js").withReader { line = it.readLine() }
     def m = line =~ /[A-Z\s]+\s+([0-9\.]+),\s+Build\s+[0-9]+/;
     def jsfmVersion // = m[0][1]
     println jsfmVersion
 
-    copy {
-        from '../../pre-build'
-        into new File(projectDir,"assets")
-        include 'weex-main-jsfm.js'
-        rename('weex-main-jsfm.js','weex-main-jsfm.js')
-    }
+//    copy {
+//        from '../../pre-build'
+//        into new File(projectDir,"assets")
+//        include 'weex-main-jsfm.js'
+//        rename('weex-main-jsfm.js','weex-main-jsfm.js')
+//    }
 
     copy {
         from '../../pre-build'
