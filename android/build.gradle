@@ -24,17 +24,17 @@ subprojects {
             url 'https://maven.google.com'
         }
     }
-    buildscript {
-        dependencies {
-            classpath 'com.android.tools.build:gradle:2.3.3'
-            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-            classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        }
-    }
+//    buildscript {
+//        dependencies {
+//            classpath 'com.android.tools.build:gradle:2.3.3'
+//            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+//            classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+//        }
+//    }
     ext {
         compileSdkVersion=26
         buildToolsVersion="26.0.2"
-        minSdkVersion=14
+        minSdkVersion=16
         targetSdkVersion=26
         supportLibVersion="26.0.2"
         fastjsonLibVersion="1.1.46.android"

@@ -26,7 +26,6 @@ under the License.
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_wx_main">WXMainActivity</string>
-
     <string name="title_activity_splash">SplashActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">WEEX\nPLAYGROUND</string>

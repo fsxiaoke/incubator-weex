@@ -1,0 +1,5 @@
+weex compile pages/meta/demo.vue src/main/assets/meta/ && adb push src/main/assets/meta/demo.js sdcard/facishare
+weex compile pages/index.we src/main/assets/index.js
+weex compile pages/hello.vue src/main/assets/ && adb push src/main/assets/hello.js sdcard/facishare
+weex compile pages/vue/components/scroller.vue src/main/assets/vue/components/scroller.js && adb push src/main/assets/vue/components/scroller.js sdcard/facishare/demo.js
+weex compile pages/test.vue src/main/assets/ && adb push src/main/assets/test.js sdcard/facishare

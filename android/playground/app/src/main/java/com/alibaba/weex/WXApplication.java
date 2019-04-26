@@ -39,6 +39,9 @@ import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.alibaba.weex.extend.module.WXTitleBar;
 import com.alibaba.weex.extend.module.WXWsonTestModule;
+import com.didi.chameleon.sdk.CmlEngine;
+import com.didi.chameleon.sdk.CmlEnvironment;
+import com.didi.chameleon.sdk.ICmlConfig;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
@@ -47,12 +50,12 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.WXException;
 
-public class WXApplication extends Application {
+public class WXApplication extends Application implements ICmlConfig {
 
   @Override
   public void onCreate() {
     super.onCreate();
-
+    CmlEngine.getInstance().init(this, this);
     /**
      * Set up for fresco usage.
      * Set<RequestListener> requestListeners = new HashSet<>();
@@ -68,16 +71,16 @@ public class WXApplication extends Application {
     WXEnvironment.setApkDebugable(true);
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
-    WXSDKEngine.initialize(this,
-                           new InitConfig.Builder()
-                               //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
-                               .setImgAdapter(new ImageAdapter())
-                               .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
-                               .setJSExceptionAdapter(new JSExceptionAdapter())
-                               .setHttpAdapter(new InterceptWXHttpAdapter())
-                               .setApmGenerater(new ApmGenerator())
-                               .build()
-                          );
+//    WXSDKEngine.initialize(this,
+//                           new InitConfig.Builder()
+//                               //.setImgAdapter(new FrescoImageAdapter())// use fresco adapter
+//                               .setImgAdapter(new ImageAdapter())
+//                               .setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory())
+//                               .setJSExceptionAdapter(new JSExceptionAdapter())
+//                               .setHttpAdapter(new InterceptWXHttpAdapter())
+//                               .setApmGenerater(new ApmGenerator())
+//                               .build()
+//                          );
 
     WXSDKManager.getInstance().setAccessibilityRoleAdapter(new DefaultAccessibilityRoleAdapter());
 
@@ -177,4 +180,14 @@ public class WXApplication extends Application {
     }
   }
 
+  @Override
+  public void configAdapter() {
+    CmlEnvironment.CML_ALLOW_BUNDLE_CACHE = false;
+    CmlEnvironment.setDegradeAdapter(new CmlDegradeDefault());
+  }
+
+  @Override
+  public void registerModule() {
+    CmlEngine.getInstance().registerModule(ModuleDemo.class);
+  }
 }

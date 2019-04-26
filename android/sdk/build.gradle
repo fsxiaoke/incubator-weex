@@ -245,7 +245,7 @@ dependencies {
 //    provided "com.android.support:support-v4:${project.supportLibVersion}"
 //    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
 
-    provided files(project.getProjectDir().getAbsolutePath() + "/libsDex/android-support-v4.jar")
+//    provided files(project.getProjectDir().getAbsolutePath() + "/libsDex/android-support-v4.jar")
     provided files(project.getProjectDir().getAbsolutePath() + "/libsDex/fastjson.jar")
     
 //    provided depLibProjectWithMavenOrSource("fastjson")

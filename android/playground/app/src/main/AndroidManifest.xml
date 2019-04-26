@@ -54,7 +54,13 @@ under the License.
                 <action android:name="com.taobao.weex.DUMP_COVERAGE_DATA"/>
             </intent-filter>
         </receiver>
+        <activity android:name=".MainActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
         <activity
                 android:name=".SplashActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"

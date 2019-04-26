@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/cml_logo"
+
+        />
+
+    <Button
+        android:id="@+id/txt_open_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开url"
+        />
+
+    <Button
+        android:id="@+id/txt_open_js_bundle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开 JS Bundle"
+
+        />
+
+    <Button
+        android:id="@+id/txt_preload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="weex debug"
+        />
+
+    <Button
+        android:id="@+id/txt_degrade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="自动降级"
+
+        />
+
+    <Button
+        android:id="@+id/txt_module"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="module 扩展"
+    />
+
+</LinearLayout>
