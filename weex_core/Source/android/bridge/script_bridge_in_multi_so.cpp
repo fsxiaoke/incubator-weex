@@ -18,15 +18,16 @@
  */
 
 #include "script_bridge_in_multi_so.h"
-#include <base/thread/waitable_event.h>
 #include <dlfcn.h>
 #include <malloc.h>
-#include "android/base/log_utils.h"
+
 #include "android/bridge/multi_so_initializer.h"
 #include "android/bridge/script/script_side_in_multi_so.h"
-#include "android/utils/IPCStringResult.h"
+#include "android/utils/ipc_string_result.h"
 #include "android/utils/params_utils.h"
+#include "base/android/log_utils.h"
 #include "base/make_copyable.h"
+#include "base/thread/waitable_event.h"
 #include "core/bridge/script/core_side_in_script.h"
 #include "core/manager/weex_core_manager.h"
 
@@ -443,6 +444,28 @@ static void DispatchMessage(const char *client_id, const char *data, int dataLen
           }));
 }
 
+static std::unique_ptr<WeexJSResult> DispatchMessageSync(const char *client_id,
+                                                         const char *data,
+                                                         int dataLength,
+                                                         const char *vm_id) {
+  weex::base::WaitableEvent event;
+  std::unique_ptr<WeexJSResult> result;
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable([client_id = std::string(client_id),
+                                data = std::string(data),
+                                vm_id = std::string(vm_id), length = dataLength,
+                                e = &event, r = &result]() {
+        *r = WeexCoreManager::Instance()
+                 ->script_bridge()
+                 ->core_side()
+                 ->DispatchMessageSync(client_id.c_str(), data.c_str(), length,
+                                       vm_id.c_str());
+        e->Signal();
+      }));
+  event.Wait();
+  return result;
+}
+
 static void OnReceivedResult(long callback_id,
                              std::unique_ptr<WeexJSResult> &result) {
   WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
@@ -454,6 +477,19 @@ static void OnReceivedResult(long callback_id,
                 callback_id,
                 const_cast<std::unique_ptr<WeexJSResult> &>(result));
       }));
+}
+
+static void UpdateComponentData(const char* page_id,
+                                const char* cid,
+                                const char* json_data) {
+  WeexCoreManager::Instance()->script_thread()->message_loop()->PostTask(
+      weex::base::MakeCopyable(
+          [page_id = std::string(page_id), cid = std::string(cid), json_data = std::string(json_data)]() {
+            WeexCoreManager::Instance()
+                ->script_bridge()
+                ->core_side()
+                ->UpdateComponentData(page_id.c_str(), cid.c_str(), json_data.c_str());
+          }));
 }
 
 static void ReportException(const char *page_id, const char *func,
@@ -506,7 +542,9 @@ FunctionsExposedByCore *ScriptBridgeInMultiSo::GetExposedFunctions() {
                                  CallT3DLinkNative,
                                  PostMessage,
                                  DispatchMessage,
-                                 OnReceivedResult};
+                                 DispatchMessageSync,
+                                 OnReceivedResult,
+                                 UpdateComponentData};
   auto functions =
       (FunctionsExposedByCore *)malloc(sizeof(FunctionsExposedByCore));
   memset(functions, 0, sizeof(FunctionsExposedByCore));

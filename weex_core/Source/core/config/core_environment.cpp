@@ -17,10 +17,12 @@
  * under the License.
  */
 #include "core_environment.h"
-#include "base/CoreConstants.h"
+#include <math.h>
 #include <stdlib.h>
-#include <base/ViewUtils.h>
-#include "base/LogDefines.h"
+
+#include "base/core_constants.h"
+#include "base/log_defines.h"
+#include "core/common/view_utils.h"
 
 namespace WeexCore {
 
@@ -69,9 +71,7 @@ namespace WeexCore {
 
   const std::string WXCoreEnvironment::GetOption(const std::string &key) {
     std::map<std::string, std::string>::iterator iter = mOptions.find(key);
-      LOGE("KEY = %s", key.c_str());
     if (iter != mOptions.end()) {
-        LOGE("KEY = %s, VALUE = %s", key.c_str(), iter->second.c_str());
       return iter->second;
     } else {
       return "";
@@ -80,5 +80,8 @@ namespace WeexCore {
 
   void WXCoreEnvironment::AddOption(std::string key, std::string value) {
     mOptions.insert(std::pair<std::string, std::string>(key, value));
+    if (key == "switchInteractionLog") {
+      mInteractionLogSwitch = "true" == value;
+    }
   }
 }

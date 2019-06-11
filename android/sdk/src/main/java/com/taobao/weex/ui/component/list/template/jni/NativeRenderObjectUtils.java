@@ -51,6 +51,7 @@ public class NativeRenderObjectUtils {
      * */
     public static native int nativeLayoutRenderObject(long ptr, float width, float height);
 
+    public static native int nativeRenderObjectGetLayoutDirectionFromPathNode(long ptr);
     /**
      * get child length
      * */
@@ -62,7 +63,7 @@ public class NativeRenderObjectUtils {
     public static native boolean nativeRenderObjectHasNewLayout(long ptr);
     public static native int nativeRenderObjectChildCount(long ptr);
     public static native long nativeRenderObjectGetChild(long ptr, int index);
-    public static native long nativeRenderObjectUpdateComponent(long ptr, WXComponent component);
+    public static native void nativeRenderObjectUpdateComponent(long ptr, WXComponent component);
     public static native void nativeRenderObjectChildWaste(long ptr, boolean waster);
 
 

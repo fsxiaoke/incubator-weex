@@ -24,7 +24,6 @@
 #import "WXView.h"
 #import "WXSDKInstance_private.h"
 #import "WXTransform.h"
-#import "WXTracingManager.h"
 #import "WXSDKManager.h"
 #import "WXComponent+Layout.h"
 
@@ -263,6 +262,7 @@ do {\
         WXTransform* transform = [[WXTransform alloc] initWithCSSValue:[WXConvert NSString:styles[@"transform"]] origin:[WXConvert NSString:transformOrigin] instance:self.weexInstance];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
         self.transform = transform;
@@ -270,8 +270,13 @@ do {\
         [_transform setTransformOrigin:[WXConvert NSString:styles[@"transformOrigin"]]];
         if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
             [_transform applyTransformForView:_view];
+            [self _adjustForRTL];
             [_layer setNeedsDisplay];
         }
+    }
+    // for RTL
+    if (styles[@"direction"]) {
+        [self _adjustForRTL];
     }
 }
 
@@ -308,7 +313,7 @@ do {\
         [self setNeedsDisplay];
     }
     if (styles && [styles containsObject:@"backgroundImage"]) {
-        _backgroundImage = @"linear-gradient(to left,rgba(255,255,255,0),rgba(255,255,255,0))"; // if backgroundImage is nil, give defalut color value.
+        _backgroundImage = nil;
         [self setGradientLayer];
     }
     

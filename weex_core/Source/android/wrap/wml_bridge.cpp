@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 #include "android/wrap/wml_bridge.h"
-#include "android/base/jni/android_jni.h"
-#include "android/base/jni_type.h"
-#include "android/base/log_utils.h"
+
 #include "android/base/string/string_utils.h"
 #include "android/utils/params_utils.h"
+#include "base/android/jni/android_jni.h"
+#include "base/android/jni_type.h"
+#include "base/android/log_utils.h"
 #include "core/manager/weex_core_manager.h"
 
 static intptr_t jDoubleValueMethodId = 0;
@@ -184,7 +184,7 @@ namespace WeexCore {
 
 WMLBridge* WMLBridge::g_instance = nullptr;
 
-const char kWMLBridgeClassPath[] = "com/taobao/windmill/bridge/WMLBridge";
+const char kWMLBridgeClassPath[] =  "com/taobao/windmill/bundle/bridge/WeexBridge";
 jclass g_WMLBridge_clazz = nullptr;
 
 static JNINativeMethod gWMMethods[] = {
@@ -235,6 +235,21 @@ static void Java_WMLBridge_dispatchMessage(JNIEnv* env, jobject obj,
   base::android::CheckException(env);
 }
 
+static intptr_t g_WMLBridge_dispatchMessageSync = 0;
+static base::android::ScopedLocalJavaRef<jbyteArray>
+Java_WMLBridge_dispatchMessageSync(JNIEnv* env, jobject obj, jstring clientID,
+                                   jstring vmID, jbyteArray data) {
+  jmethodID method_id = base::android::GetMethod(
+      env, g_WMLBridge_clazz, base::android::INSTANCE_METHOD,
+      "dispatchMessageSync", "(Ljava/lang/String;Ljava/lang/String;[B)[B",
+      &g_WMLBridge_dispatchMessageSync);
+
+  auto result = env->CallObjectMethod(obj, method_id, clientID, vmID, data);
+  base::android::CheckException(env);
+  return base::android::ScopedLocalJavaRef<jbyteArray>(
+      env, static_cast<jbyteArray>(result));
+}
+
 static intptr_t g_WMLBridge_postMessage = 0;
 
 static void Java_WMLBridge_postMessage(JNIEnv* env, jobject obj, jstring vmID,
@@ -264,6 +279,7 @@ bool WMLBridge::RegisterJNIUtils(JNIEnv* env) {
                                    sizeof(gWMMethods) / sizeof(gWMMethods[0]));
     return true;
   }
+  return false;
 }
 
 void WMLBridge::PostMessage(JNIEnv* env, const char* vm_id, const char* data, int dataLength) {
@@ -292,6 +308,23 @@ void WMLBridge::DispatchMessage(JNIEnv *env, const char *client_id,
                                    jni_vm_id.Get(), jni_array.Get(),
                                    jni_callback.Get());
   }
+}
+
+base::android::ScopedLocalJavaRef<jbyteArray> WMLBridge::DispatchMessageSync(
+    JNIEnv* env, const char* client_id, const char* data, int dataLength,
+    const char* vm_id) {
+  if (jni_object() != NULL) {
+    auto jni_client_id = base::android::ScopedLocalJavaRef<jstring>(
+        env, newJString(env, client_id));
+    auto jni_array = base::android::ScopedLocalJavaRef<jbyteArray>(
+        env, newJByteArray(env, data, dataLength));
+    auto jni_vm_id =
+        base::android::ScopedLocalJavaRef<jstring>(env, newJString(env, vm_id));
+    return Java_WMLBridge_dispatchMessageSync(env, jni_object(),
+                                              jni_client_id.Get(),
+                                              jni_vm_id.Get(), jni_array.Get());
+  }
+  return base::android::ScopedLocalJavaRef<jbyteArray>();
 }
 
 }  // namespace WeexCore

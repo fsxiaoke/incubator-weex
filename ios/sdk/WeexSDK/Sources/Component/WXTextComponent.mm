@@ -29,7 +29,6 @@
 #import "WXComponent+Layout.h"
 #import <pthread/pthread.h>
 #import <CoreText/CoreText.h>
-#import "WXComponent+Layout.h"
 
 // WXText is a non-public is not permitted
 @interface WXTextView : WXView
@@ -116,10 +115,8 @@
 
 @end
 
-static BOOL textRenderUsingCoreText = YES;
-
-NSString *const WXTextTruncationToken = @"\u2026";
-CGFloat WXTextDefaultLineThroughWidth = 1.2;
+static NSString *const WXTextTruncationToken = @"\u2026";
+static CGFloat WXTextDefaultLineThroughWidth = 1.2;
 
 @interface WXTextComponent()
 @property (nonatomic, strong) NSString *useCoreTextAttr;
@@ -130,22 +127,20 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     UIEdgeInsets _border;
     UIEdgeInsets _padding;
     NSTextStorage *_textStorage;
-    CGFloat _textStorageWidth;
-    
-    UIColor *_color;
+    float _textStorageWidth;
+    float _color[4];
     NSString *_fontFamily;
-    CGFloat _fontSize;
-    CGFloat _fontWeight;
+    float _fontSize;
+    float _fontWeight;
     WXTextStyle _fontStyle;
     NSUInteger _lines;
     NSTextAlignment _textAlign;
-    NSString *_direction;
     WXTextDecoration _textDecoration;
     NSString *_textOverflow;
-    CGFloat _lineHeight;
-    CGFloat _letterSpacing;
-    CGFloat _fontDescender;
-    CGFloat _fontAscender;
+    float _lineHeight;
+    float _letterSpacing;
+    float _fontDescender;
+    float _fontAscender;
     BOOL _truncationLine; // support trunk tail
     
     NSAttributedString * _ctAttributedString;
@@ -155,16 +150,6 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     pthread_mutexattr_t _propertMutexAttr;
     BOOL _observerIconfont;
     BOOL _enableCopy;
-}
-
-+ (void)setRenderUsingCoreText:(BOOL)usingCoreText
-{
-    textRenderUsingCoreText = usingCoreText;
-}
-
-+ (BOOL)textRenderUsingCoreText
-{
-    return textRenderUsingCoreText;
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -181,12 +166,16 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
         pthread_mutexattr_settype(&(_propertMutexAttr), PTHREAD_MUTEX_RECURSIVE);
         pthread_mutex_init(&(_ctAttributedStringMutex), &(_propertMutexAttr));
         
+        _textAlign = NSTextAlignmentNatural;
+        
         if ([attributes objectForKey:@"coretext"]) {
             _useCoreTextAttr = [WXConvert NSString:attributes[@"coretext"]];
         } else {
             _useCoreTextAttr = nil;
         }
         
+        _color[0] = -1.0;
+
         [self fillCSSStyles:styles];
         [self fillAttributes:attributes];
         
@@ -202,11 +191,7 @@ CGFloat WXTextDefaultLineThroughWidth = 1.2;
     if ([_useCoreTextAttr isEqualToString:@"false"]) {
         return NO;
     }
-    
-    if ([WXTextComponent textRenderUsingCoreText]) {
-        return YES;
-    }
-    return NO;
+    return YES;
 }
 
 - (void)dealloc
@@ -261,7 +246,6 @@ do {\
 
 - (void)fillCSSStyles:(NSDictionary *)styles
 {
-    WX_STYLE_FILL_TEXT_WITH_DEFAULT_VALUE(color, color, UIColor, [UIColor blackColor], NO)
     WX_STYLE_FILL_TEXT(fontFamily, fontFamily, NSString, YES)
     WX_STYLE_FILL_TEXT_PIXEL(fontSize, fontSize, YES)
     WX_STYLE_FILL_TEXT(fontWeight, fontWeight, WXTextWeight, YES)
@@ -273,7 +257,26 @@ do {\
     WX_STYLE_FILL_TEXT_PIXEL(lineHeight, lineHeight, YES)
     WX_STYLE_FILL_TEXT_PIXEL(letterSpacing, letterSpacing, YES)
     WX_STYLE_FILL_TEXT(wordWrap, wordWrap, NSString, YES);
-    WX_STYLE_FILL_TEXT(direction, direction, NSString, YES)
+
+    UIColor* color = nil;
+    id value = styles[@"color"];
+    if (value) {
+        if([WXUtility isBlankString:value]){
+            color = [UIColor blackColor];
+        } else {
+            color = [WXConvert UIColor:value];
+        }
+        if (color) {
+            [self setNeedsRepaint];
+            CGFloat red, green, blue, alpha;
+            [color getRed:&red green:&green blue:&blue alpha:&alpha];
+            _color[0] = red;
+            _color[1] = green;
+            _color[2] = blue;
+            _color[3] = alpha;
+        }
+    }
+
     if (_fontFamily && !_observerIconfont) {
         // notification received when custom icon font file download finish
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(repaintText:) name:WX_ICONFONT_DOWNLOAD_NOTIFICATION object:nil];
@@ -359,6 +362,10 @@ do {\
 - (UIView *)loadView
 {
     return [[WXTextView alloc] init];
+}
+
+- (void)layoutDirectionDidChanged:(BOOL)isRTL {
+    [self setNeedsRepaint];
 }
 
 - (BOOL)needsDrawRect
@@ -488,8 +495,8 @@ do {\
         string = @"";
     }
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
-    if (_color) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
+    if (_color[0] >= 0) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
     }
     
     // set font
@@ -515,11 +522,12 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
     
     // handle text direction style, default ltr
-    BOOL isRtl = [_direction isEqualToString:@"rtl"];
+    NSTextAlignment retAlign = _textAlign;
+    BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
-        if (0 == _textAlign) {
+        if (0 == retAlign) {
             //force text right-align if don't specified any align.
-            _textAlign = NSTextAlignmentRight;
+            retAlign = NSTextAlignmentRight;
         }
         paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
     } else {
@@ -529,8 +537,8 @@ do {\
         paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
     }
     
-    if (_textAlign) {
-        paragraphStyle.alignment = _textAlign;
+    if (retAlign) {
+        paragraphStyle.alignment = retAlign;
     }
     
     if ([[_wordWrap lowercaseString] isEqualToString:@"break-word"]) {
@@ -579,8 +587,8 @@ do {\
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:string];
     
     // set textColor
-    if(_color) {
-        [attributedString addAttribute:NSForegroundColorAttributeName value:_color range:NSMakeRange(0, string.length)];
+    if (_color[0] >= 0) {
+        [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithRed:_color[0] green:_color[1] blue:_color[2] alpha:_color[3]] range:NSMakeRange(0, string.length)];
     }
     
     // set font
@@ -598,11 +606,12 @@ do {\
     NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
 
     // handle text direction style, default ltr
-    BOOL isRtl = [_direction isEqualToString:@"rtl"];
+    NSTextAlignment retAlign = _textAlign;
+    BOOL isRtl = [self isDirectionRTL];
     if (isRtl) {
-        if (0 == _textAlign) {
+        if (0 == retAlign) {
             //force text right-align if don't specified any align.
-            _textAlign = NSTextAlignmentRight;
+            retAlign = NSTextAlignmentRight;
         }
         paragraphStyle.baseWritingDirection = NSWritingDirectionRightToLeft;
     } else {
@@ -612,8 +621,8 @@ do {\
         paragraphStyle.baseWritingDirection =  NSWritingDirectionNatural;
     }
     
-    if (_textAlign) {
-        paragraphStyle.alignment = _textAlign;
+    if (retAlign) {
+        paragraphStyle.alignment = retAlign;
     }
     
     if (_lineHeight) {
@@ -1108,7 +1117,10 @@ NS_INLINE NSRange WXNSRangeFromCFRange(CFRange range) {
 {
     [super _resetCSSNodeStyles:styles];
     if ([styles containsObject:@"color"]) {
-        _color = [UIColor blackColor];
+        _color[0] = 0;
+        _color[1] = 0;
+        _color[2] = 0;
+        _color[3] = 1.0;
         [self setNeedsRepaint];
     }
     if ([styles containsObject:@"fontSize"]) {

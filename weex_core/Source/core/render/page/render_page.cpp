@@ -17,15 +17,16 @@
  * under the License.
  */
 
-#include "core/render/page/render_page.h"
-#include "base/TimeUtils.h"
-#include "base/ViewUtils.h"
-#include "base/LogDefines.h"
+#include <math.h>
+#include "base/log_defines.h"
+#include "base/time_utils.h"
+#include "core/common/view_utils.h"
 #include "core/config/core_environment.h"
 #include "core/css/constants_value.h"
 #include "core/layout/layout.h"
 #include "core/manager/weex_core_manager.h"
 #include "core/moniter/render_performance.h"
+#include "core/render/page/render_page.h"
 #include "core/render/action/render_action_add_element.h"
 #include "core/render/action/render_action_add_event.h"
 #include "core/render/action/render_action_appendtree_createfinish.h"
@@ -157,6 +158,11 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
     return false;
   }
 
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()) {
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementStart],%s,%s,%s",
+         this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
+
   // add child to Render Tree
   insert_posiotn = parent->AddRenderObject(insert_posiotn, child);
   if (insert_posiotn < -1) {
@@ -167,6 +173,10 @@ bool RenderPage::AddRenderObject(const std::string &parent_ref,
   SendAddElementAction(child, parent, insert_posiotn, false);
 
   Batch();
+  if (WeexCore::WXCoreEnvironment::getInstance()->isInteractionLogOpen()) {
+    LOGD("wxInteractionAnalyzer: [weexcore][addElementEnd],%s,%s,%s",
+         this->page_id().c_str(),child->type().c_str(),child->ref().c_str());
+  }
   return true;
 }
 
@@ -220,7 +230,8 @@ bool RenderPage::UpdateStyle(
   std::vector<std::pair<std::string, std::string>> *margin = nullptr;
   std::vector<std::pair<std::string, std::string>> *padding = nullptr;
   std::vector<std::pair<std::string, std::string>> *border = nullptr;
-
+  bool inheriableLayout = false;
+    
   bool flag = false;
   int result =
       WeexCoreManager::Instance()
@@ -276,13 +287,16 @@ bool RenderPage::UpdateStyle(
                   flag = true;
               });
           break;
+          case kTypeInheritableLayout:
+              inheriableLayout = true;
+              break;
         default: break;
       }
     }
   }
 
   if (style != nullptr || margin != nullptr || padding != nullptr ||
-      border != nullptr)
+      border != nullptr || inheriableLayout)
     SendUpdateStyleAction(render, style, margin, padding, border);
 
   Batch();

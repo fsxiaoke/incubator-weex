@@ -32,6 +32,14 @@
 #import "WXRefreshComponent.h"
 #import "WXLoadingComponent.h"
 
+@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
+
+@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
+// Set whether the content offset position all the way to the bottom
+@property (assign, nonatomic) BOOL contentAttachBottom;
+
+@end
+
 @interface WXTableView : UITableView
 
 @end
@@ -79,6 +87,40 @@
     [super setContentOffset:contentOffset];
 }
 
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    if (![self.wx_component isKindOfClass:[WXListComponent class]]) return;
+    BOOL contentAttachBottom = [(WXListComponent *)self.wx_component contentAttachBottom];
+    if (contentAttachBottom) {
+        CGFloat offsetHeight = self.contentSize.height - CGRectGetHeight(self.bounds);
+        if (offsetHeight >= 0) {
+            [self setContentOffset:CGPointMake(0, offsetHeight) animated:NO];
+        }
+    }
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+{
+    [super setContentOffset:contentOffset animated:animated];
+    BOOL scrollStartEvent = [[self.wx_component valueForKey:@"_scrollStartEvent"] boolValue];
+    id scrollEventListener = [self.wx_component valueForKey:@"_scrollEventListener"];
+    
+    if (animated && (scrollStartEvent ||scrollEventListener)  && !WXPointEqualToPoint(contentOffset, self.contentOffset)) {
+        CGFloat scaleFactor = self.wx_component.weexInstance.pixelScaleFactor;
+        NSDictionary *contentSizeData = @{@"width":@(self.contentSize.width / scaleFactor),
+                                          @"height":@(self.contentSize.height / scaleFactor)};
+        NSDictionary *contentOffsetData = @{@"x":@(-self.contentOffset.x / scaleFactor),
+                                            @"y":@(-self.contentOffset.y / scaleFactor)};
+        if (scrollStartEvent) {
+            [self.wx_component fireEvent:@"scrollstart" params:@{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData} domChanges:nil];
+        }
+        if (scrollEventListener) {
+            WXScrollerComponent *component = (WXScrollerComponent *)self.wx_component;
+            component.scrollEventListener(component, @"scrollstart", @{@"contentSize":contentSizeData, @"contentOffset":contentOffsetData});
+        }
+    }
+}
+
 @end
 
 // WXText is a non-public is not permitted
@@ -114,12 +156,6 @@
 }
 @end
 
-@interface WXListComponent () <UITableViewDataSource, UITableViewDelegate, WXCellRenderDelegate, WXHeaderRenderDelegate>
-
-@property (nonatomic, assign) NSUInteger currentTopVisibleSection;
-
-@end
-
 @implementation WXListComponent
 {
     __weak UITableView * _tableView;
@@ -144,6 +180,7 @@
         _completedSections = [NSMutableArray array];
         _reloadInterval = attributes[@"reloadInterval"] ? [WXConvert CGFloat:attributes[@"reloadInterval"]]/1000 : 0;
         _updataType = [WXConvert NSString:attributes[@"updataType"]]?:@"insert";
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
         [self fixFlicker];
     }
     
@@ -198,6 +235,9 @@
     if (attributes[@"updataType"]) {
         _updataType = [WXConvert NSString:attributes[@"updataType"]];
     }
+    if (attributes[@"contentAttachBottom"]) {
+        _contentAttachBottom = [WXConvert BOOL:attributes[@"contentAttachBottom"]];
+    }
 }
 
 - (void)setContentSize:(CGSize)contentSize
@@ -212,6 +252,13 @@
 
 - (void)scrollToComponent:(WXComponent *)component withOffset:(CGFloat)offset animated:(BOOL)animated
 {
+    UIScrollView *scrollView = (UIScrollView *)self.view;
+    // http://dotwe.org/vue/aa1af34e5fc745c0f1520e346904682a
+    // ignore scroll action if contentSize smaller than scroller frame
+    if (scrollView.contentSize.height < scrollView.frame.size.height) {
+        return;
+    }
+    
     CGPoint contentOffset = _tableView.contentOffset;
     CGFloat contentOffsetY = 0;
     
@@ -636,7 +683,7 @@
             // Must invoke synchronously otherwise it will remove the view just added.
             WXCellComponent *cellComponent = (WXCellComponent *)wxCellView.wx_component;
             if (cellComponent.isRecycle) {
-                [wxCellView.wx_component _unloadViewWithReusing:YES];
+                [cellComponent _unloadViewWithReusing:YES];
             }
         }
     }
@@ -889,7 +936,7 @@
     
     if (keepScrollPosition) {
         CGPoint afterContentOffset = _tableView.contentOffset;
-        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + adjustment);
+        CGPoint newContentOffset = CGPointMake(afterContentOffset.x, afterContentOffset.y + ceilf(adjustment));
         _tableView.contentOffset = newContentOffset;
     }
     
@@ -976,6 +1023,7 @@
     }];
 }
 
+// Hook _adjustContentOffsetIfNecessary will cause UITableView freezing if bounces is set to NO.
 - (void)fixFlicker
 {
     static dispatch_once_t onceToken;

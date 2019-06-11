@@ -20,8 +20,8 @@
 #import "WXVersion.h"
 #import "WXDefine.h"
 
-static const char* WeexSDKBuildTime = "2018-11-06 06:35:19 UTC";
-static const unsigned long WeexSDKBuildTimestamp = 1541486119;
+static const char* WeexSDKBuildTime = "2019-04-16 13:26:54 UTC";
+static const unsigned long WeexSDKBuildTimestamp = 1555421214;
 
 NSString* GetWeexSDKVersion(void)
 {

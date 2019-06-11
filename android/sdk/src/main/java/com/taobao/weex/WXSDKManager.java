@@ -26,8 +26,10 @@ import android.text.TextUtils;
 import com.taobao.weex.adapter.ClassLoaderAdapter;
 import com.taobao.weex.adapter.DefaultUriAdapter;
 import com.taobao.weex.adapter.DefaultWXHttpAdapter;
+import com.taobao.weex.adapter.IWXConfigAdapter;
 import com.taobao.weex.adapter.ICrashInfoReporter;
 import com.taobao.weex.adapter.IDrawableLoader;
+import com.taobao.weex.adapter.IWXJscProcessManager;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.adapter.IWXAccessibilityRoleAdapter;
 import com.taobao.weex.adapter.IWXHttpAdapter;
@@ -89,6 +91,7 @@ public class WXSDKManager {
 
   private IWXJSExceptionAdapter mIWXJSExceptionAdapter;
 
+  private IWXConfigAdapter mConfigAdapter;
   private IWXStorageAdapter mIWXStorageAdapter;
   private IWXStatisticsListener mStatisticsListener;
   private URIAdapter mURIAdapter;
@@ -96,6 +99,7 @@ public class WXSDKManager {
   private IWebSocketAdapterFactory mIWebSocketAdapterFactory;
   private ITracingAdapter mTracingAdapter;
   private WXValidateProcessor mWXValidateProcessor;
+  private IWXJscProcessManager mWXJscProcessManager;
   // Tell weexv8 to initialize v8, default is true.
   private boolean mNeedInitV8 = true;
 
@@ -209,9 +213,19 @@ public class WXSDKManager {
   public WXRenderManager getWXRenderManager() {
     return mWXRenderManager;
   }
-
+  public IWXJscProcessManager getWXJscProcessManager() {
+    return mWXJscProcessManager;
+  }
   public WXWorkThreadManager getWXWorkThreadManager() {
     return mWXWorkThreadManager;
+  }
+
+  public void setWxConfigAdapter(IWXConfigAdapter mConfigAdapter) {
+    this.mConfigAdapter = mConfigAdapter;
+  }
+
+  public IWXConfigAdapter getWxConfigAdapter() {
+    return mConfigAdapter;
   }
 
   public @Nullable WXSDKInstance getSDKInstance(String instanceId) {
@@ -399,6 +413,7 @@ public class WXSDKManager {
     this.mClassLoaderAdapter = config.getClassLoaderAdapter();
     this.mApmGenerater = config.getApmGenerater();
     this.mWXJsFileLoaderAdapter = config.getJsFileLoaderAdapter();
+    this.mWXJscProcessManager = config.getJscProcessManager();
   }
 
   public IWXStorageAdapter getIWXStorageAdapter(){

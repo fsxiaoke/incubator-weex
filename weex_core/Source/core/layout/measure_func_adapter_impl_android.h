@@ -17,11 +17,12 @@
  * under the License.
  */
 #include "measure_func_adapter.h"
-#include <core/render/node/render_object.h>
+
+#include "android/bridge/platform/android_side.h"
 #include "android/wrap/content_box_measurement_impl_android.h"
-#include <android/base/jni/scoped_java_ref.h>
-#include <core/manager/weex_core_manager.h>
-#include <android/bridge/platform/android_side.h>
+#include "base/android/jni/scoped_java_ref.h"
+#include "core/manager/weex_core_manager.h"
+#include "core/render/node/render_object.h"
 
 namespace WeexCore {
 
@@ -46,6 +47,7 @@ namespace WeexCore {
       }
 
       JNIEnv* env = base::android::AttachCurrentThread();
+      if (!env) return size;
 
       cumsmeasure_Imple_Android(env, measureFunc,
                                 width, height,
@@ -65,6 +67,7 @@ namespace WeexCore {
       }
 
         JNIEnv *env = base::android::AttachCurrentThread();
+      if (!env) return;
       LayoutBeforeImplAndroid(env, measureFunc);
       env->DeleteLocalRef(measureFunc);
     }
@@ -75,6 +78,7 @@ namespace WeexCore {
         return;
       }
         JNIEnv *env = base::android::AttachCurrentThread();
+      if (!env) return;
       LayoutAfterImplAndroid(env, measureFunc, width, height);
       env->DeleteLocalRef(measureFunc);
     }

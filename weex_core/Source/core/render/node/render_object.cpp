@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #include "core/render/node/render_object.h"
-#include "base/ViewUtils.h"
+#include <math.h>
+
+#include "core/common/view_utils.h"
 #include "core/css/constants_name.h"
 #include "core/css/constants_value.h"
 #include "core/css/css_value_getter.h"
@@ -158,6 +161,13 @@ StyleType RenderObject::ApplyStyle(const std::string &key,
       }
     }
     return kTypeLayout;
+  } else if (key == DIRECTION) {
+    WeexCore::WXCoreDirection direction = GetWXCoreDirection(value);
+    if (direction ==  WeexCore::kDirectionInherit && this->is_root_render_ ) {
+        direction = WeexCore::kDirectionLTR;
+    } 
+    setDirection(direction, updating);
+    return kTypeInheritableLayout;
   } else if (key == FLEX_DIRECTION) {
     setFlexDirection(GetWXCoreFlexDirection(value), updating);
     return kTypeLayout;

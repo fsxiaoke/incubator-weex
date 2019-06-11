@@ -35,7 +35,6 @@
 #import <pthread/pthread.h>
 #import "WXComponent+PseudoClassManagement.h"
 #import "WXComponent+BoxShadow.h"
-#import "WXTracingManager.h"
 #import "WXComponent+Events.h"
 #import "WXComponent+Layout.h"
 #import "WXConfigCenterProtocol.h"
@@ -101,6 +100,7 @@ static BOOL bNeedRemoveEvents = YES;
         _ariaHidden = nil;
         _accessible = nil;
         _accessibilityHintContent = nil;
+        _cancelsTouchesInView = YES;
         
         _async = NO;
         
@@ -148,6 +148,15 @@ static BOOL bNeedRemoveEvents = YES;
         {
             _clipRadius = [WXConvert NSString:attributes[@"clipRadius"]];
         }
+        
+        if (attributes[@"customEvent"]) {
+            _customEvent = [WXConvert BOOL:attributes[@"customEvent"]];
+        }
+        
+        if (attributes[@"cancelsTouchesInView"]) {
+            _cancelsTouchesInView = [WXConvert BOOL:attributes[@"cancelsTouchesInView"]];
+        }
+
         
 #ifdef DEBUG
         WXLogDebug(@"flexLayout -> init component: ref : %@ , styles: %@",ref,styles);
@@ -275,7 +284,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *styles;
     pthread_mutex_lock(&_propertyMutex);
-    styles = _styles;
+    styles = [_styles copy];
     pthread_mutex_unlock(&_propertyMutex);
     return styles;
 }
@@ -284,7 +293,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *pseudoClassStyles;
     pthread_mutex_lock(&_propertyMutex);
-    pseudoClassStyles = _pseudoClassStyles;
+    pseudoClassStyles = [_pseudoClassStyles copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return pseudoClassStyles;
@@ -299,7 +308,7 @@ static BOOL bNeedRemoveEvents = YES;
 {
     NSDictionary *attributes;
     pthread_mutex_lock(&_propertyMutex);
-    attributes = _attributes;
+    attributes = [_attributes copy];
     pthread_mutex_unlock(&_propertyMutex);
     
     return attributes;
@@ -383,10 +392,12 @@ static BOOL bNeedRemoveEvents = YES;
         if (_backgroundImage) {
             [self setGradientLayer];
         }
-        
+
         if (_transform) {
             [_transform applyTransformForView:_view];
         }
+        
+        [self _adjustForRTL];
         
         if (_boxShadow) {
             [self configBoxShadow:_boxShadow];
@@ -593,6 +604,7 @@ static BOOL bNeedRemoveEvents = YES;
     pthread_mutex_unlock(&_propertyMutex);
     
     if (subcomponent->_positionType == WXPositionTypeFixed) {
+        subcomponent.ignoreInteraction = YES;
         [self.weexInstance.componentManager addFixedComponent:subcomponent];
     }
     
@@ -678,6 +690,7 @@ static BOOL bNeedRemoveEvents = YES;
         [_transition _handleTransitionWithStyles:[styles mutableCopy] resetStyles:resetStyles target:self];
     } else {
         styles = [self parseStyles:styles];
+        [self resetPseudoClassStyles:resetStyles];
         [self _updateCSSNodeStyles:styles];
         [self _resetCSSNodeStyles:resetStyles];
     }
@@ -801,6 +814,7 @@ static BOOL bNeedRemoveEvents = YES;
     self.transform = [[WXTransform alloc] initWithNativeTransform:CATransform3DMakeAffineTransform(transform) instance:self.weexInstance];
     if (!CGRectEqualToRect(self.calculatedFrame, CGRectZero)) {
         [_transform applyTransformForView:_view];
+        [self _adjustForRTL];
         [_layer setNeedsDisplay];
     }
 }

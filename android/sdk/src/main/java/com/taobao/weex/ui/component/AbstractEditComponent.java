@@ -128,6 +128,18 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     });
   }
 
+  @Override
+  protected void layoutDirectionDidChanged(boolean isRTL) {
+    String alignStr = (String) getStyles().get(Constants.Name.TEXT_ALIGN);
+    int textAlign = getTextAlign(alignStr);
+    if (textAlign <= 0) {
+      textAlign = Gravity.START;
+    }
+    if (getHostView() instanceof WXEditText) {
+      getHostView().setGravity(textAlign | getVerticalGravity());
+    }
+  }
+
   protected final float getMeasuredLineHeight() {
     return mLineHeight != UNSET && mLineHeight > 0 ? mLineHeight : mPaint.getFontMetrics(null);
   }
@@ -603,6 +615,9 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     if ((view = getHostView()) == null) {
       return;
     }
+    if (TextUtils.equals(view.getText(), value)) {
+      return;
+    }
 
     mIgnoreNextOnInputEvent = true;
     int oldIndex = view.getSelectionStart();
@@ -757,10 +772,12 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
   }
 
   private int getTextAlign(String textAlign) {
-    int align = Gravity.START;
+    boolean isRTL = isLayoutRTL();
+    int align = isRTL ? Gravity.END : Gravity.START;
     if (TextUtils.isEmpty(textAlign)) {
       return align;
     }
+
     if (textAlign.equals(Constants.Value.LEFT)) {
       align = Gravity.START;
     } else if (textAlign.equals(Constants.Value.CENTER)) {

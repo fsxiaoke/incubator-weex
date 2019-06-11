@@ -119,7 +119,7 @@ class PlatformBridge {
                                     long callback_id) = 0;
     virtual int CreateInstance(const char* instanceId, const char* func,
                                const char* script, int script_length, const char* opts,
-                               const char* initData, const char* extendsApi,
+                               const char* initData, const char* extendsApi, std::vector<INIT_FRAMEWORK_PARAMS*>& params,
                                const char* render_strategy) = 0;
     virtual std::unique_ptr<WeexJSResult> ExecJSOnInstance(const char* instanceId,
                                          const char* script) = 0;
@@ -169,6 +169,9 @@ class PlatformBridge {
                                      const char* method, const char* arguments,
                                      int arguments_length, const char* options,
                                      int options_length) = 0;
+#if OS_IOS
+    virtual std::unique_ptr<ValueWithType> RegisterPluginModule(const char *name, const char *class_name, const char *version) = 0;
+#endif
     virtual void SetTimeout(const char* callback_id, const char* time) = 0;
     virtual void NativeLog(const char* str_array) = 0;
     virtual int UpdateFinish(const char* page_id, const char* task, int taskLen,
@@ -199,7 +202,7 @@ class PlatformBridge {
                            bool willLayout = true) = 0;
     virtual int Layout(const char* page_id, const char* ref, float top,
                        float bottom, float left, float right, float height,
-                       float width, int index) = 0;
+                       float width, bool isRTL, int index) = 0;
 
     virtual int UpdateStyle(
         const char* pageId, const char* ref,
@@ -226,8 +229,12 @@ class PlatformBridge {
         const char* pageId, const char* ref,
         std::vector<std::pair<std::string, std::string>>* style) = 0;
     virtual void PostMessage(const char* vm_id, const char* data, int dataLength) = 0;
-    virtual void DispatchMessage(const char* client_id,
-                                 const char* data, int dataLength, const char* callback, const char* vm_id) = 0;
+    virtual void DispatchMessage(const char* client_id, const char* data,
+                                 int dataLength, const char* callback,
+                                 const char* vm_id) = 0;
+    virtual std::unique_ptr<WeexJSResult> DispatchMessageSync(
+        const char* client_id, const char* data, int dataLength,
+        const char* vm_id) = 0;
     virtual void OnReceivedResult(long callback_id,
                                   std::unique_ptr<WeexJSResult>& result) = 0;
 

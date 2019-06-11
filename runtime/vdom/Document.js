@@ -183,13 +183,12 @@ export default class Document {
     if (domChanges) {
       updateElement(el, domChanges)
     }
-    let result
+    let isBubble
     const $root = this.getRef('_root')
     if ($root && $root.attr) {
-      const isBubble = $root.attr['bubble'] === 'true'
-      result = el.fireEvent(type, event, isBubble, options)
+      isBubble = $root.attr['bubble'] === 'true'
     }
-    return result
+    return el.fireEvent(type, event, isBubble, options)
   }
 
   /**
