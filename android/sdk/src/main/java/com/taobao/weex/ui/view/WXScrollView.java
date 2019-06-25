@@ -159,6 +159,14 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
       }
       mCurrentStickyView.getLocationOnScreen(stickyViewP);
       ev.offsetLocation(0, stickyViewP[1] - mScrollRect.top);
+      postInvalidate();
+      if (ev.getAction() == MotionEvent.ACTION_UP||ev.getAction() == MotionEvent.ACTION_CANCEL) {
+
+        for(int i =20; i<1200;i=i+20){
+          postInvalidateDelayed(i);
+        }
+      }
+
     }
     boolean result = super.dispatchTouchEvent(ev);
     if (wxGesture != null) {
