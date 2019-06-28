@@ -86,7 +86,7 @@ public class IndexActivity extends AbstractWeexActivity {
     }
 //    loadTest();
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
+      renderPage(WXFileUtils.loadAsset("about.js", this), getIndexUrl());
     } else {
       renderPageByURL(getIndexUrl());
     }
@@ -97,7 +97,7 @@ public class IndexActivity extends AbstractWeexActivity {
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
         if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
+          renderPage(WXFileUtils.loadAsset("about.js", getApplicationContext()), getIndexUrl());
         } else {
           renderPageByURL(getIndexUrl());
         }
@@ -169,7 +169,14 @@ public class IndexActivity extends AbstractWeexActivity {
     }
   }
 
-  @Override
+    @Override
+    public void onViewCreated(WXSDKInstance wxsdkInstance, View view) {
+        super.onViewCreated(wxsdkInstance, view);
+        mProgressBar.setVisibility(View.GONE);
+        mTipView.setVisibility(View.GONE);
+    }
+
+    @Override
   public void onRenderSuccess(WXSDKInstance wxsdkInstance, int i, int i1) {
     super.onRenderSuccess(wxsdkInstance,i,i1);
     mProgressBar.setVisibility(View.GONE);
