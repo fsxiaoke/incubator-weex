@@ -62,6 +62,7 @@ import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.FsPagerWithHeader;
+import com.taobao.weex.ui.component.FsWXScroller;
 import com.taobao.weex.ui.component.Textarea;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -357,6 +358,15 @@ public class WXSDKEngine implements Serializable {
               ),
               false,
               WXBasicComponentType.SCROLLER
+      );
+
+      registerComponent(
+              new SimpleComponentHolder(
+                      FsWXScroller.class,
+                      new FsWXScroller.Creator()
+              ),
+              false,
+              WXBasicComponentType.FSSCROLLER
       );
       registerComponent(
               new SimpleComponentHolder(

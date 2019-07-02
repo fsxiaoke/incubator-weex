@@ -28,6 +28,8 @@ import com.taobao.weex.annotation.Component;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.view.WXFrameLayout;
+import com.taobao.weex.ui.view.WXHorizontalScrollView;
+import com.taobao.weex.ui.view.WXTextView;
 import com.taobao.weex.ui.view.coordinatortablayout.CoordinatorTabLayout;
 
 
@@ -84,10 +86,17 @@ public class FsPagerWithHeader extends WXVContainer<CoordinatorTabLayout> {
             mTabLayout.addTopView(view);
         }
 
+        if(view instanceof WXTextView||view instanceof WXHorizontalScrollView){
+            mTabLayout.addTabView(view);
+        }
+
         if(view instanceof ViewPager){
 
             mTabLayout.addPageView(view);
         }
+
+
+
     }
 
 }

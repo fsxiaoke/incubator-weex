@@ -72,18 +72,19 @@
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
-        <android.support.design.widget.TabLayout
+        <LinearLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            app:tabIndicatorColor="#ff8000"
             android:background="#fafafa"
             android:clipToPadding="true"
             android:fillViewport="false"
             app:layout_scrollFlags="scroll"
             app:layout_collapseMode="pin"
-            app:tabMode="scrollable" />
+            android:orientation="vertical"
+             />
+
 
     </android.support.design.widget.AppBarLayout>
 
