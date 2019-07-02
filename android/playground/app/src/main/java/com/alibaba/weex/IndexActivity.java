@@ -86,7 +86,7 @@ public class IndexActivity extends AbstractWeexActivity {
     }
 //    loadTest();
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("about.js", this), getIndexUrl());
+      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
     } else {
       renderPageByURL(getIndexUrl());
     }
@@ -97,7 +97,7 @@ public class IndexActivity extends AbstractWeexActivity {
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
         if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("about.js", getApplicationContext()), getIndexUrl());
+          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
         } else {
           renderPageByURL(getIndexUrl());
         }
@@ -109,7 +109,7 @@ public class IndexActivity extends AbstractWeexActivity {
 
     LocalBroadcastManager.getInstance(this).registerReceiver(mReloadReceiver, new IntentFilter(WXSDKEngine.JS_FRAMEWORK_RELOAD));
 
-    CheckForUpdateUtil.checkForUpdate(this);
+//    CheckForUpdateUtil.checkForUpdate(this);
   }
   void loadTest(){
     renderPage(WXFileUtils.loadFileOrAsset("sdcard/facishare/test.js",getApplicationContext()),"test");
