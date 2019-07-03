@@ -64,6 +64,7 @@ import android.widget.LinearLayout;
 
 public class FsTabLayout extends WXVContainer<TabLayout> implements TabLayout.OnTabSelectedListener {
 
+
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
 
@@ -144,6 +145,7 @@ public class FsTabLayout extends WXVContainer<TabLayout> implements TabLayout.On
         } else {
             mTabLayout.addTab(mTabLayout.newTab().setCustomView(child),index);
         }
+
     }
 
 
@@ -193,6 +195,18 @@ public class FsTabLayout extends WXVContainer<TabLayout> implements TabLayout.On
     public void setTabSelectedColor(String color) {
         if(mTabLayout!=null){
             mTabLayout.setSelectedTabIndicatorColor(Color.parseColor(color));
+        }
+    }
+
+
+
+    @WXComponentProp(name = Constants.Name.TAB_SELECTED_INDEX)
+    public void setTabSelectedIndex(int index) {
+        if(mTabLayout!=null){
+            TabLayout.Tab tab = mTabLayout.getTabAt(index);
+            if(tab != null){
+                tab.select();
+            }
         }
 
     }

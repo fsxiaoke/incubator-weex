@@ -227,6 +227,7 @@ public class Constants {
 
     String TAB_SELECTED_HEIGHT = "tabSelectedHeight";
     String TAB_SELECTED_COLOR = "tabSelectedColor";
+    String TAB_SELECTED_INDEX = "tabSelectedIndex";
 
     interface  Recycler{
       String LIST_DATA = "listData";
