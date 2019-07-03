@@ -166,12 +166,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         return this;
     }
 
-    /**
-     * 设置每个tab对应的头部图�?
-     *
-     * @param imageArray 图片数组
-     * @return CoordinatorTabLayout
-     */
+
     public CoordinatorTabLayout setImageArray(@NonNull int[] imageArray) {
         mImageArray = imageArray;
         return this;
