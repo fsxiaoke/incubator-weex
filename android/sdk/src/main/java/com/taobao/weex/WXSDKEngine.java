@@ -61,7 +61,6 @@ import com.taobao.weex.ui.IFComponentHolder;
 import com.taobao.weex.ui.SimpleComponentHolder;
 import com.taobao.weex.ui.WXComponentRegistry;
 import com.taobao.weex.ui.animation.WXAnimationModule;
-import com.taobao.weex.ui.component.FsPagerWithHeader;
 import com.taobao.weex.ui.component.Textarea;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -74,7 +73,6 @@ import com.taobao.weex.ui.component.WXIndicator;
 import com.taobao.weex.ui.component.WXInput;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXLoadingIndicator;
-import com.taobao.weex.ui.component.WXPager;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXSlider;
@@ -375,25 +373,6 @@ public class WXSDKEngine implements Serializable {
               true,
               WXBasicComponentType.SLIDER_NEIGHBOR
       );
-      registerComponent(
-              new SimpleComponentHolder(
-                      FsPagerWithHeader.class,
-                      new FsPagerWithHeader.Creator()
-              ),
-              false,
-              WXBasicComponentType.FSPAGER
-      );
-
-      registerComponent(
-              new SimpleComponentHolder(
-                      WXPager.class,
-                      new WXPager.Creator()
-              ),
-              false,
-              WXBasicComponentType.WXPAGER
-      );
-
-
       registerComponent(
               new SimpleComponentHolder(
                       WXCell.class,
