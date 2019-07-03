@@ -32,7 +32,6 @@ public class WXBasicComponentType {
   public static final String WXPAGER = "wxpager";
 
   public static final String SCROLLER = "scroller";
-  public static final String FSSCROLLER = "fsscroller";
   public static final String SLIDER = "slider";
   public static final String SLIDER_NEIGHBOR = "slider-neighbor";
   public static final String LIST = "list";

@@ -20,7 +20,6 @@ package com.taobao.weex.ui.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
@@ -37,7 +36,6 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
-import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.dom.WXEvent;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
@@ -175,20 +173,7 @@ public class WXPager extends WXVContainer<ViewPager> {
   public ViewGroup getRealView() {
     return mViewPager;
   }
-  @Override
-  public void setLayout(WXComponent component) {
-    if (TextUtils.isEmpty(component.getComponentType())
-            || TextUtils.isEmpty(component.getRef()) || component.getLayoutPosition() == null
-            || component.getLayoutSize() == null) {
-      return;
-    }
 
-    CSSShorthand cs=new CSSShorthand();
-
-    component.setMargins(cs);
-    component.getLayoutPosition().update(0,0,0,0);
-    super.setLayout(component);
-  }
   @Override
   public void addSubView(View view, int index) {
     if (view == null || mAdapter == null) {

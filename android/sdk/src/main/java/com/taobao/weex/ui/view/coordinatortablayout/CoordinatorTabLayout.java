@@ -36,7 +36,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.taobao.weex.R;
@@ -57,7 +56,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     private Context mContext;
 //    private Toolbar mToolbar;
 //    private ActionBar mActionbar;
-    private LinearLayout mTabLayout;
+    private TabLayout mTabLayout;
     private LinearLayout mPagerContainer;
 //    private ImageView mImageView;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -92,7 +91,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weexview_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mTabLayout = (LinearLayout) findViewById(R.id.tabLayout);
+        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
 
 //        testPager();
@@ -121,13 +120,6 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
 
 
-    public void addTabView(View v){
-        if(mTabLayout != null){
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            mTabLayout.addView(v,params);
-        }
-    }
 
     public void addTopView(View v){
         if(mFeedRootLayout != null){
@@ -233,43 +225,43 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     }
 
     private void setupTabLayout() {
-//        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-////                mImageView.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_dismiss));
-////                if (mLoadHeaderImagesListener == null) {
-////                    if (mImageArray != null) {
-////                        mImageView.setImageResource(mImageArray[tab.getPosition()]);
-////                    }
-////                } else {
-////                    mLoadHeaderImagesListener.loadHeaderImages(mImageView, tab);
-////                }
-////                if (mColorArray != null) {
-////                    mCollapsingToolbarLayout.setContentScrimColor(
-////                            ContextCompat.getColor(
-////                                    mContext, mColorArray[tab.getPosition()]));
-////                }
-////
-////                if (mOnTabSelectedListener != null) {
-////                    mOnTabSelectedListener.onTabSelected(tab);
-////                }
-//
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//                if (mOnTabSelectedListener != null) {
-//                    mOnTabSelectedListener.onTabUnselected(tab);
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+//                mImageView.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_dismiss));
+//                if (mLoadHeaderImagesListener == null) {
+//                    if (mImageArray != null) {
+//                        mImageView.setImageResource(mImageArray[tab.getPosition()]);
+//                    }
+//                } else {
+//                    mLoadHeaderImagesListener.loadHeaderImages(mImageView, tab);
 //                }
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//                if (mOnTabSelectedListener != null) {
-//                    mOnTabSelectedListener.onTabReselected(tab);
+//                if (mColorArray != null) {
+//                    mCollapsingToolbarLayout.setContentScrimColor(
+//                            ContextCompat.getColor(
+//                                    mContext, mColorArray[tab.getPosition()]));
 //                }
-//            }
-//        });
+//
+//                if (mOnTabSelectedListener != null) {
+//                    mOnTabSelectedListener.onTabSelected(tab);
+//                }
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                if (mOnTabSelectedListener != null) {
+                    mOnTabSelectedListener.onTabUnselected(tab);
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (mOnTabSelectedListener != null) {
+                    mOnTabSelectedListener.onTabReselected(tab);
+                }
+            }
+        });
     }
 
     /**
@@ -279,7 +271,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
      * @return CoordinatorTabLayout
      */
     public CoordinatorTabLayout setTabMode(@TabLayout.Mode int mode) {
-//        mTabLayout.setTabMode(mode);
+        mTabLayout.setTabMode(mode);
         return this;
     }
 
@@ -291,7 +283,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
      */
     public CoordinatorTabLayout setupWithViewPager(ViewPager viewPager) {
         setupTabLayout();
-//        mTabLayout.setupWithViewPager(viewPager);
+        mTabLayout.setupWithViewPager(viewPager);
         return this;
     }
 
@@ -305,7 +297,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     /**
      * 获取该组件中的TabLayout
      */
-    public LinearLayout getTabLayout() {
+    public TabLayout getTabLayout() {
         return mTabLayout;
     }
 
