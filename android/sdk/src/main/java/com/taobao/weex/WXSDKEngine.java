@@ -66,6 +66,7 @@ import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXDiv;
+import com.taobao.weex.ui.component.WXDivFs;
 import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.component.WXHeader;
 import com.taobao.weex.ui.component.WXImage;
@@ -338,6 +339,14 @@ public class WXSDKEngine implements Serializable {
               WXBasicComponentType.DIV,
               WXBasicComponentType.HEADER,
               WXBasicComponentType.FOOTER
+      );
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXDivFs.class,
+                      new WXDivFs.Ceator()
+              ),
+              false,
+              WXBasicComponentType.DIV_fs
       );
       registerComponent(
               new SimpleComponentHolder(
