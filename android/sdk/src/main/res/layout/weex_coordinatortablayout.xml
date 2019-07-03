@@ -71,18 +71,18 @@
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
-        <LinearLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="#fafafa"
-            android:clipToPadding="true"
-            android:fillViewport="false"
-            app:layout_scrollFlags="scroll"
-            app:layout_collapseMode="pin"
-            android:orientation="vertical"
-             />
+        <!--<LinearLayout-->
+            <!--android:id="@+id/tabLayout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom"-->
+            <!--android:background="#fafafa"-->
+            <!--android:clipToPadding="true"-->
+            <!--android:fillViewport="false"-->
+            <!--app:layout_scrollFlags="scroll"-->
+            <!--app:layout_collapseMode="pin"-->
+            <!--android:orientation="vertical"-->
+             <!--/>-->
 
 
     </android.support.design.widget.AppBarLayout>

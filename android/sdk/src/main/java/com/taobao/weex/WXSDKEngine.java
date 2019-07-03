@@ -20,13 +20,13 @@ package com.taobao.weex;
 
 import static com.taobao.weex.WXEnvironment.CORE_SO_NAME;
 
-import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
-import android.util.Log;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.taobao.weex.adapter.IDrawableLoader;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.adapter.IWXImgLoaderAdapter;
@@ -82,8 +82,8 @@ import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.facishare.FsPagerDetail;
-import com.taobao.weex.ui.component.facishare.FsScroller;
 import com.taobao.weex.ui.component.facishare.FsStickyPager;
+import com.taobao.weex.ui.component.facishare.FsTabLayout;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
@@ -103,12 +103,14 @@ import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXSoInstallMgrSdk;
 import com.taobao.weex.utils.batch.BatchOperationHelper;
 import com.taobao.weex.utils.cache.RegisterCache;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
+import android.util.Log;
 
 public class WXSDKEngine implements Serializable {
 
@@ -439,13 +441,15 @@ public class WXSDKEngine implements Serializable {
               true,
               "pagedetail");
 
+
       registerComponent(
               new SimpleComponentHolder(
-                      FsScroller.class,
-                      new FsScroller.Creator()
+                      FsTabLayout.class,
+                      new FsTabLayout.Creator()
               ),
-              true,
-              "pagetab");
+              false,
+              "pagetab"
+      );
 
       registerComponent(
               new SimpleComponentHolder(

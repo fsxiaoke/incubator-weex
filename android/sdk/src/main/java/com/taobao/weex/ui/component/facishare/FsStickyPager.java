@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component.facishare;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
@@ -82,12 +83,13 @@ public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
             mTabLayout.addTopView(view);
         }
 
-        if(view instanceof WXHorizontalScrollView){
-            mTabLayout.addTabView(view);
+        if(view instanceof TabLayout){
+            mTabLayout.addTabView((TabLayout) view);
         }
 
         if(view instanceof ViewPager){
-            mTabLayout.addPageView(view);
+
+            mTabLayout.addPageView((ViewPager) view);
         }
     }
 

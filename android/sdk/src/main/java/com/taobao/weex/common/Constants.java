@@ -225,6 +225,9 @@ public class Constants {
 
 
 
+    String TAB_SELECTED_HEIGHT = "tabSelectedHeight";
+    String TAB_SELECTED_COLOR = "tabSelectedColor";
+
     interface  Recycler{
       String LIST_DATA = "listData";
       String LIST_DATA_ITEM  ="alias";
@@ -333,6 +336,7 @@ public class Constants {
 
     String UNSTICKY = "unsticky";
     String STICKY = "sticky";
+    String TAB_SELECTED = "tabSelected";
 
     String ON_TRANSITION_END = "transitionEnd";
 
