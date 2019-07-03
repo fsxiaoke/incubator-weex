@@ -88,6 +88,7 @@ import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
+import com.taobao.weex.ui.component.list.WXNbListComponent;
 import com.taobao.weex.ui.component.list.template.WXRecyclerTemplateList;
 import com.taobao.weex.ui.component.richtext.WXRichText;
 import com.taobao.weex.ui.config.AutoScanConfigRegister;
@@ -446,7 +447,13 @@ public class WXSDKEngine implements Serializable {
               true,
               "pagetab");
 
-
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXNbListComponent.class,
+                      new WXNbListComponent.Creator()
+              ),
+              true,
+              "nblist");
 
       registerModule("modal", WXModalUIModule.class);
       registerModule("instanceWrap", WXInstanceWrap.class);
