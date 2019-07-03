@@ -230,6 +230,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     provided "com.android.support:recyclerview-v7:${project.supportLibVersion}"
     provided "com.android.support:appcompat-v7:${project.supportLibVersion}"
+    compile "com.android.support:design:${project.supportLibVersion}"
+
 //    provided "com.android.support:support-v4:${project.supportLibVersion}"
 //    provided "com.alibaba:fastjson:${project.fastjsonLibVersion}"
 

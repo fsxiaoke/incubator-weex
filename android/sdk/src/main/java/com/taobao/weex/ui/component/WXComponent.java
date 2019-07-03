@@ -142,7 +142,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mFixedProp = 0;
   /** package **/ T mHost;
 
-  private volatile WXVContainer mParent;
+  protected volatile WXVContainer mParent;
   private WXSDKInstance mInstance;
   private Context mContext;
 

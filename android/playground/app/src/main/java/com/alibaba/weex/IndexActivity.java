@@ -86,7 +86,7 @@ public class IndexActivity extends AbstractWeexActivity {
     }
 //    loadTest();
     if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-      renderPage(WXFileUtils.loadAsset("about.js", this), getIndexUrl());
+      renderPage(WXFileUtils.loadAsset("landing.weex.js", this), getIndexUrl());
     } else {
       renderPageByURL(getIndexUrl());
     }
@@ -97,7 +97,7 @@ public class IndexActivity extends AbstractWeexActivity {
       public void onReceive(Context context, Intent intent) {
         createWeexInstance();
         if (TextUtils.equals(sCurrentIp, DEFAULT_IP)) {
-          renderPage(WXFileUtils.loadAsset("about.js", getApplicationContext()), getIndexUrl());
+          renderPage(WXFileUtils.loadAsset("landing.weex.js", getApplicationContext()), getIndexUrl());
         } else {
           renderPageByURL(getIndexUrl());
         }
