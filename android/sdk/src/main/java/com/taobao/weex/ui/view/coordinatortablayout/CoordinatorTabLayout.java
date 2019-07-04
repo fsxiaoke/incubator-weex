@@ -90,6 +90,13 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
 
+    public void setLayoutParams(ViewGroup.LayoutParams params){
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        super.setLayoutParams(params);
+    }
+
+
 
 
     public void addTabView(TabLayout v){
