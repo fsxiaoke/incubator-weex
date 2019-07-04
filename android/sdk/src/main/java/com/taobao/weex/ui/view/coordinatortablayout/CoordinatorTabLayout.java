@@ -49,8 +49,10 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     private Context mContext;
 //    private Toolbar mToolbar;
 //    private ActionBar mActionbar;
-    private LinearLayout mTabLayout;
+    private LinearLayout mBarLayout;
     private LinearLayout mPagerContainer;
+    private TabLayout mTabLayout;
+    private ViewPager mViewPage;
 //    private ImageView mImageView;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private LoadHeaderImagesListener mLoadHeaderImagesListener;
@@ -84,17 +86,19 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weex_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mTabLayout = (LinearLayout) findViewById(R.id.tabLayout);
+        mBarLayout = (LinearLayout) findViewById(R.id.appbarId);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
 
 
 
-    public void addTabView(View v){
-        if(mTabLayout != null){
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+    public void addTabView(TabLayout v){
+        if(mBarLayout != null){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
-            mTabLayout.addView(v,params);
+            mBarLayout.addView(v,params);
+            mTabLayout = v;
+            setupTabListener();
         }
     }
 
@@ -104,12 +108,14 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         }
     }
 
-    public void addPageView(View v){
+    public void addPageView(ViewPager v){
         mPagerContainer = findViewById(R.id.vp);
         if(mPagerContainer != null){
+            this.mViewPage = v;
             ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             ((LinearLayout.LayoutParams) params).setMargins(0,0,0,0);
             mPagerContainer.addView(v, params);
+            setupViewPageListener();
         }
     }
 
@@ -196,44 +202,59 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         return this;
     }
 
-    private void setupTabLayout() {
-//        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-////                mImageView.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.anim_dismiss));
-////                if (mLoadHeaderImagesListener == null) {
-////                    if (mImageArray != null) {
-////                        mImageView.setImageResource(mImageArray[tab.getPosition()]);
-////                    }
-////                } else {
-////                    mLoadHeaderImagesListener.loadHeaderImages(mImageView, tab);
-////                }
-////                if (mColorArray != null) {
-////                    mCollapsingToolbarLayout.setContentScrimColor(
-////                            ContextCompat.getColor(
-////                                    mContext, mColorArray[tab.getPosition()]));
-////                }
-////
-////                if (mOnTabSelectedListener != null) {
-////                    mOnTabSelectedListener.onTabSelected(tab);
-////                }
-//
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//                if (mOnTabSelectedListener != null) {
-//                    mOnTabSelectedListener.onTabUnselected(tab);
-//                }
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//                if (mOnTabSelectedListener != null) {
-//                    mOnTabSelectedListener.onTabReselected(tab);
-//                }
-//            }
-//        });
+    private void setupViewPageListener(){
+        if(mViewPage!=null){
+            mViewPage.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int i, float v, int i1) {
+
+                }
+
+                @Override
+                public void onPageSelected(int i) {
+                    if(mTabLayout!=null){
+                        mTabLayout.getTabAt(i).select();
+                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int i) {
+
+                }
+            });
+        }
+
+    }
+
+    private void setupTabListener() {
+        if(mTabLayout!=null) {
+            mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    if (mViewPage != null) {
+                        mViewPage.setCurrentItem(tab.getPosition());
+                    }
+                    if (mOnTabSelectedListener != null) {
+                        mOnTabSelectedListener.onTabSelected(tab);
+                    }
+
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                    if (mOnTabSelectedListener != null) {
+                        mOnTabSelectedListener.onTabUnselected(tab);
+                    }
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                    if (mOnTabSelectedListener != null) {
+                        mOnTabSelectedListener.onTabReselected(tab);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -247,17 +268,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         return this;
     }
 
-    /**
-     * 设置与该组件搭配的ViewPager
-     *
-     * @param viewPager 与TabLayout结合的ViewPager
-     * @return CoordinatorTabLayout
-     */
-    public CoordinatorTabLayout setupWithViewPager(ViewPager viewPager) {
-        setupTabLayout();
-//        mTabLayout.setupWithViewPager(viewPager);
-        return this;
-    }
+
 
     /**
      * 获取该组件中的ActionBar
@@ -269,7 +280,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     /**
      * 获取该组件中的TabLayout
      */
-    public LinearLayout getTabLayout() {
+    public TabLayout getTabLayout() {
         return mTabLayout;
     }
 
