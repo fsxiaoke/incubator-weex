@@ -90,6 +90,13 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
 
+    public void setLayoutParams(ViewGroup.LayoutParams params){
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        super.setLayoutParams(params);
+    }
+
+
 
 
     public void addTabView(TabLayout v){
@@ -172,12 +179,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         return this;
     }
 
-    /**
-     * 设置每个tab对应的头部图�?
-     *
-     * @param imageArray 图片数组
-     * @return CoordinatorTabLayout
-     */
+
     public CoordinatorTabLayout setImageArray(@NonNull int[] imageArray) {
         mImageArray = imageArray;
         return this;

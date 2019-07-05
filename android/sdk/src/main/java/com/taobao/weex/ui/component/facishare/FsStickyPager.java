@@ -23,6 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -71,6 +73,21 @@ public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
         mTabLayout = new CoordinatorTabLayout(context);
         return  mTabLayout;
 
+    }
+
+    protected void setHostLayoutParams(ViewPager host, int width, int height, int left, int right, int top, int bottom) {
+        ViewGroup.LayoutParams lp;
+        if (mParent == null) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+            this.setMarginsSupportRTL(params, left, top, right, bottom);
+            lp = params;
+        } else {
+            lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
+        }
+        lp.height= ViewGroup.LayoutParams.MATCH_PARENT;
+        if (lp != null) {
+            host.setLayoutParams(lp);
+        }
     }
 
     @Override
