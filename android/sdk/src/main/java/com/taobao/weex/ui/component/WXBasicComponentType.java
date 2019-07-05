@@ -28,6 +28,7 @@ public class WXBasicComponentType {
   public static final String IMG = "img";
   public static final String CONTAINER = "container";
   public static final String DIV = "div";
+  public static final String DIV_fs = "divfs";
   public static final String SCROLLER = "scroller";
   public static final String SLIDER = "slider";
   public static final String SLIDER_NEIGHBOR = "slider-neighbor";
