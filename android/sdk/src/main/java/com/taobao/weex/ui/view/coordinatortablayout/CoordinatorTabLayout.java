@@ -220,7 +220,10 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                 @Override
                 public void onPageSelected(int i) {
                     if(mTabLayout!=null){
-                        mTabLayout.getTabAt(i).select();
+                        TabLayout.Tab tab = mTabLayout.getTabAt(i);
+                        if(!tab.isSelected()){
+                            tab.select();
+                        }
                     }
                 }
 
@@ -238,7 +241,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    if (mViewPage != null) {
+                    if (mViewPage != null && mViewPage.getCurrentItem() != tab.getPosition()) {
                         mViewPage.setCurrentItem(tab.getPosition());
                     }
                     if (mOnTabSelectedListener != null) {
