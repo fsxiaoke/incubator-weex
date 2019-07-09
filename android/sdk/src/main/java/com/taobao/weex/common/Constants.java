@@ -343,6 +343,10 @@ public class Constants {
 
     String LAYEROVERFLOW = "layeroverflow";
 
+    String ON_TAB_SELECTED = "onTabSelected";
+    String ON_TAB_UNSELECTED = "onTabUnselected";
+    String ON_TAB_RESELECTED = "onTabReselected";
+
     interface SLOT_LIFECYCLE {
       String CREATE = "create";
       String ATTACH = "attach";
