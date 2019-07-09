@@ -68,7 +68,7 @@ public class FsTabLayout extends WXVContainer<TabLayout> implements TabLayout.On
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
 
-        fireEvent(Constants.Event.TAB_SELECTED, getTabEvent(tab));
+        fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
 
     }
 
@@ -81,12 +81,12 @@ public class FsTabLayout extends WXVContainer<TabLayout> implements TabLayout.On
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
+        fireEvent(Constants.Event.ON_TAB_UNSELECTED, getTabEvent(tab));
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
+        fireEvent(Constants.Event.ON_TAB_RESELECTED, getTabEvent(tab));
     }
 
     public static class Creator implements ComponentCreator {
