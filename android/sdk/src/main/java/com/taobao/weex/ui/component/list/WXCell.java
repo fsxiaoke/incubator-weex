@@ -277,4 +277,18 @@ public class WXCell extends WidgetContainer<WXFrameLayout> {
     public interface CellAppendTreeListener{
         public void onAppendTreeDone();
     }
+    protected void setHostLayoutParams(WXFrameLayout host, int width, int height, int left, int right, int top, int bottom) {
+        ViewGroup.LayoutParams lp;
+        if (mParent == null) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+            this.setMarginsSupportRTL(params, left, top, right, bottom);
+            lp = params;
+        } else {
+            lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
+        }
+        if (lp != null) {
+            lp.height= ViewGroup.LayoutParams.WRAP_CONTENT;
+            host.setLayoutParams(lp);
+        }
+    }
 }
