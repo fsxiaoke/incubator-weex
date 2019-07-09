@@ -47,10 +47,10 @@ public class ImgSpan extends ReplacementSpan implements IDrawableLoader.StaticTa
   @Override
   public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
     if (fm != null) {
-      fm.ascent = -height;
-      fm.descent = 0;
+      fm.ascent = -(height/2);
+      fm.descent = height/2;
 
-      fm.top = fm.ascent;
+      fm.top = 0;
       fm.bottom = 0;
     }
     return width;
@@ -64,10 +64,10 @@ public class ImgSpan extends ReplacementSpan implements IDrawableLoader.StaticTa
   @Override
   public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint) {
     if (mDrawable != null) {
+      Paint.FontMetricsInt fm = paint.getFontMetricsInt();
+      int transY = (y + fm.descent + y + fm.ascent) / 2 - mDrawable.getBounds().bottom / 2;//计算y方向的位移
       canvas.save();
-      int transY = bottom - mDrawable.getBounds().bottom;
-      transY -= paint.getFontMetricsInt().descent;
-      canvas.translate(x, transY);
+      canvas.translate(x, transY);//绘制图片位移一段距离
       mDrawable.draw(canvas);
       canvas.restore();
     }
