@@ -104,7 +104,7 @@ class ImgNode extends RichTextNode {
       DrawableStrategy drawableStrategy = new DrawableStrategy();
       drawableStrategy.width = width;
       drawableStrategy.height = height;
-      WXSDKEngine.getDrawableLoader().setDrawable(rewrited.toString(), imageSpan, drawableStrategy);
+      WXSDKEngine.getDrawableLoader().setDrawable(instance,rewrited.toString(), imageSpan, drawableStrategy);
     }
     return imageSpan;
   }

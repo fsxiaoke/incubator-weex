@@ -22,6 +22,8 @@ package com.taobao.weex.adapter;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 
+import com.taobao.weex.WXSDKInstance;
+
 public interface IDrawableLoader {
 
   interface DrawableTarget {
@@ -37,5 +39,6 @@ public interface IDrawableLoader {
   }
 
   void setDrawable(String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
+  void setDrawable(WXSDKInstance instance, String url, DrawableTarget drawableTarget, DrawableStrategy drawableStrategy);
 }
 
