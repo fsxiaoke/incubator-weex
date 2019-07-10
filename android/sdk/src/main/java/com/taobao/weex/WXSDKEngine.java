@@ -84,7 +84,7 @@ import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.facishare.FsPagerDetail;
 import com.taobao.weex.ui.component.facishare.FsStickyPager;
-import com.taobao.weex.ui.component.facishare.FsTabLayout;
+import com.taobao.weex.ui.component.facishare.FsTabComponent;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.SimpleListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
@@ -453,8 +453,8 @@ public class WXSDKEngine implements Serializable {
 
       registerComponent(
               new SimpleComponentHolder(
-                      FsTabLayout.class,
-                      new FsTabLayout.Creator()
+                      FsTabComponent.class,
+                      new FsTabComponent.Creator()
               ),
               false,
               "pagetab"
