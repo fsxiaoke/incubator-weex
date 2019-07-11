@@ -19,7 +19,7 @@
     under the License.
 
 -->
-<android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.taobao.weex.ui.component.facishare.FsTabLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
                                          android:id="@+id/tabLayout"
                                          android:layout_width="match_parent"
@@ -35,4 +35,4 @@
                                          app:tabMinWidth="0dp"
                                          android:orientation="vertical">
 
-</android.support.design.widget.TabLayout>
+</com.taobao.weex.ui.component.facishare.FsTabLayout>

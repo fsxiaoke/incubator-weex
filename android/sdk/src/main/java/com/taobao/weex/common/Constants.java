@@ -347,6 +347,7 @@ public class Constants {
     String ON_TAB_SELECTED = "onTabSelected";
     String ON_TAB_UNSELECTED = "onTabUnselected";
     String ON_TAB_RESELECTED = "onTabReselected";
+    String ON_TAB_STOP_SCROLL = "onTabStopScroll";
 
     interface SLOT_LIFECYCLE {
       String CREATE = "create";
