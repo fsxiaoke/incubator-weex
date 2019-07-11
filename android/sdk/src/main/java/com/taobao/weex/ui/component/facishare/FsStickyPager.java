@@ -146,10 +146,10 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
     }
 
 
-    @WXComponentProp(name = Constants.Name.REFRESHING)
-    public void setRefreshing(boolean refreshing) {
+    @WXComponentProp(name = Constants.Name.DISPLAY)
+    public void setRefreshing(boolean display) {
         if(mSwiper != null)
-            mSwiper.setRefreshing(refreshing);
+            mSwiper.setRefreshing(display);
     }
 
 
