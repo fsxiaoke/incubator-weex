@@ -108,6 +108,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             setupTabListener();
         }
     }
+    public View getAppBar(){
+        return mBarLayout;
+    }
 
     public void addTopView(View v){
         if(mFeedRootLayout != null){

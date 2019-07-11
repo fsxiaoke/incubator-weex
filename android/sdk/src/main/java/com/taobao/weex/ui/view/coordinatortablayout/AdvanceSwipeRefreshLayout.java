@@ -23,6 +23,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 
 public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
 
@@ -36,6 +37,12 @@ public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
     public AdvanceSwipeRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mConfiguration = ViewConfiguration.get(context);
+    }
+
+    public void setLayoutParams(ViewGroup.LayoutParams params){
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        super.setLayoutParams(params);
     }
 
 

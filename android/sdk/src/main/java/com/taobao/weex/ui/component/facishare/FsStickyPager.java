@@ -35,6 +35,7 @@ import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXHorizontalScrollView;
@@ -43,6 +44,7 @@ import com.taobao.weex.ui.view.coordinatortablayout.CoordinatorTabLayout;
 import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 /**
  * Component for scroller. It also support features like
@@ -77,23 +79,30 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
     @Override
     protected AdvanceSwipeRefreshLayout initComponentHostView(@NonNull Context context) {
 
-        mSwiper = new AdvanceSwipeRefreshLayout(context);
+        ViewGroup.LayoutParams  params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
         mTabLayout = new CoordinatorTabLayout(context);
-        mSwiper.addView(mTabLayout);
+
+        mSwiper = new AdvanceSwipeRefreshLayout(context);
+        mSwiper.setLayoutParams(params);
+
+        mSwiper.addView(mTabLayout, params);
 
         mSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 Log.e("zds", "onRefresh event");
                 if (getEvents().contains(Constants.Event.ONREFRESH)) {
-                    fireEvent(Constants.Event.ONREFRESH);
+                    mSwiper.setRefreshing(true);
+                    fireEvent(Constants.Event.ONREFRESH, new HashMap<String, Object>());
                 }
             }
         });
         mSwiper.setOnPreInterceptTouchEventDelegate(new AdvanceSwipeRefreshLayout.OnPreInterceptTouchEventDelegate() {
             @Override
             public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
-                return mTabLayout.getTabLayout().getTop() < 0;
+                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getTop());
+                return mTabLayout.getAppBar().getTop() < 0;
             }
         });
 
@@ -136,16 +145,12 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         }
     }
 
-    @Override
-    protected boolean setProperty(String key, Object param) {
-        switch (key) {
-            case Constants.Name.REFRESHING:
-                boolean refresh = WXUtils.getBoolean(param, false);
-                if(mSwiper != null)
-                    mSwiper.setRefreshing(refresh);
-                return true;
-        }
-        return true;
+
+    @WXComponentProp(name = Constants.Name.REFRESHING)
+    public void setRefreshing(boolean refreshing) {
+        if(mSwiper != null)
+            mSwiper.setRefreshing(refreshing);
     }
+
 
 }
