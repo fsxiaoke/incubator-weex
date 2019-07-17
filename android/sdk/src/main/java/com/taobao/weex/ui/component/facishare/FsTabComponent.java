@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.taobao.weex.R;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -33,6 +34,7 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
+import com.taobao.weex.utils.WXViewUtils;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -40,6 +42,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.ViewUtils;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,15 +95,24 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     }
     int tabItemWidth;
+    int screenItemSize;
     private void fireStopEvent(){
         if(tabItemWidth== 0 ){
             tabItemWidth = mTabLayout.getTabAt(0).getCustomView().getWidth();
         }
+        if(screenItemSize==0){
+            screenItemSize = Math.round((float)WXViewUtils.getScreenWidth(WXEnvironment.sApplication)/(float)tabItemWidth);
+            if(screenItemSize==0){
+                screenItemSize = 1;
+            }
+        }
         int startIndex = Math.round((float)mTabLayout.getScrollX()/(float)tabItemWidth);
+        int endIndex = startIndex + screenItemSize -1;
 
         Map<String, Object> event = new HashMap<>(1);
 
-        event.put("index", startIndex);
+        event.put("startIndex", startIndex);
+        event.put("endIndex", endIndex);
         event.put("scrollX", mTabLayout.getScrollX());
         fireEvent(Constants.Event.ON_TAB_STOP_SCROLL, event);
     }
