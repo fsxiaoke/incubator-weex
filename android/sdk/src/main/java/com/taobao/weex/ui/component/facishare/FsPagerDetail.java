@@ -108,7 +108,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
     mViewPager = new ViewPager(context);
 //    mViewPager.setCircle(isInfinite);
     mViewPager.setLayoutParams(pagerParams);
-
+    mViewPager.setOffscreenPageLimit(1);
     // init adapter
     mAdapter = new WXCirclePageAdapter(false);
     mViewPager.setAdapter(mAdapter);

@@ -22,21 +22,29 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.ui.view.WXHorizontalScrollView;
+import com.taobao.weex.ui.view.coordinatortablayout.AdvanceSwipeRefreshLayout;
 import com.taobao.weex.ui.view.coordinatortablayout.CoordinatorTabLayout;
+import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 /**
  * Component for scroller. It also support features like
@@ -44,7 +52,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Component(lazyload = false)
 
-public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
+public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
 
     public static class Creator implements ComponentCreator {
         @Override
@@ -54,6 +62,7 @@ public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
     }
 
     public CoordinatorTabLayout mTabLayout = null;
+    public AdvanceSwipeRefreshLayout mSwiper = null;
 
     public FsStickyPager(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
         super(instance, parent, instanceId, isLazy, basicComponentData);
@@ -68,10 +77,36 @@ public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
     }
 
     @Override
-    protected CoordinatorTabLayout initComponentHostView(@NonNull Context context) {
+    protected AdvanceSwipeRefreshLayout initComponentHostView(@NonNull Context context) {
+
+        ViewGroup.LayoutParams  params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         mTabLayout = new CoordinatorTabLayout(context);
-        return  mTabLayout;
+
+        mSwiper = new AdvanceSwipeRefreshLayout(context);
+        mSwiper.setLayoutParams(params);
+
+        mSwiper.addView(mTabLayout, params);
+
+        mSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.e("zds", "onRefresh event");
+                if (getEvents().contains(Constants.Event.ONREFRESH)) {
+                    mSwiper.setRefreshing(true);
+                    fireEvent(Constants.Event.ONREFRESH, new HashMap<String, Object>());
+                }
+            }
+        });
+        mSwiper.setOnPreInterceptTouchEventDelegate(new AdvanceSwipeRefreshLayout.OnPreInterceptTouchEventDelegate() {
+            @Override
+            public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
+                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getTop());
+                return mTabLayout.getAppBar().getTop() < 0;
+            }
+        });
+
+        return  mSwiper;
 
     }
 
@@ -109,5 +144,13 @@ public class FsStickyPager extends WXVContainer<CoordinatorTabLayout> {
             mTabLayout.addPageView((ViewPager) view);
         }
     }
+
+
+    @WXComponentProp(name = Constants.Name.DISPLAY)
+    public void setRefreshing(boolean display) {
+        if(mSwiper != null)
+            mSwiper.setRefreshing(display);
+    }
+
 
 }
