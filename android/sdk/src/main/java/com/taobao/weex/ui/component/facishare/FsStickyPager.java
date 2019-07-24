@@ -101,7 +101,7 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         mSwiper.setOnPreInterceptTouchEventDelegate(new AdvanceSwipeRefreshLayout.OnPreInterceptTouchEventDelegate() {
             @Override
             public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
-                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getTop());
+                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getAppBar().getTop());
                 return mTabLayout.getAppBar().getTop() < 0;
             }
         });
