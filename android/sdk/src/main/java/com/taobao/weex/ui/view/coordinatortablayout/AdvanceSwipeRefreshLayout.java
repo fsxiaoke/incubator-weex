@@ -30,13 +30,19 @@ public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
     private OnPreInterceptTouchEventDelegate mOnPreInterceptTouchEventDelegate;
     ViewConfiguration mConfiguration;
 
+    private int mTouchSlop;
+    private float mPrevX;
+
     public AdvanceSwipeRefreshLayout(Context context) {
         super(context);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
     public AdvanceSwipeRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mConfiguration = ViewConfiguration.get(context);
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+
     }
 
     public void setLayoutParams(ViewGroup.LayoutParams params){
@@ -48,6 +54,21 @@ public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mPrevX = MotionEvent.obtain(ev).getX();
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                final float eventX = ev.getX();
+                float xDiff = Math.abs(eventX - mPrevX);
+
+                if (xDiff > mTouchSlop) {
+                    return false;
+                }
+        }
+
+
         boolean disallowIntercept = false;
         if (mOnPreInterceptTouchEventDelegate != null)
 
