@@ -323,8 +323,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
    */
   public void setRenderContainer(RenderContainer a){
     if(a != null) {
-      a.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      a.setBackgroundColor(Color.TRANSPARENT);
+//      a.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//      a.setBackgroundColor(Color.TRANSPARENT);
       a.setSDKInstance(this);
       a.addOnLayoutChangeListener(this);
     }
