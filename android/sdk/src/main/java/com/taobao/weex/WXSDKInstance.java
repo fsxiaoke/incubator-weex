@@ -1674,8 +1674,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
   public void onRootCreated(WXComponent root) {
     this.mRootComp = root;
     this.mRootComp.mDeepInComponentTree =1;
-    
-    mRenderContainer.addView(root.getHostView(), new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    root.getHostView().setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    mRenderContainer.addView(root.getHostView() );
     setSize(mRenderContainer.getWidth(),mRenderContainer.getHeight());
   }
 
