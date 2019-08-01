@@ -156,8 +156,7 @@ public abstract class RichTextNode {
                 }
             }
             if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
-                int fw = WXResourceUtils.getColor(style.get(Constants.Name.BACKGROUND_COLOR).toString(),
-                        Color.TRANSPARENT);
+                int fw = WXStyle.getFontWeight(style);
                 if (fw >0) {
                     spans.add(new WXCustomStyleSpan(mInstanceId,UNSET, fw, null));
                 }
