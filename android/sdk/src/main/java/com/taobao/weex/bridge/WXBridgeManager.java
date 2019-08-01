@@ -1702,10 +1702,10 @@ public class WXBridgeManager implements Callback, BactchExecutor {
           }
         }
       }
-      return BundType.Others;
+      return BundType.Vue;
     } catch (Throwable e) {
       e.printStackTrace();
-      return BundType.Others;
+      return BundType.Vue;
     }
   }
 
