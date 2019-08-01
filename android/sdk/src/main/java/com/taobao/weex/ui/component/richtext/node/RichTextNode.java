@@ -159,7 +159,7 @@ public abstract class RichTextNode {
                 int fw = WXResourceUtils.getColor(style.get(Constants.Name.BACKGROUND_COLOR).toString(),
                         Color.TRANSPARENT);
                 if (fw >0) {
-                    spans.add(new WXCustomStyleSpan(UNSET, fw, null));
+                    spans.add(new WXCustomStyleSpan(mInstanceId,UNSET, fw, null));
                 }
             }
 
@@ -219,7 +219,7 @@ public abstract class RichTextNode {
         if (fontWeight != UNSET
             || fontStyle != UNSET
             || fontFamily != null) {
-            return new WXCustomStyleSpan(fontStyle, fontWeight, fontFamily);
+            return new WXCustomStyleSpan(mInstanceId,fontStyle, fontWeight, fontFamily);
         } else {
             return null;
         }

@@ -176,7 +176,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         mPaint.setTextSize(fontSize);
 
       if (fontFamily != null) {
-        TypefaceUtil.applyFontStyle(mPaint, fontStyle, fontWeight, fontFamily);
+        TypefaceUtil.applyFontStyle(getInstanceId(),mPaint, fontStyle, fontWeight, fontFamily);
       }
     }
   }

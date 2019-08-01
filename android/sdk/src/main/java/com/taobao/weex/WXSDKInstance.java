@@ -77,6 +77,7 @@ import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.flat.FlatGUIContext;
 import com.taobao.weex.ui.view.WXScrollView;
 import com.taobao.weex.utils.Trace;
+import com.taobao.weex.utils.TypefaceUtil;
 import com.taobao.weex.utils.WXExceptionUtils;
 import com.taobao.weex.utils.WXFileUtils;
 import com.taobao.weex.utils.WXJsonUtils;
@@ -1637,6 +1638,8 @@ public class WXSDKInstance implements IWXActivityStateListener,View.OnLayoutChan
           WXSDKManager.getInstance().getAllInstanceMap().remove(mInstanceId);
         }
       },5000);
+
+      TypefaceUtil.removeFontDO(mInstanceId);
     }
   }
 

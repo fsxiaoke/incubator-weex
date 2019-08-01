@@ -34,6 +34,7 @@ import com.taobao.weex.dom.WXStyle;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,17 +48,26 @@ public class TypefaceUtil {
 
   public static final String ACTION_TYPE_FACE_AVAILABLE = "type_face_available";
 
-  public static void putFontDO(FontDO fontDO) {
+  public static void putFontDO(String instanceId,FontDO fontDO) {
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
-      sCacheMap.put(fontDO.getFontFamilyName(), fontDO);
+      sCacheMap.put(getFontFamilyKey(instanceId,fontDO.getFontFamilyName()), fontDO);
     }
+  }
+
+  public static String getFontFamilyKey(String instanceId,String fontFamilyName){
+      if(TextUtils.isEmpty(instanceId)){
+          return fontFamilyName;
+      }else{
+          return instanceId+"_"+fontFamilyName;
+      }
+
   }
 
   public static void registerNativeFont(Map<String, Typeface> fonts) {
     if (fonts != null && fonts.size() > 0) {
       for (Map.Entry<String, Typeface> font : fonts.entrySet()) {
         FontDO fontDO = new FontDO(font.getKey(), font.getValue());
-        putFontDO(fontDO);
+        putFontDO(null,fontDO);
         if (WXEnvironment.isApkDebugable()){
           WXLogUtils.d("TypefaceUtil", "register new typeface: " + font.getKey());
         }
@@ -65,15 +75,29 @@ public class TypefaceUtil {
     }
   }
 
-  public static FontDO getFontDO(String fontFamilyName) {
-    return sCacheMap.get(fontFamilyName);
+  public static FontDO getFontDO(String instanceId,String fontFamilyName) {
+    return sCacheMap.get(getFontFamilyKey(instanceId,fontFamilyName));
   }
 
-  public static void removeFontDO(String fontFamilyName) {
-    sCacheMap.remove(fontFamilyName);
+  public static void removeFontDO(String instanceId,String fontFamilyName) {
+    sCacheMap.remove(getFontFamilyKey(instanceId,fontFamilyName));
   }
 
-  public static void applyFontStyle(Paint paint, int style, int weight, String family) {
+  public static void removeFontDO(String instanceId) {
+    if(!TextUtils.isEmpty(instanceId)){
+      Iterator<Map.Entry<String, FontDO>> it = sCacheMap.entrySet().iterator();
+      while(it.hasNext()){
+        Map.Entry<String, FontDO> entry = it.next();
+        String key = entry.getKey();
+        if(key!=null && key.startsWith(instanceId)){
+          it.remove();
+        }
+      }
+    }
+
+  }
+
+  public static void applyFontStyle(String instanceId,Paint paint, int style, int weight, String family) {
     int oldStyle;
     Typeface typeface = paint.getTypeface();
     if (typeface == null) {
@@ -94,7 +118,7 @@ public class TypefaceUtil {
     }
 
     if (family != null) {
-      typeface = getOrCreateTypeface(family, want);
+      typeface = getOrCreateTypeface(instanceId,family, want);
     }
 
     if (typeface != null) {
@@ -104,8 +128,8 @@ public class TypefaceUtil {
     }
   }
 
-  public static Typeface getOrCreateTypeface(String family, int style) {
-    FontDO fontDo = sCacheMap.get(family);
+  public static Typeface getOrCreateTypeface(String instanceId,String family, int style) {
+    FontDO fontDo = sCacheMap.get(getFontFamilyKey(instanceId,family));
     if (fontDo != null && fontDo.getTypeface() != null) {
       return fontDo.getTypeface();
     }
@@ -130,7 +154,7 @@ public class TypefaceUtil {
     }
   }
 
-  public static void loadTypeface(final FontDO fontDo) {
+  public static void loadTypeface(String instanceId,final FontDO fontDo) {
     if (fontDo != null && fontDo.getTypeface() == null &&
             (fontDo.getState() == FontDO.STATE_FAILED || fontDo.getState() == FontDO.STATE_INIT)) {
       fontDo.setState(FontDO.STATE_LOADING);
@@ -147,11 +171,11 @@ public class TypefaceUtil {
           dir.mkdirs();
         }
         final String fullPath =  dir.getAbsolutePath()+ File.separator +fileName;
-        if (!loadLocalFontFile(fullPath, fontFamily, false)) {
-          downloadFontByNetwork(url, fullPath, fontFamily);
+        if (!loadLocalFontFile(instanceId,fullPath, fontFamily, false)) {
+          downloadFontByNetwork(instanceId,url, fullPath, fontFamily);
         }
       } else if (fontDo.getType() == FontDO.TYPE_FILE || fontDo.getType() == FontDO.TYPE_BASE64) {
-        boolean result = loadLocalFontFile(fontDo.getUrl(), fontDo.getFontFamilyName(), false);
+        boolean result = loadLocalFontFile(instanceId,fontDo.getUrl(), fontDo.getFontFamilyName(), false);
         if (!result) {
           fontDo.setState(FontDO.STATE_FAILED);
         }
@@ -159,7 +183,8 @@ public class TypefaceUtil {
     }
   }
 
-  private static void downloadFontByNetwork(final String url, final String fullPath, final String fontFamily) {
+  private static void downloadFontByNetwork(final String instanceId, final String url, final String fullPath,
+                                            final String fontFamily) {
     IWXHttpAdapter adapter = WXSDKManager.getInstance().getIWXHttpAdapter();
     if (adapter == null) {
       WXLogUtils.e(TAG, "downloadFontByNetwork() IWXHttpAdapter == null");
@@ -206,7 +231,7 @@ public class TypefaceUtil {
         if (statusCode >= 200 && statusCode <= 299 && response.originalData != null) {
           result = WXFileUtils.saveFile(fullPath, response.originalData, WXEnvironment.getApplication());
           if (result) {
-            result = loadLocalFontFile(fullPath, fontFamily, true);
+            result = loadLocalFontFile(instanceId,fullPath, fontFamily, true);
           } else {
             if(WXEnvironment.isApkDebugable()) {
               WXLogUtils.d(TAG, "downloadFontByNetwork() onHttpFinish success, but save file failed.");
@@ -217,7 +242,7 @@ public class TypefaceUtil {
         }
 
         if (!result) {
-          FontDO fontDO = sCacheMap.get(fontFamily);
+          FontDO fontDO = sCacheMap.get(getFontFamilyKey(instanceId,fontFamily));
           if (fontDO != null) {
             fontDO.setState(FontDO.STATE_FAILED);
           }
@@ -226,7 +251,8 @@ public class TypefaceUtil {
     });
   }
 
-  private static boolean loadLocalFontFile(String path, final String fontFamily, boolean hasNetworkDowload) {
+  private static boolean loadLocalFontFile(String instanceId,String path, final String fontFamily,
+                                           boolean hasNetworkDowload) {
     if (TextUtils.isEmpty(path) || TextUtils.isEmpty(fontFamily)) {
       return false;
     }
@@ -237,7 +263,7 @@ public class TypefaceUtil {
       }
       Typeface typeface = Typeface.createFromFile(path);
       if (typeface != null) {
-        FontDO fontDo = sCacheMap.get(fontFamily);
+        FontDO fontDo = sCacheMap.get(getFontFamilyKey(instanceId ,fontFamily));
         if (fontDo != null) {
           fontDo.setState(FontDO.STATE_SUCCESS);
           fontDo.setTypeface(typeface);
