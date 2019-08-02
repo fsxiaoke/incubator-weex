@@ -2335,6 +2335,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       WXLogUtils.e("Weex [data_render register err]", e);
     }
 
+    
     WXJSObject[] args = {WXWsonJSONSwitch.toWsonOrJsonWXJSObject(components)};
     String errorMsg = null;
     try {
