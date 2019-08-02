@@ -298,7 +298,8 @@ public class TextContentBoxMeasurement extends ContentBoxMeasurement {
     setSpan(spannable, new AlignmentSpan.Standard(mAlignment), 0, end, spanFlag);
 
     if (mFontStyle != UNSET || mFontWeight != UNSET || mFontFamily != null) {
-      setSpan(spannable, new WXCustomStyleSpan(mFontStyle, mFontWeight, mFontFamily), 0, end, spanFlag);
+      setSpan(spannable, new WXCustomStyleSpan(mComponent.getInstanceId(),mFontStyle, mFontWeight, mFontFamily), 0,
+              end, spanFlag);
     }
 
     if (mIsColorSet) {

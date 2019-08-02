@@ -390,10 +390,10 @@ public class WXEnvironment {
     sGlobalFontFamily = fontFamilyName;
     if (!TextUtils.isEmpty(fontFamilyName)) {
       if (typeface == null) {
-        TypefaceUtil.removeFontDO(fontFamilyName);
+        TypefaceUtil.removeFontDO(null,fontFamilyName);
       } else {
         FontDO nativeFontDO = new FontDO(fontFamilyName, typeface);
-        TypefaceUtil.putFontDO(nativeFontDO);
+        TypefaceUtil.putFontDO(null,nativeFontDO);
         WXLogUtils.d("TypefaceUtil", "Add new font: " + fontFamilyName);
       }
     }

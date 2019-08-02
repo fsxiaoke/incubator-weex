@@ -158,7 +158,7 @@ public abstract class RichTextNode {
             if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
                 int fw = WXStyle.getFontWeight(style);
                 if (fw >0) {
-                    spans.add(new WXCustomStyleSpan(UNSET, fw, null));
+                    spans.add(new WXCustomStyleSpan(mInstanceId,UNSET, fw, null));
                 }
             }
 
@@ -218,7 +218,7 @@ public abstract class RichTextNode {
         if (fontWeight != UNSET
             || fontStyle != UNSET
             || fontFamily != null) {
-            return new WXCustomStyleSpan(fontStyle, fontWeight, fontFamily);
+            return new WXCustomStyleSpan(mInstanceId,fontStyle, fontWeight, fontFamily);
         } else {
             return null;
         }

@@ -55,12 +55,12 @@ public class ActionAddRule implements IExecutable {
 
     FontDO fontDO = parseFontDO(mData, instance);
     if (fontDO != null && !TextUtils.isEmpty(fontDO.getFontFamilyName())) {
-      FontDO cacheFontDO = TypefaceUtil.getFontDO(fontDO.getFontFamilyName());
+      FontDO cacheFontDO = TypefaceUtil.getFontDO(mPageId,fontDO.getFontFamilyName());
       if (cacheFontDO == null || !TextUtils.equals(cacheFontDO.getUrl(), fontDO.getUrl())) {
-        TypefaceUtil.putFontDO(fontDO);
-        TypefaceUtil.loadTypeface(fontDO);
+        TypefaceUtil.putFontDO(mPageId,fontDO);
+        TypefaceUtil.loadTypeface(mPageId,fontDO);
       } else {
-        TypefaceUtil.loadTypeface(cacheFontDO);
+        TypefaceUtil.loadTypeface(mPageId,cacheFontDO);
       }
     }
 
