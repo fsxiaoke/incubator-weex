@@ -28,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
@@ -38,10 +39,8 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXFrameLayout;
-import com.taobao.weex.ui.view.WXHorizontalScrollView;
 import com.taobao.weex.ui.view.coordinatortablayout.AdvanceSwipeRefreshLayout;
 import com.taobao.weex.ui.view.coordinatortablayout.CoordinatorTabLayout;
-import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -52,27 +51,27 @@ import java.util.HashMap;
  */
 @Component(lazyload = false)
 
-public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
+public class FsRecycleViewWithRefresh extends WXVContainer<AdvanceSwipeRefreshLayout> {
 
     public static class Creator implements ComponentCreator {
         @Override
         public WXComponent createInstance(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-            return new FsStickyPager(instance, parent, basicComponentData);
+            return new FsRecycleViewWithRefresh(instance, parent, basicComponentData);
         }
     }
 
-    public CoordinatorTabLayout mTabLayout = null;
+    public LinearLayout mContainer = null;
     public AdvanceSwipeRefreshLayout mSwiper = null;
 
-    public FsStickyPager(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
+    public FsRecycleViewWithRefresh(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
         super(instance, parent, instanceId, isLazy, basicComponentData);
     }
 
-    public FsStickyPager(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
+    public FsRecycleViewWithRefresh(WXSDKInstance instance, WXVContainer parent, boolean lazy, BasicComponentData basicComponentData) {
         super(instance, parent, lazy, basicComponentData);
     }
 
-    public FsStickyPager(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
+    public FsRecycleViewWithRefresh(WXSDKInstance instance, WXVContainer parent, BasicComponentData basicComponentData) {
         super(instance, parent, basicComponentData);
     }
 
@@ -81,12 +80,12 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
 
         ViewGroup.LayoutParams  params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        mTabLayout = new CoordinatorTabLayout(context);
+        mContainer = new LinearLayout(context);
 
         mSwiper = new AdvanceSwipeRefreshLayout(context);
         mSwiper.setLayoutParams(params);
 
-        mSwiper.addView(mTabLayout, params);
+        mSwiper.addView(mContainer, params);
 
         mSwiper.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -101,8 +100,8 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         mSwiper.setOnPreInterceptTouchEventDelegate(new AdvanceSwipeRefreshLayout.OnPreInterceptTouchEventDelegate() {
             @Override
             public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
-                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getAppBar().getTop());
-                return mTabLayout.getAppBar().getTop() < 0;
+//                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getAppBar().getTop());
+                return mContainer.getChildAt(0).getTop()< 0;
             }
         });
 
@@ -130,19 +129,7 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         if (view == null) {
             return;
         }
-
-        if (view instanceof WXFrameLayout) {
-            mTabLayout.addTopView(view);
-        }
-
-        if(view instanceof TabLayout){
-            mTabLayout.addTabView((TabLayout) view);
-        }
-
-        if(view instanceof ViewPager){
-
-            mTabLayout.addPageView((ViewPager) view);
-        }
+        mContainer.addView(view);
     }
 
 
@@ -157,6 +144,7 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         if(mSwiper != null)
             mSwiper.setEnabled(enable);
     }
+
 
 
 }

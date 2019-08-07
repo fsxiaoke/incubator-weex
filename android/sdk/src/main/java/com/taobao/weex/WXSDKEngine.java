@@ -83,6 +83,7 @@ import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
 import com.taobao.weex.ui.component.facishare.FsPagerDetail;
+import com.taobao.weex.ui.component.facishare.FsRecycleViewWithRefresh;
 import com.taobao.weex.ui.component.facishare.FsStickyPager;
 import com.taobao.weex.ui.component.facishare.FsTabComponent;
 import com.taobao.weex.ui.component.list.HorizontalListComponent;
@@ -441,6 +442,17 @@ public class WXSDKEngine implements Serializable {
               ),
               true,
               "stickypager");
+
+
+
+      registerComponent(
+              new SimpleComponentHolder(
+                      FsRecycleViewWithRefresh.class,
+                      new FsRecycleViewWithRefresh.Creator()
+              ),
+              true,
+              "fs-refresh");
+
 
       registerComponent(
               new SimpleComponentHolder(
