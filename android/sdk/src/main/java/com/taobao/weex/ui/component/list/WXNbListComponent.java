@@ -143,7 +143,7 @@ public class WXNbListComponent extends BasicListComponent<NoBounceRecyclerView> 
 
         // 判断是否滑动到了最后一个item，并且是向上滑动
         if (lastItemPosition == (itemCount - 1) && isSlidingUpward) {
-          fireEvent(Constants.Event.ONLOADING, new HashMap<String, Object>());
+          fireEvent(Constants.Event.ONLOADINGMORE, new HashMap<String, Object>());
         }
       }
     }
