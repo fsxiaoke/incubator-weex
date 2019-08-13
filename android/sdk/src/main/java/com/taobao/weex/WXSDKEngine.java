@@ -74,6 +74,7 @@ import com.taobao.weex.ui.component.WXIndicator;
 import com.taobao.weex.ui.component.WXInput;
 import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXLoadingIndicator;
+import com.taobao.weex.ui.component.WXNBScroller;
 import com.taobao.weex.ui.component.WXRefresh;
 import com.taobao.weex.ui.component.WXScroller;
 import com.taobao.weex.ui.component.WXSlider;
@@ -479,6 +480,14 @@ public class WXSDKEngine implements Serializable {
               ),
               true,
               "nblist");
+
+      registerComponent(
+              new SimpleComponentHolder(
+                      WXNBScroller.class,
+                      new WXNBScroller.Creator()
+              ),
+              true,
+              "nbscroller");
 
       registerModule("modal", WXModalUIModule.class);
       registerModule("instanceWrap", WXInstanceWrap.class);
