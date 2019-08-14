@@ -39,7 +39,7 @@ android {
     }
     buildTypes {
         debug {
-            jniDebuggable true
+            jniDebuggable false
             debuggable true
         }
     }
