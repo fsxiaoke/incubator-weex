@@ -324,7 +324,6 @@ public class Constants {
     String PAGESTART = "pagestart";
     String ONREFRESH = "refresh";
     String ONLOADING = "loading";
-    String ONLOADINGMORE = "loadingmore";
     String ONLOAD = "load";
     String CHANGE = "change";
     String ONPULLING_DOWN = "pullingdown";
