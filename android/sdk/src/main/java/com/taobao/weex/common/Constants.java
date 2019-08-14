@@ -361,6 +361,7 @@ public class Constants {
     String STOP_PROPAGATION_RAX = "stoppropagation";
     String ONMESSAGE = "message";
     String NATIVE_BACK = "nativeback";
+    
   }
 
   public interface PSEUDO {
