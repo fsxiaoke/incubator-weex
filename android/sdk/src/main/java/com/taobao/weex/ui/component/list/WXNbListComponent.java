@@ -20,8 +20,11 @@ package com.taobao.weex.ui.component.list;
 
 import android.content.Context;
 import android.support.v4.util.ArrayMap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstance;
@@ -48,6 +51,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -115,7 +119,42 @@ public class WXNbListComponent extends BasicListComponent<NoBounceRecyclerView> 
       snapHelper.attachToRecyclerView(bounceRecyclerView.getInnerView());
     }
 
+
+    bounceRecyclerView.getInnerView().addOnScrollListener(new EndlessRecyclerOnScrollListener());
+
     return bounceRecyclerView;
+  }
+
+
+  public  class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
+
+    //用来标记是否正在向上滑动
+    private boolean isSlidingUpward = false;
+
+    @Override
+    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+      super.onScrollStateChanged(recyclerView, newState);
+      LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+      // 当不滑动时
+      if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+        //获取最后一个完全显示的itemPosition
+        int lastItemPosition = manager.findLastCompletelyVisibleItemPosition();
+        int itemCount = manager.getItemCount();
+
+        // 判断是否滑动到了最后一个item，并且是向上滑动
+        if (lastItemPosition == (itemCount - 1) && isSlidingUpward) {
+          fireEvent(Constants.Event.ONLOADING, new HashMap<String, Object>());
+        }
+      }
+    }
+
+    @Override
+    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+      super.onScrolled(recyclerView, dx, dy);
+      // 大于0表示正在向上滑动，小于等于0表示停止或向下滑动
+      isSlidingUpward = dy > 0;
+    }
+
   }
 
   @Override
