@@ -53,6 +53,7 @@ public class WXText extends WXComponent<WXTextView> implements FlatComponent<Tex
    * The default text size
    **/
   public static int sDEFAULT_SIZE = 32;
+  public static float sDEFAULT_Rate = 1;
   private BroadcastReceiver mTypefaceObserver;
   private String mFontFamily;
 

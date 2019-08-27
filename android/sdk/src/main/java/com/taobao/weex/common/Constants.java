@@ -66,6 +66,7 @@ public class Constants {
     String RIGHT = "right";
     String BOTTOM = "bottom";
 
+    String ENABLE = "enable";
 
     String BACKGROUND_COLOR = "backgroundColor";
     String BACKGROUND_IMAGE = "backgroundImage";
