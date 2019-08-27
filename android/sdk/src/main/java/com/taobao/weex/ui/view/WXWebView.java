@@ -80,7 +80,7 @@ public class WXWebView implements IWebView {
         FrameLayout root = new FrameLayout(mContext);
         root.setBackgroundColor(Color.WHITE);
 
-        mWebView = new WebView(mContext);//mContext.getApplicationContext();
+        mWebView = new ExtendedWebView(mContext);//mContext.getApplicationContext();
         FrameLayout.LayoutParams wvLayoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT);
