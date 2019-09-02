@@ -177,6 +177,19 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     return fontFamily;
   }
 
+  public static String getVerticalAlign(Map<String, Object> style) {
+    String align = null;
+    if (style != null) {
+      Object temp;
+      temp = style.get(Constants.Name.VERTICAL_ALIGN);
+      if (temp != null) {
+        align = temp.toString();
+      }
+    }
+    return align;
+  }
+
+
   public static Layout.Alignment getTextAlignment(Map<String, Object> style){
     return getTextAlignment(style, false);
   }

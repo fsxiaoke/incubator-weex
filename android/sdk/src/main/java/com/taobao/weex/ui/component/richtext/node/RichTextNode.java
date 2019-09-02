@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -37,6 +38,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.WXVerticalCenterSpan;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXCustomStyleSpan;
 import com.taobao.weex.dom.WXStyle;
@@ -164,6 +166,13 @@ public abstract class RichTextNode {
 
             if (style.containsKey(Constants.Name.COLOR)) {
                 spans.add(new ForegroundColorSpan(WXResourceUtils.getColor(WXStyle.getTextColor(style))));
+            }
+
+            if (style.containsKey(Constants.Name.VERTICAL_ALIGN)) {
+                String alignment = WXStyle.getVerticalAlign(style);
+                if(alignment!=null && alignment.equals("middle")){
+                    spans.add(new WXVerticalCenterSpan(WXStyle.getFontSize(style, instance.getInstanceViewPortWidth())));
+                }
             }
 
             int spanFlag = createSpanFlag(level);
