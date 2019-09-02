@@ -109,7 +109,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
   public void destroy() {
     if (handler != null) {
       if(WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d(TAG, "Timer Module removeAllMessages: ");
+        WXLogUtils.v(TAG, "Timer Module removeAllMessages: ");
       }
       handler.removeCallbacksAndMessages(null);
       antiIntAutoBoxing.clear();
