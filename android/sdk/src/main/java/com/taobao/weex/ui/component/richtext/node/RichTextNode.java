@@ -148,11 +148,11 @@ public abstract class RichTextNode {
             }
 
 
-            WXVerticalCenterSpan verticalCenterSpan =  createVerticalCenterSpan();
-
-            if (verticalCenterSpan != null) {
-                spans.add(verticalCenterSpan);
-            }
+//            WXVerticalCenterSpan verticalCenterSpan =  createVerticalCenterSpan();
+//
+//            if (verticalCenterSpan != null) {
+//                spans.add(verticalCenterSpan);
+//            }
 
             if (style.containsKey(Constants.Name.FONT_SIZE)) {
                 spans.add(new AbsoluteSizeSpan(WXStyle.getFontSize(style, instance.getInstanceViewPortWidth())));
