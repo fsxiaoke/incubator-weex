@@ -66,6 +66,7 @@ public class WXVerticalCenterSpan extends ReplacementSpan {
         Paint.FontMetricsInt fm = p.getFontMetricsInt();
         // 此处重新计算y坐标，使字体居中
         canvas.drawText(text.toString(), x, y - ((y + fm.descent + y + fm.ascent) / 2 - (bottom + top) / 2), p);
+        canvas.drawText(text.subSequence(start, end).toString(), x, (top + bottom)/2 - (fm.bottom - fm.top) / 2 - fm.top, paint);
     }
 
     private Paint getCustomTextPaint(Paint paint) {
