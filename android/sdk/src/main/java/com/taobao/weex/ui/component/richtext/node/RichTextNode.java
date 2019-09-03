@@ -42,6 +42,7 @@ import com.taobao.weex.WXVerticalCenterSpan;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXCustomStyleSpan;
 import com.taobao.weex.dom.WXStyle;
+import com.taobao.weex.dom.WXVerticalCenterSpan;
 import com.taobao.weex.utils.WXResourceUtils;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -146,6 +147,13 @@ public abstract class RichTextNode {
                 spans.add(customStyleSpan);
             }
 
+
+            WXVerticalCenterSpan verticalCenterSpan =  createVerticalCenterSpan();
+
+            if (verticalCenterSpan != null) {
+                spans.add(verticalCenterSpan);
+            }
+
             if (style.containsKey(Constants.Name.FONT_SIZE)) {
                 spans.add(new AbsoluteSizeSpan(WXStyle.getFontSize(style, instance.getInstanceViewPortWidth())));
             }
@@ -168,12 +176,6 @@ public abstract class RichTextNode {
                 spans.add(new ForegroundColorSpan(WXResourceUtils.getColor(WXStyle.getTextColor(style))));
             }
 
-            if (style.containsKey(Constants.Name.VERTICAL_ALIGN)) {
-                String alignment = WXStyle.getVerticalAlign(style);
-                if(alignment!=null && alignment.equals("middle")){
-                    spans.add(new WXVerticalCenterSpan(WXStyle.getFontSize(style, instance.getInstanceViewPortWidth())));
-                }
-            }
 
             int spanFlag = createSpanFlag(level);
             for (Object span : spans) {
@@ -232,4 +234,46 @@ public abstract class RichTextNode {
             return null;
         }
     }
+
+
+    private
+    @Nullable
+    WXVerticalCenterSpan createVerticalCenterSpan() {
+
+        if (style.containsKey(Constants.Name.VERTICAL_ALIGN)) {
+            String alignment = WXStyle.getVerticalAlign(style);
+            if(alignment!=null && alignment.equals("middle")){
+
+
+                int fontWeight = UNSET, fontStyle = UNSET,fontColor =UNSET,fontSize=UNSET;
+                String fontFamily = null;
+                if (style.containsKey(Constants.Name.FONT_WEIGHT)) {
+                    fontWeight = WXStyle.getFontWeight(style);
+                }
+                if (style.containsKey(Constants.Name.FONT_STYLE)) {
+                    fontStyle = WXStyle.getFontStyle(style);
+                }
+                if (style.containsKey(Constants.Name.FONT_FAMILY)) {
+                    fontFamily = WXStyle.getFontFamily(style);
+                }
+                if (style.containsKey(Constants.Name.COLOR)) {
+                    fontColor = WXResourceUtils.getColor(WXStyle.getTextColor(style);
+                }
+
+                if (style.containsKey(Constants.Name.FONT_SIZE)) {
+                    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(mInstanceId);
+                    fontSize = WXStyle.getFontSize(style, instance.getInstanceViewPortWidth());
+                }
+
+                return new WXVerticalCenterSpan(mInstanceId,fontStyle, fontWeight, fontFamily,fontSize,fontColor);
+
+            }
+        }
+        return null;
+
+    }
+
+
+
+
 }
