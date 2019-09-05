@@ -170,7 +170,16 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 //        mTabLayout.addTab(mTabLayout.newTab().setText("text"+index));
         TabLayout.Tab tab = mTabLayout.newTab().setCustomView(child);
         child.setTag(tab);
-        mTabLayout.addTab(tab);
+//        mTabLayout.addTab(tab);
+
+
+        int count = getRealView().getChildCount();
+        index = index >= count ? -1 : index;
+        if (index == -1) {
+            mTabLayout.addTab(tab);
+        } else {
+            mTabLayout.addTab(tab,index);
+        }
 
     }
 
@@ -188,6 +197,9 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
                 TabLayout.Tab tab = (TabLayout.Tab) tag;
                 mTabLayout.removeTab(tab);
             }
+        }
+        if (destroy) {
+            child.destroy();
         }
     }
 
