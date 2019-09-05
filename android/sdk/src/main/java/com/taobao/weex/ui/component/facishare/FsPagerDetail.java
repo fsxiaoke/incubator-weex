@@ -36,6 +36,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXIndicator;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -381,27 +382,19 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
 //    }
 //  }
 //
-//  @WXComponentProp(name = Constants.Name.INDEX)
-//  public void setIndex(int index) {
-//    if (mViewPager != null && mAdapter != null) {
-//      if (index >= mAdapter.getRealCount() || index < 0) {
-//        initIndex = index;
-//        return;
-//      }
-//      mViewPager.setCurrentItem(index);
-//      if (mIndicator != null && mIndicator.getHostView() != null
-//              && mIndicator.getHostView().getRealCurrentItem() != index) {
-//        //OnPageChangeListener not triggered
-//        WXLogUtils.d("setIndex >>>> correction indicator to " + index);
-//        mIndicator.getHostView().setRealCurrentItem(index);
-//        mIndicator.getHostView().invalidate();
-//
-//        if (mPageChangeListener != null && mAdapter != null) {
-//          mPageChangeListener.onPageSelected(mAdapter.getFirst() + index);
-//        }
-//      }
-//    }
-//  }
+  @WXComponentProp(name = Constants.Name.INDEX)
+  public void setIndex(int index) {
+    if (mViewPager != null && mAdapter != null) {
+      if (index >= mAdapter.getRealCount() || index < 0) {
+        initIndex = index;
+        return;
+      }
+      mViewPager.setCurrentItem(index);
+    }
+  }
+
+
+
 //  @WXComponentProp(name = Constants.Name.SCROLLABLE)
 //  public void setScrollable(boolean scrollable) {
 //    if (mViewPager != null && mAdapter != null) {
