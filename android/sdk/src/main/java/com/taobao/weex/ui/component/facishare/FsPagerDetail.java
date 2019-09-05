@@ -190,7 +190,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
     if (view instanceof WXCircleIndicator) {
       return;
     }
-    mAdapter.addPageView(view);
+    mAdapter.addPageView(view,index);
 //    hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
       if(initRunnable == null){

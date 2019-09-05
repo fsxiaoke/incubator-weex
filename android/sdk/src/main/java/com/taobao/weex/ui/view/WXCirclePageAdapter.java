@@ -81,6 +81,31 @@ public class WXCirclePageAdapter extends PagerAdapter {
     ensureShadow();
   }
 
+  public void addPageView(View view,int index) {
+    if (WXEnvironment.isApkDebugable()) {
+      WXLogUtils.d("onPageSelected >>>> addPageView");
+    }
+
+    int count = originalViews.size();
+    index = index >= count ? -1 : index;
+    if (index == -1) {
+      originalViews.add(view);
+      views.add(view);
+
+    } else {
+      originalViews.add(index,view);
+      views.add(index, view);
+    }
+
+//    originalViews.add(view);
+//    if (this.isRTL) {
+//      views.add(0, view);
+//    } else {
+//      views.add(view);
+//    }
+    ensureShadow();
+  }
+
   public void removePageView(View view) {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("onPageSelected >>>> removePageView");
@@ -139,7 +164,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
     if (WXEnvironment.isApkDebugable()) {
       WXLogUtils.d("onPageSelected >>>> destroyItem >>>>> position:" + position);
     }
-    // container.removeView((View) object);
+     container.removeView((View) object);
   }
 
   @Override
