@@ -208,9 +208,9 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
       mViewPager.removeCallbacks(initRunnable);
       mViewPager.postDelayed(initRunnable, 50);
     } else {
-      if (!keepIndex) {
-        mViewPager.setCurrentItem(0);
-      }
+//      if (!keepIndex) {
+//        mViewPager.setCurrentItem(0);
+//      }
     }
 //    if (mIndicator != null) {
 //      mIndicator.getHostView().forceLayout();
