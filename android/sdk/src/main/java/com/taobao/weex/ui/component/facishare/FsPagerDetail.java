@@ -198,7 +198,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
         initRunnable = new Runnable() {
           @Override
           public void run() {
-            initIndex = getInitIndex();
+//            initIndex = getInitIndex();
             mViewPager.setCurrentItem(initIndex);
             initIndex = -1;
             initRunnable = null;
@@ -271,17 +271,17 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
   }
 
 
-  private int getInitIndex(){
-    Object index = getAttrs().get(Constants.Name.INDEX);
-    int select = WXUtils.getInteger(index, initIndex);
-    if(mAdapter == null || mAdapter.getCount() == 0){
-      return  0;
-    }
-    if(select >= mAdapter.getRealCount()){
-      select = select%mAdapter.getRealCount();
-    }
-    return select;
-  }
+//  private int getInitIndex(){
+//    Object index = getAttrs().get(Constants.Name.INDEX);
+//    int select = WXUtils.getInteger(index, initIndex);
+//    if(mAdapter == null || mAdapter.getCount() == 0){
+//      return  0;
+//    }
+//    if(select >= mAdapter.getRealCount()){
+//      select = select%mAdapter.getRealCount();
+//    }
+//    return select;
+//  }
 
 //
 //  @Override
