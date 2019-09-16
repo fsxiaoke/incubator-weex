@@ -157,6 +157,8 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     }
 
+    Runnable initRunnable = null;
+    int initIndex = -1;
     @Override
     public void addSubView(View child, int index) {
         if (child == null || mTabLayout == null) {
@@ -170,7 +172,32 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 //        mTabLayout.addTab(mTabLayout.newTab().setText("text"+index));
         TabLayout.Tab tab = mTabLayout.newTab().setCustomView(child);
         child.setTag(tab);
-        mTabLayout.addTab(tab);
+//        mTabLayout.addTab(tab);
+
+
+
+        int count = mTabLayout.getTabCount();
+        index = index >= count ? -1 : index;
+        if (index == -1) {
+            mTabLayout.addTab(tab,initIndex == -1);
+        } else {
+            mTabLayout.addTab(tab,index,false);
+        }
+
+
+        if (initIndex != -1 && count > initIndex) {
+            if(initRunnable == null){
+                initRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mTabLayout.getTabAt(initIndex).select();
+                        initRunnable = null;
+                    }
+                };
+            }
+            mTabLayout.removeCallbacks(initRunnable);
+            mTabLayout.postDelayed(initRunnable, 50);
+        }
 
     }
 
@@ -188,6 +215,9 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
                 TabLayout.Tab tab = (TabLayout.Tab) tag;
                 mTabLayout.removeTab(tab);
             }
+        }
+        if (destroy) {
+            child.destroy();
         }
     }
 
@@ -246,11 +276,20 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     @WXComponentProp(name = Constants.Name.TAB_SELECTED_INDEX)
     public void setTabSelectedIndex(int index) {
+
         if(mTabLayout!=null){
+
+            if (index >= mTabLayout.getTabCount()|| index < 0) {
+                initIndex = index;
+                return;
+            }
+
             TabLayout.Tab tab = mTabLayout.getTabAt(index);
             if(tab != null){
                 tab.select();
             }
+        }else{
+            initIndex = index;
         }
 
     }

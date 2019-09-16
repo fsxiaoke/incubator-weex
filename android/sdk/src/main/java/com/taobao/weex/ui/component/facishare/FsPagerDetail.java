@@ -36,6 +36,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.action.BasicComponentData;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXIndicator;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXCircleIndicator;
@@ -190,14 +191,14 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
     if (view instanceof WXCircleIndicator) {
       return;
     }
-    mAdapter.addPageView(view);
+    mAdapter.addPageView(view,index);
 //    hackTwoItemsInfiniteScroll();
     if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
       if(initRunnable == null){
         initRunnable = new Runnable() {
           @Override
           public void run() {
-            initIndex = getInitIndex();
+//            initIndex = getInitIndex();
             mViewPager.setCurrentItem(initIndex);
             initIndex = -1;
             initRunnable = null;
@@ -207,9 +208,9 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
       mViewPager.removeCallbacks(initRunnable);
       mViewPager.postDelayed(initRunnable, 50);
     } else {
-      if (!keepIndex) {
-        mViewPager.setCurrentItem(0);
-      }
+//      if (!keepIndex) {
+//        mViewPager.setCurrentItem(0);
+//      }
     }
 //    if (mIndicator != null) {
 //      mIndicator.getHostView().forceLayout();
@@ -270,17 +271,17 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
   }
 
 
-  private int getInitIndex(){
-    Object index = getAttrs().get(Constants.Name.INDEX);
-    int select = WXUtils.getInteger(index, initIndex);
-    if(mAdapter == null || mAdapter.getCount() == 0){
-      return  0;
-    }
-    if(select >= mAdapter.getRealCount()){
-      select = select%mAdapter.getRealCount();
-    }
-    return select;
-  }
+//  private int getInitIndex(){
+//    Object index = getAttrs().get(Constants.Name.INDEX);
+//    int select = WXUtils.getInteger(index, initIndex);
+//    if(mAdapter == null || mAdapter.getCount() == 0){
+//      return  0;
+//    }
+//    if(select >= mAdapter.getRealCount()){
+//      select = select%mAdapter.getRealCount();
+//    }
+//    return select;
+//  }
 
 //
 //  @Override
@@ -381,27 +382,19 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
 //    }
 //  }
 //
-//  @WXComponentProp(name = Constants.Name.INDEX)
-//  public void setIndex(int index) {
-//    if (mViewPager != null && mAdapter != null) {
-//      if (index >= mAdapter.getRealCount() || index < 0) {
-//        initIndex = index;
-//        return;
-//      }
-//      mViewPager.setCurrentItem(index);
-//      if (mIndicator != null && mIndicator.getHostView() != null
-//              && mIndicator.getHostView().getRealCurrentItem() != index) {
-//        //OnPageChangeListener not triggered
-//        WXLogUtils.d("setIndex >>>> correction indicator to " + index);
-//        mIndicator.getHostView().setRealCurrentItem(index);
-//        mIndicator.getHostView().invalidate();
-//
-//        if (mPageChangeListener != null && mAdapter != null) {
-//          mPageChangeListener.onPageSelected(mAdapter.getFirst() + index);
-//        }
-//      }
-//    }
-//  }
+  @WXComponentProp(name = Constants.Name.INDEX)
+  public void setIndex(int index) {
+    if (mViewPager != null && mAdapter != null) {
+      if (index >= mAdapter.getRealCount() || index < 0) {
+        initIndex = index;
+        return;
+      }
+      mViewPager.setCurrentItem(index);
+    }
+  }
+
+
+
 //  @WXComponentProp(name = Constants.Name.SCROLLABLE)
 //  public void setScrollable(boolean scrollable) {
 //    if (mViewPager != null && mAdapter != null) {

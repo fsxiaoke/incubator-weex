@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.component.richtext.span;
 
 
+import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import com.taobao.weex.WXSDKInstance;
@@ -47,5 +48,10 @@ public class ItemClickSpan extends ClickableSpan {
       param.put(RichTextNode.PSEUDO_REF, mPseudoRef);
       instance.fireEvent(mComponentRef, RichTextNode.ITEM_CLICK, param);
     }
+  }
+
+  @Override
+  public void updateDrawState(TextPaint ds) {
+
   }
 }

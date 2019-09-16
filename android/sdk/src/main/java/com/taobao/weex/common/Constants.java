@@ -200,6 +200,9 @@ public class Constants {
     String ARIA_HIDDEN = "ariaHidden";
     String ROLE = "role";
 
+
+    String VERTICAL_ALIGN = "verticalAlign";
+
     String LAYERLIMIT = "layerLimit";
     String LAYER_LIMIT = "layer-limit";
 

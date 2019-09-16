@@ -158,7 +158,7 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     if (style == null) {
       return (int) WXViewUtils.getRealPxByWidth(WXText.sDEFAULT_SIZE,viewPortW);
     }
-    int fontSize = WXUtils.getInt(style.get(Constants.Name.FONT_SIZE));
+    int fontSize = (int)(WXUtils.getInt(style.get(Constants.Name.FONT_SIZE))*WXText.sDEFAULT_Rate);
     if (fontSize <= 0) {
       fontSize = WXText.sDEFAULT_SIZE;
     }
@@ -176,6 +176,19 @@ public class WXStyle implements Map<String, Object>,Cloneable {
     }
     return fontFamily;
   }
+
+  public static String getVerticalAlign(Map<String, Object> style) {
+    String align = null;
+    if (style != null) {
+      Object temp;
+      temp = style.get(Constants.Name.VERTICAL_ALIGN);
+      if (temp != null) {
+        align = temp.toString();
+      }
+    }
+    return align;
+  }
+
 
   public static Layout.Alignment getTextAlignment(Map<String, Object> style){
     return getTextAlignment(style, false);
