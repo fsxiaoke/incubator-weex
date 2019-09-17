@@ -63,7 +63,9 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
 
-        fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
+        if (getEvents().contains(Constants.Event.ON_TAB_SELECTED)) {
+            fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
+        }
 
     }
 
@@ -76,12 +78,16 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-        fireEvent(Constants.Event.ON_TAB_UNSELECTED, getTabEvent(tab));
+        if (getEvents().contains(Constants.Event.ON_TAB_UNSELECTED)) {
+            fireEvent(Constants.Event.ON_TAB_UNSELECTED, getTabEvent(tab));
+        }
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-        fireEvent(Constants.Event.ON_TAB_RESELECTED, getTabEvent(tab));
+        if (getEvents().contains(Constants.Event.ON_TAB_RESELECTED)) {
+            fireEvent(Constants.Event.ON_TAB_RESELECTED, getTabEvent(tab));
+        }
     }
 
 
@@ -90,7 +96,9 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
     public void onScrollChanged(FsTabLayout.ScrollType scrollType) {
         if(scrollType == FsTabLayout.ScrollType.IDLE){//停止滚动
 
-            fireStopEvent();
+            if (getEvents().contains(Constants.Event.ON_TAB_STOP_SCROLL)) {
+                fireStopEvent();
+            }
         }
 
     }
