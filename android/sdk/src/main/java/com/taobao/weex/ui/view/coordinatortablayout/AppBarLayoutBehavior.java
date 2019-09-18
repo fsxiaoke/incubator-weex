@@ -19,6 +19,8 @@
 package com.taobao.weex.ui.view.coordinatortablayout;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
@@ -41,6 +43,13 @@ public class AppBarLayoutBehavior extends AppBarLayout.Behavior {
 
     public AppBarLayoutBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        setDragCallback(new DragCallback() {
+            @Override
+            public boolean canDrag(@NonNull AppBarLayout appBarLayout) {
+                return true;
+            }
+        });
     }
 
     @Override
@@ -59,6 +68,8 @@ public class AppBarLayoutBehavior extends AppBarLayout.Behavior {
 
         return super.onInterceptTouchEvent(parent, child, ev);
     }
+
+
 
     /**
      * 停止appbarLayout的fling事件
