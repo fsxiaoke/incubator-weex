@@ -24,4 +24,4 @@ gradle.ext.mavenUrl = "http://maven.firstshare.cn/artifactory/libs-release-local
 gradle.ext.mavenDevUrl = "http://maven.firstshare.cn/artifactory/libs-snapshot-local"
 gradle.ext.mavenUserName = "deployer"
 gradle.ext.mavenPwd = "fxiaoke"
-gradle.ext.FS_DIR="F:\\master"
+gradle.ext.FS_DIR="F:\\master\\fs-android"
