@@ -123,7 +123,7 @@ public class WXTimerModule extends WXModule implements Destroyable, Handler.Call
     if (msg != null) {
       int what = msg.what;
       if(WXEnvironment.isApkDebugable()) {
-        WXLogUtils.d(TAG, "Timer Module handleMessage : " + msg.what);
+        WXLogUtils.v(TAG, "Timer Module handleMessage : " + msg.what);
       }
       switch (what) {
         case MODULE_TIMEOUT:
