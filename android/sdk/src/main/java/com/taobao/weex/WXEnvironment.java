@@ -283,34 +283,35 @@ public class WXEnvironment {
   }
 
   public static boolean isApkDebugable() {
-    if (sApplication == null) {
-      return false;
-    }
-
-    if (isPerf) {
-      return false;
-    }
-
-    if (sDebugFlagInit){
-      return isApkDebug;
-    }
-    try {
-      String debugModeConfig = getCustomOptions().get(WXConfig.debugMode);
-      if (TextUtils.isEmpty(debugModeConfig)){
-        ApplicationInfo info = sApplication.getApplicationInfo();
-        isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-      }else {
-        isApkDebug = Boolean.valueOf(debugModeConfig);
-      }
-    } catch (Exception e) {
-      /**
-       * Don't call WXLogUtils.e here,will cause stackoverflow
-       */
-      e.printStackTrace();
-      isApkDebug = false;
-    }
-    sDebugFlagInit = true;
-    return isApkDebug;
+//    if (sApplication == null) {
+//      return false;
+//    }
+//
+//    if (isPerf) {
+//      return false;
+//    }
+//
+//    if (sDebugFlagInit){
+//      return isApkDebug;
+//    }
+//    try {
+//      String debugModeConfig = getCustomOptions().get(WXConfig.debugMode);
+//      if (TextUtils.isEmpty(debugModeConfig)){
+//        ApplicationInfo info = sApplication.getApplicationInfo();
+//        isApkDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+//      }else {
+//        isApkDebug = Boolean.valueOf(debugModeConfig);
+//      }
+//    } catch (Exception e) {
+//      /**
+//       * Don't call WXLogUtils.e here,will cause stackoverflow
+//       */
+//      e.printStackTrace();
+//      isApkDebug = false;
+//    }
+//    sDebugFlagInit = true;
+//    return isApkDebug;
+    return true;
   }
 
   public static boolean isPerf() {
