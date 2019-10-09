@@ -312,7 +312,7 @@ public class WXEnvironment {
 //    sDebugFlagInit = true;
 //    return isApkDebug;
     return true;
-    
+
   }
 
   public static boolean isPerf() {

@@ -33,11 +33,11 @@ add_definitions(-DGNU_SUPPORT=1)
 add_definitions(-DJSONCPP_NO_LOCALE_SUPPORT=1)
 add_definitions(-DDEBUG=1)
 
-add_definitions(-DRENDER_LOG=0)
-add_definitions(-DPERFORMANCE_LOG=0)
-add_definitions(-DLAYOUT_LOG=0)
-add_definitions(-DJSAPI_LOG=0)
-add_definitions(-DDOM_PARSER_LOG=0)
+add_definitions(-DRENDER_LOG=1)
+add_definitions(-DPERFORMANCE_LOG=1)
+add_definitions(-DLAYOUT_LOG=1)
+add_definitions(-DJSAPI_LOG=1)
+add_definitions(-DDOM_PARSER_LOG=1)
 
 set(LOCAL_LIBRARIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
 

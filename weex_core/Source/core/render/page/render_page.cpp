@@ -55,7 +55,7 @@ RenderPage::RenderPage(const std::string &page_id)
       render_object_registers_(),
       render_performance_(nullptr) {
 #if RENDER_LOG
-  LOGD("[RenderPage] new RenderPage >>>> pageId: %s", pageId.c_str());
+  LOGD("[RenderPage] new RenderPage >>>> pageId: %s", page_id.c_str());
 #endif
 
   this->page_id_ = page_id;
@@ -88,7 +88,9 @@ void RenderPage::CalculateLayout() {
   if (this->render_root_ == nullptr || !this->render_root_->ViewInit()) return;
 
 #if RENDER_LOG
-  LOGD("[RenderPage] CalculateLayout >>>> pageId: %s", mPageId.c_str());
+//  LOGD("[RenderPage] CalculateLayout >>>> pageId: %s", mPageId.c_str());
+  LOGD("[RenderPage] CalculateLayout >>>> pageId:");
+
 #endif
 
   int64_t start_time = getCurrentTime();

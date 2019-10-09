@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <android/base/string/string_utils.h>
 #include "core/bridge/platform/core_side_in_platform.h"
 #include "base/string_util.h"
 #include "base/log_defines.h"
@@ -45,7 +46,7 @@ void CoreSideInPlatform::SetDefaultHeightAndWidthIntoRootDom(
   LOGD(
       "[JNI] SetDefaultHeightAndWidthIntoRootDom >>>> pageId: %s, "
       "defaultWidth: %f, defaultHeight: %f",
-      page->PageId().c_str(), defaultWidth, defaultHeight);
+      page->page_id().c_str(), default_width, default_height);
 #endif
 
   page->SetDefaultHeightAndWidthIntoRootRender(default_width, default_height,
@@ -179,9 +180,11 @@ void CoreSideInPlatform::ForceLayout(const std::string &instance_id) {
   RenderPage *page = RenderManager::GetInstance()->GetPage(instance_id);
   if (page != nullptr) {
 #if RENDER_LOG
-    LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s",
-         jString2StrFast(env, instanceId).c_str(),
-         page->hasForeLayoutAction.load() ? "true" : "false");
+//    LOGD("[JNI] ForceLayout >>>> pageId: %s, needForceLayout: %s",
+//         jString2StrFast(env, instance_id).c_str(),
+//         page->hasForeLayoutAction.load() ? "true" : "false");
+
+    LOGD("[JNI] ForceLayout >>>> pageId:, needForceLayout:");
 #endif
 
     page->LayoutImmediately();

@@ -185,7 +185,7 @@ android {
 
         debug {
             buildConfigField "boolean", "ENABLE_TRACE", "true"
-            jniDebuggable false
+            jniDebuggable true
             debuggable true
             testCoverageEnabled disableCov.toBoolean()
             consumerProguardFiles 'proguard-rules.pro'

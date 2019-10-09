@@ -41,7 +41,7 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
-       pageId.c_str(), parser.toStringUTF8().c_str());
+       page_id.c_str(), parser.toStringUTF8().c_str());
 #endif
 
   RenderPage *page = new RenderPage(page_id);
@@ -70,11 +70,11 @@ bool RenderManager::CreatePage(const std::string& page_id, const char *data) {
 }
 
 bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
-#if RENDER_LOG
-  wson_parser parser(data);
-  LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
-       pageId.c_str(), parser.toStringUTF8().c_str());
-#endif
+//#if RENDER_LOG
+//  wson_parser parser(data);
+//  LOGD("[RenderManager] CreatePage >>>> pageId: %s, dom data: %s",
+//       pageId.c_str(), parser.toStringUTF8().c_str());
+//#endif
 
   RenderPage *page = new RenderPage(page_id);
   this->pages_.insert(std::pair<std::string, RenderPage *>(page_id, page));
@@ -92,7 +92,7 @@ bool RenderManager::CreatePage(const std::string& page_id, RenderObject *root) {
     
 bool RenderManager::CreatePage(const std::string& page_id, std::function<RenderObject* (RenderPage*)> constructRoot) {
 #if RENDER_LOG
-    LOGD("[RenderManager] CreatePage >>>> pageId: %s", pageId.c_str());
+    LOGD("[RenderManager] CreatePage >>>> pageId: %s", page_id.c_str());
 #endif
     
     RenderPage *page = new RenderPage(page_id);
@@ -124,7 +124,7 @@ bool RenderManager::AddRenderObject(const std::string &page_id,
   LOGD(
       "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
       "%d, dom data: %s",
-      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
+      page_id.c_str(), parent_ref.c_str(), index, parser.toStringUTF8().c_str());
 #endif
 
   int64_t start_time = getCurrentTime();
@@ -142,13 +142,13 @@ bool RenderManager::AddRenderObject(const std::string &page_id, const std::strin
   RenderPage *page = GetPage(page_id);
   if (page == nullptr) return false;
 
-#if RENDER_LOG
-  wson_parser parser(data);
-  LOGD(
-      "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
-      "%d, dom data: %s",
-      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
-#endif
+//#if RENDER_LOG
+//  wson_parser parser(data);
+//  LOGD(
+//      "[RenderManager] AddRenderObject >>>> pageId: %s, parentRef: %s, index: "
+//      "%d, dom data: %s",
+//      pageId.c_str(), parentRef.c_str(), index, parser.toStringUTF8().c_str());
+//#endif
 
   if (root == nullptr) return false;
 
@@ -163,7 +163,7 @@ bool RenderManager::RemoveRenderObject(const std::string &page_id,
 
 #if RENDER_LOG
   LOGD("[RenderManager] RemoveRenderObject >>>> pageId: %s, ref: %s",
-       pageId.c_str(), ref.c_str());
+       page_id.c_str(), ref.c_str());
 #endif
 
   page->set_is_dirty(true);
@@ -180,7 +180,7 @@ bool RenderManager::MoveRenderObject(const std::string &page_id,
   LOGD(
       "[RenderManager] MoveRenderObject >>>> pageId: %s, ref: %s, parentRef: "
       "%s, index: %d",
-      pageId.c_str(), ref.c_str(), parentRef.c_str(), index);
+      page_id.c_str(), ref.c_str(), parent_ref.c_str(), index);
 #endif
 
   page->set_is_dirty(true);
@@ -195,7 +195,7 @@ bool RenderManager::UpdateAttr(const std::string &page_id,
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
-       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+       page_id.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
 #endif
 
   int64_t start_time = getCurrentTime();
@@ -211,11 +211,11 @@ bool RenderManager::UpdateAttr(const std::string &page_id, const std::string &re
   RenderPage *page = this->GetPage(page_id);
   if (page == nullptr) return false;
 
-#if RENDER_LOG
-  wson_parser parser(data);
-  LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
-       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
-#endif
+//#if RENDER_LOG
+//  wson_parser parser(data);
+//  LOGD("[RenderManager] UpdateAttr >>>> pageId: %s, ref: %s, data: %s",
+//       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+//#endif
 
   page->set_is_dirty(true);
   return page->UpdateAttr(ref, attrPair);
@@ -229,7 +229,7 @@ bool RenderManager::UpdateStyle(const std::string &page_id,
 #if RENDER_LOG
   wson_parser parser(data);
   LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
-       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+       page_id.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
 #endif
 
   int64_t start_time = getCurrentTime();
@@ -246,11 +246,11 @@ bool RenderManager::UpdateStyle(const std::string &page_id, const std::string &r
   RenderPage *page = this->GetPage(page_id);
   if (page == nullptr) return false;
 
-#if RENDER_LOG
-  wson_parser parser(data);
-  LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
-       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
-#endif
+//#if RENDER_LOG
+//  wson_parser parser(data);
+//  LOGD("[RenderManager] UpdateStyle >>>> pageId: %s, ref: %s, data: %s",
+//       pageId.c_str(), ref.c_str(), parser.toStringUTF8().c_str());
+//#endif
 
 
   page->set_is_dirty(true);
@@ -265,7 +265,7 @@ bool RenderManager::AddEvent(const std::string &page_id, const std::string &ref,
 
 #if RENDER_LOG
   LOGD("[RenderManager] AddEvent >>>> pageId: %s, ref: %s, event: %s",
-       pageId.c_str(), ref.c_str(), event.c_str());
+       page_id.c_str(), ref.c_str(), event.c_str());
 #endif
 
   page->set_is_dirty(true);
@@ -280,7 +280,7 @@ bool RenderManager::RemoveEvent(const std::string &page_id,
 
 #if RENDER_LOG
   LOGD("[RenderManager] RemoveEvent >>>> pageId: %s, ref: %s, event: %s",
-       pageId.c_str(), ref.c_str(), event.c_str());
+       page_id.c_str(), ref.c_str(), event.c_str());
 #endif
 
   page->set_is_dirty(true);
@@ -292,7 +292,7 @@ bool RenderManager::CreateFinish(const std::string &page_id) {
   if (page == nullptr) return false;
 
 #if RENDER_LOG
-  LOGD("[RenderManager] CreateFinish >>>> pageId: %s", pageId.c_str());
+  LOGD("[RenderManager] CreateFinish >>>> pageId: %s", page_id.c_str());
 #endif
 
   page->set_is_dirty(true);
@@ -353,7 +353,7 @@ bool RenderManager::ClosePage(const std::string &page_id) {
   if (page == nullptr) return false;
 
 #if RENDER_LOG
-  LOGD("[RenderManager] ClosePage >>>> pageId: %s", pageId.c_str());
+  LOGD("[RenderManager] ClosePage >>>> pageId: %s", page_id.c_str());
 #endif
   page->OnRenderPageClose();
   this->pages_.erase(page_id);
