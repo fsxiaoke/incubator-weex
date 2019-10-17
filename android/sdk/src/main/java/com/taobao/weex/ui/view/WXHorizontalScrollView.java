@@ -53,7 +53,13 @@ public class WXHorizontalScrollView extends HorizontalScrollView implements IWXS
     init();
   }
 
+
   @Override
+  protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
+    return 0;
+  }
+
+    @Override
   protected void onScrollChanged(int l, int t, int oldl, int oldt) {
     super.onScrollChanged(l, t, oldl, oldt);
     if (mScrollViewListener != null) {
