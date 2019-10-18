@@ -187,7 +187,7 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
         int count = mTabLayout.getTabCount();
         index = index >= count ? -1 : index;
         if (index == -1) {
-            mTabLayout.addTab(tab,initIndex == -1);
+            mTabLayout.addTab(tab,false);
         } else {
             mTabLayout.addTab(tab,index,false);
         }
