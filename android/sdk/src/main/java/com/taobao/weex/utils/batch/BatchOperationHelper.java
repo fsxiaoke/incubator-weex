@@ -37,7 +37,6 @@ public class BatchOperationHelper implements Interceptor {
   private BactchExecutor mExecutor;
   private CopyOnWriteArrayList<Runnable> sRegisterTasks = new CopyOnWriteArrayList<>();
   private boolean isCollecting = false;
-
   public BatchOperationHelper(BactchExecutor executor){
     mExecutor = executor;
     executor.setInterceptor(this);
@@ -45,7 +44,7 @@ public class BatchOperationHelper implements Interceptor {
   }
 
   @Override
-  public synchronized boolean take(Runnable runnable) {
+  public boolean take(Runnable runnable) {
     if(isCollecting){
       sRegisterTasks.add(runnable);
       if (runnable==null){
@@ -59,7 +58,7 @@ public class BatchOperationHelper implements Interceptor {
   /**
    * Post all tasks to executor. Can only be called once.
    */
-  public synchronized void flush(){
+  public void flush(){
     isCollecting = false;
     mExecutor.post(new Runnable() {
       @Override
