@@ -97,6 +97,11 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     }
   }
 
+  @Override
+  protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
+    return 0;
+  }
+
   private void init() {
     setWillNotDraw(false);
     startScrollerTask();
