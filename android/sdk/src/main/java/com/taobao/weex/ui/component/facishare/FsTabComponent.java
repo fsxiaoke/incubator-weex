@@ -166,7 +166,7 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
     }
 
     Runnable initRunnable = null;
-    int initIndex = -1;
+    int initIndex = 0;
     @Override
     public void addSubView(View child, int index) {
         if (child == null || mTabLayout == null) {
