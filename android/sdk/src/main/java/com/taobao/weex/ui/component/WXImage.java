@@ -220,7 +220,7 @@ public class WXImage extends WXComponent<ImageView> {
       }
     }
 
-    if (src == null||src.equals(this.mSrc)) {
+    if (src == null) {
       return;
     }
 
