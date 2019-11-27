@@ -210,7 +210,7 @@ public class WXEnvironment {
    * Get the version of the current app.
    */
   private static int getAppVersionCode() {
-    if (appVersionCode > 0){
+    if (appVersionCode == 0){
       PackageManager manager;
       PackageInfo info = null;
       try {

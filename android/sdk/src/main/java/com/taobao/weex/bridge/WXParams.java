@@ -259,6 +259,7 @@ public class WXParams implements Serializable {
     HashMap<String, Object> map  = new HashMap<>();
     map.put("appName", appName);
     map.put("appVersion", appVersion);
+    map.put("appVersionCode", appVersionCode);
     map.put("cacheDir", cacheDir);
     map.put("deviceHeight", deviceHeight);
     map.put("deviceModel", deviceModel);
