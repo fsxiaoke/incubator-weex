@@ -2111,7 +2111,6 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
-    wxParams.setAppVersionCode(config.get(WXConfig.appVersionCode));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
     wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
@@ -2131,6 +2130,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setDeviceWidth(TextUtils.isEmpty(config.get("deviceWidth")) ? String.valueOf(WXViewUtils.getScreenWidth(WXEnvironment.sApplication)) : config.get("deviceWidth"));
     wxParams.setDeviceHeight(TextUtils.isEmpty(config.get("deviceHeight")) ? String.valueOf(WXViewUtils.getScreenHeight(WXEnvironment.sApplication)) : config.get("deviceHeight"));
     Map<String, String> customOptions = WXEnvironment.getCustomOptions();
+    customOptions.put(WXConfig.appVersionCode, config.get(WXConfig.appVersionCode));
     customOptions.put("enableBackupThread", String.valueOf(jsEngineMultiThreadEnable()));
     IWXJscProcessManager wxJscProcessManager = WXSDKManager.getInstance().getWXJscProcessManager();
     if(wxJscProcessManager != null) {

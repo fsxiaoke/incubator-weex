@@ -30,7 +30,6 @@ public class WXParams implements Serializable {
   private String platform;
   private String osVersion;
   private String appVersion;
-  private String appVersionCode;
   private String weexVersion;
   private String deviceModel;
   private String appName;
@@ -104,15 +103,6 @@ public class WXParams implements Serializable {
     this.appVersion = appVersion;
   }
 
-
-  @CalledByNative
-  public String getAppVersionCode() {
-    return appVersionCode;
-  }
-
-  public void setAppVersionCode(String appVersionCode) {
-    this.appVersionCode = appVersionCode;
-  }
 
   @CalledByNative
   public String getWeexVersion() {
@@ -259,7 +249,6 @@ public class WXParams implements Serializable {
     HashMap<String, Object> map  = new HashMap<>();
     map.put("appName", appName);
     map.put("appVersion", appVersion);
-    map.put("appVersionCode", appVersionCode);
     map.put("cacheDir", cacheDir);
     map.put("deviceHeight", deviceHeight);
     map.put("deviceModel", deviceModel);
