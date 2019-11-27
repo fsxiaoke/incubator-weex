@@ -23,6 +23,7 @@ public interface WXConfig {
   String os = "os";
   String osName = "osName";
   String appVersion="appVersion";
+  String appVersionCode="appVersionCode";
   String cacheDir = "cacheDir";
   String devId="devId";
   String sysVersion="sysVersion";

@@ -108,6 +108,7 @@ public class WXEnvironment {
   public static boolean MULTIPROCESS = true;
   private static boolean isApkDebug = true;
   private static String appVersionName;
+  private static int appVersionCode;
   public static boolean isPerf = false;
   private static boolean sDebugFlagInit = false;
 
@@ -152,7 +153,8 @@ public class WXEnvironment {
     if (configs.size()==0){
       configs.put(WXConfig.os, OS);
       configs.put(WXConfig.appVersion, getAppVersionName());
-    configs.put(WXConfig.cacheDir, getAppCacheFile());
+      configs.put(WXConfig.appVersionCode, getAppVersionCode()+"");
+     configs.put(WXConfig.cacheDir, getAppCacheFile());
       configs.put(WXConfig.devId, DEV_Id);
       configs.put(WXConfig.sysVersion, SYS_VERSION);
       configs.put(WXConfig.sysModel, SYS_MODEL);
@@ -164,6 +166,7 @@ public class WXEnvironment {
     } catch (Exception e) {
       configs.put(WXConfig.layoutDirection, "ltr");
     }
+
 
     try {
       if (isApkDebugable()) {
@@ -194,12 +197,33 @@ public class WXEnvironment {
         manager = sApplication.getPackageManager();
         info = manager.getPackageInfo(sApplication.getPackageName(), 0);
         appVersionName = info.versionName;
+        appVersionCode = info.versionCode;
       } catch (Exception e) {
         WXLogUtils.e("WXEnvironment getAppVersionName Exception: ", e);
       }
     }
 
     return appVersionName;
+  }
+
+  /**
+   * Get the version of the current app.
+   */
+  private static int getAppVersionCode() {
+    if (appVersionCode > 0){
+      PackageManager manager;
+      PackageInfo info = null;
+      try {
+        manager = sApplication.getPackageManager();
+        info = manager.getPackageInfo(sApplication.getPackageName(), 0);
+        appVersionName = info.versionName;
+        appVersionCode = info.versionCode;
+      } catch (Exception e) {
+        WXLogUtils.e("WXEnvironment getAppVersionCode Exception: ", e);
+      }
+    }
+
+    return appVersionCode;
   }
 
   /**
