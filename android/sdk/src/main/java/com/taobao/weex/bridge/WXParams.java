@@ -30,6 +30,7 @@ public class WXParams implements Serializable {
   private String platform;
   private String osVersion;
   private String appVersion;
+  private String appVersionCode;
   private String weexVersion;
   private String deviceModel;
   private String appName;
@@ -101,6 +102,16 @@ public class WXParams implements Serializable {
 
   public void setAppVersion(String appVersion) {
     this.appVersion = appVersion;
+  }
+
+
+  @CalledByNative
+  public String getAppVersionCode() {
+    return appVersionCode;
+  }
+
+  public void setAppVersionCode(String appVersionCode) {
+    this.appVersionCode = appVersionCode;
   }
 
   @CalledByNative

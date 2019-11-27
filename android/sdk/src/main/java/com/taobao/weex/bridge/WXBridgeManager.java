@@ -2111,6 +2111,7 @@ public class WXBridgeManager implements Callback, BactchExecutor {
     wxParams.setCacheDir(config.get(WXConfig.cacheDir));
     wxParams.setOsVersion(config.get(WXConfig.sysVersion));
     wxParams.setAppVersion(config.get(WXConfig.appVersion));
+    wxParams.setAppVersionCode(config.get(WXConfig.appVersionCode));
     wxParams.setWeexVersion(config.get(WXConfig.weexVersion));
     wxParams.setDeviceModel(config.get(WXConfig.sysModel));
     wxParams.setShouldInfoCollect(config.get("infoCollect"));
