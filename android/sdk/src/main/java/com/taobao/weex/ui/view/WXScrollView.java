@@ -19,6 +19,7 @@
 package com.taobao.weex.ui.view;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -31,6 +32,8 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ScrollView;
 
 import com.taobao.weex.common.WXThread;
@@ -85,6 +88,7 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
   private int[] stickyScrollerP = new int[2];
   private int[] stickyViewP = new int[2];
   private boolean scrollable = true;
+  private InputMethodManager mInputMethodManager;
 
   public WXScrollView(Context context) {
     super(context);
@@ -103,11 +107,21 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
   }
 
   private void init() {
+    mInputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
     setWillNotDraw(false);
     startScrollerTask();
     setOverScrollMode(View.OVER_SCROLL_NEVER);
     childHelper = new NestedScrollingChildHelper(this);
     childHelper.setNestedScrollingEnabled(true);
+  }
+
+  private void hideSoftKeyboard() {
+    Activity activity = (Activity)getContext();
+    View focus = activity.getCurrentFocus();
+    if(focus!=null && focus instanceof EditText){
+      mInputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
   }
 
   public void startScrollerTask() {
@@ -327,6 +341,9 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
 
   @Override
   protected void onScrollChanged(int x, int y, int oldx, int oldy) {
+    if(Math.abs(y-oldy) >5) {
+      hideSoftKeyboard();
+    }
     mScrollX = getScrollX();
     mScrollY = getScrollY();
     onScroll(WXScrollView.this, mScrollX, mScrollY);
