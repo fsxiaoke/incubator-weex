@@ -138,7 +138,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   private InputMethodManager mInputMethodManager;
 
-  private boolean mScrollCloseKeyboard;
+  private boolean mScrollCloseKeyboard = true;
 
 
   @Deprecated
