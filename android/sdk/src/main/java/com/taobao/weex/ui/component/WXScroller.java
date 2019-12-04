@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -43,6 +44,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import com.taobao.weex.WXEnvironment;
@@ -132,6 +135,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
 
   private boolean isScrollable = true;
 
+
+  private InputMethodManager mInputMethodManager;
+
+  private boolean mScrollCloseKeyboard;
+
+
   @Deprecated
   public WXScroller(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
     this(instance, parent, basicComponentData);
@@ -141,6 +150,7 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     super(instance, parent, basicComponentData);
     stickyHelper = new WXStickyHelper(this);
     instance.getApmForInstance().updateDiffStats(WXInstanceApm.KEY_PAGE_STATS_SCROLLER_NUM,1);
+    mInputMethodManager =  (InputMethodManager) instance.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
   }
 
   /**
@@ -570,7 +580,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       innerView.addScrollViewListener(new WXScrollViewListener() {
         @Override
         public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
-
+          if(mScrollCloseKeyboard && Math.abs(y-oldy) >5) {
+              hideSoftKeyboard();
+          }
         }
 
         @Override
@@ -645,6 +657,15 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     return host;
   }
 
+  private void hideSoftKeyboard() {
+    Activity activity = (Activity)getContext();
+    View focus = activity.getCurrentFocus();
+    if(focus!=null && focus instanceof EditText){
+      mInputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+  }
+
   @Override
   public int getScrollY() {
     return getInnerView() == null ? 0 : getInnerView().getScrollY();
@@ -697,6 +718,12 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
     } else {
       getInnerView().setHorizontalScrollBarEnabled(show);
     }
+  }
+
+
+  @WXComponentProp(name = Constants.Name.SCROLLCLOSEKEYBOARD)
+  public void setScrollCloseKeyBoard(boolean close) {
+    this.mScrollCloseKeyboard = close;
   }
 
   @WXComponentProp(name = Constants.Name.SCROLLABLE)
