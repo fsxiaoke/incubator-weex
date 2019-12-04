@@ -170,6 +170,7 @@ public class Constants {
     String ELEVATION = "elevation";
     String PERSPECTIVE = "perspective";
     String SCROLLABLE = "scrollable";
+    String SCROLLCLOSEKEYBOARD = "scrollCloseKeyboard";
     String DRAGGABLE = "draggable";
     String DISTANCE_Y = "dy";
     String PULLING_DISTANCE = "pullingDistance";
