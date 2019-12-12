@@ -595,9 +595,9 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       innerView.addScrollViewListener(new WXScrollViewListener() {
         @Override
         public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
-//          if(mScrollCloseKeyboard && Math.abs(y-oldy) >5) {
-//              hideSoftKeyboard();
-//          }
+          if(mScrollCloseKeyboard && Math.abs(y-oldy) >5) {
+              hideSoftKeyboard();
+          }
         }
 
         @Override
