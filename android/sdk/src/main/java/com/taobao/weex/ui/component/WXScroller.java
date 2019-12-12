@@ -577,12 +577,27 @@ public class WXScroller extends WXVContainer<ViewGroup> implements WXScrollViewL
       innerView.addView(mRealView, layoutParams);
       innerView.setVerticalScrollBarEnabled(true);
       innerView.setNestedScrollingEnabled(WXUtils.getBoolean(getAttrs().get(Constants.Name.NEST_SCROLLING_ENABLED), true));
+
+      innerView.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+          switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+              if(mScrollCloseKeyboard) {
+                hideSoftKeyboard();
+              }
+              break;
+          }
+          return false;
+        }
+      });
+
       innerView.addScrollViewListener(new WXScrollViewListener() {
         @Override
         public void onScrollChanged(WXScrollView scrollView, int x, int y, int oldx, int oldy) {
-          if(mScrollCloseKeyboard && Math.abs(y-oldy) >5) {
-              hideSoftKeyboard();
-          }
+//          if(mScrollCloseKeyboard && Math.abs(y-oldy) >5) {
+//              hideSoftKeyboard();
+//          }
         }
 
         @Override
