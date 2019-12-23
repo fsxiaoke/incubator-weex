@@ -18,6 +18,20 @@
  */
 package com.taobao.weex.ui.view;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.taobao.weex.common.WXThread;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXScroller;
+import com.taobao.weex.ui.view.gesture.WXGesture;
+import com.taobao.weex.ui.view.gesture.WXGestureObservable;
+import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXReflectionUtils;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -32,20 +46,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
-
-import com.taobao.weex.common.WXThread;
-import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.view.gesture.WXGesture;
-import com.taobao.weex.ui.view.gesture.WXGestureObservable;
-import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.weex.utils.WXReflectionUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 
 /**
@@ -109,6 +109,8 @@ public class WXScrollView extends ScrollView implements Callback, IWXScroller,
     childHelper = new NestedScrollingChildHelper(this);
     childHelper.setNestedScrollingEnabled(true);
   }
+
+
 
   public void startScrollerTask() {
     if (mScrollerTask == null) {
