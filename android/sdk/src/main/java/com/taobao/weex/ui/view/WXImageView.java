@@ -47,7 +47,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class WXImageView extends ImageView implements WXGestureObservable,
+public class WXImageView extends android.support.v7.widget.AppCompatImageView implements WXGestureObservable,
         IRenderStatus<WXImage>,
         IRenderResult<WXImage>, WXImage.Measurable {
 
