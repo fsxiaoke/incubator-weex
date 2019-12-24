@@ -47,7 +47,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class WXImageView extends android.support.v7.widget.AppCompatImageView implements WXGestureObservable,
+public class WXImageView extends ImageView implements WXGestureObservable,
         IRenderStatus<WXImage>,
         IRenderResult<WXImage>, WXImage.Measurable {
 
@@ -291,10 +291,8 @@ public class WXImageView extends android.support.v7.widget.AppCompatImageView im
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    if(gif) {
-      initPaintColor();
-      addRoundRectPath(w, h);
-    }
+    initPaintColor();
+    addRoundRectPath(w, h);
   }
 
   private void initPaintColor() {
