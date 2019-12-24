@@ -855,7 +855,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     EditText hostView;
     if ((hostView = getHostView()) != null) {
       int length = getHostView().length();
-      if (selectionStart > length || selectionEnd > length) {
+      if (selectionStart > length || selectionEnd > length||selectionStart<0 || selectionEnd<0) {
         return;
       }
       focus();
@@ -871,7 +871,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
     EditText hostView;
     if ((hostView = getHostView()) != null) {
       int length = getHostView().length();
-      if (selectionStart > length || selectionEnd > length) {
+      if (selectionStart > length || selectionEnd > length||selectionStart<0 || selectionEnd<0) {
         return;
       }
       hostView.setSelection(selectionStart, selectionEnd);
