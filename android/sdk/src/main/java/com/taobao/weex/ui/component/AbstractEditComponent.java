@@ -802,17 +802,24 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @JSMethod
   public void focus() {
-    WXEditText host = getHostView();
-    if (host != null && !host.hasFocus()) {
-      if (getParent() != null) {
-        getParent().ignoreFocus();
-      }
-      host.requestFocus();
-      host.setFocusable(true);
-      host.setFocusableInTouchMode(true);
-      showSoftKeyboard();
-    }
+      focus(true);
   }
+
+    @JSMethod
+    public void focus(boolean showKeyboard) {
+        WXEditText host = getHostView();
+        if (host != null && !host.hasFocus()) {
+            if (getParent() != null) {
+                getParent().ignoreFocus();
+            }
+            host.requestFocus();
+            host.setFocusable(true);
+            host.setFocusableInTouchMode(true);
+            if(showKeyboard) {
+                showSoftKeyboard();
+            }
+        }
+    }
 
   @Override
   protected Object convertEmptyProperty(String propName, Object originalValue) {
