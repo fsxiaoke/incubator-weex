@@ -865,7 +865,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
 
   @JSMethod
-  public void setValueSelectionRange(String value, int selectionStart, int selectionEnd) {
+    public void setValueSelectionRange(String value, int selectionStart, int selectionEnd) {
     setValue(value);
 
     EditText hostView;
