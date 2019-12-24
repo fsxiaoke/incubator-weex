@@ -802,11 +802,11 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
 
   @JSMethod
   public void focus() {
-      focus(true);
+    focusShowKeyboard(true);
   }
 
     @JSMethod
-    public void focus(boolean showKeyboard) {
+    public void focusShowKeyboard(boolean showKeyboard) {
         WXEditText host = getHostView();
         if (host != null && !host.hasFocus()) {
             if (getParent() != null) {
@@ -859,6 +859,21 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         return;
       }
       focus();
+      hostView.setSelection(selectionStart, selectionEnd);
+    }
+  }
+
+
+  @JSMethod
+  public void setValueSelectionRange(String value, int selectionStart, int selectionEnd) {
+    setValue(value);
+
+    EditText hostView;
+    if ((hostView = getHostView()) != null) {
+      int length = getHostView().length();
+      if (selectionStart > length || selectionEnd > length) {
+        return;
+      }
       hostView.setSelection(selectionStart, selectionEnd);
     }
   }
