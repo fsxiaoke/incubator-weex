@@ -27,9 +27,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WXCirclePageAdapter extends PagerAdapter {
 
@@ -140,23 +138,20 @@ public class WXCirclePageAdapter extends PagerAdapter {
   public int getRealCount() {
     return views.size();
   }
-  Map<Integer,View> mCachedPosView=new HashMap<>();
+
   @Override
   public Object instantiateItem(ViewGroup container, int position) {
     View pageView = null;
     try {
       pageView = shadow.get(position);
-
       if (WXEnvironment.isApkDebugable()) {
         WXLogUtils.d("onPageSelected >>>> instantiateItem >>>>> position:" + position + ",position % getRealCount()" + position % getRealCount());
       }
       if (pageView.getParent() == null) {
         container.addView(pageView);
-      } else if(pageView.getParent() != null&&needLoop) {
+      } else {
         ((ViewGroup) pageView.getParent()).removeView(pageView);
         container.addView(pageView);
-      } else {
-        
       }
     } catch (Exception e) {
       WXLogUtils.e("[CirclePageAdapter] instantiateItem: ", e);
@@ -210,7 +205,7 @@ public class WXCirclePageAdapter extends PagerAdapter {
       temp.addAll(views);
     }
     shadow.clear();
-//    notifyDataSetChanged();
+    notifyDataSetChanged();
     shadow.addAll(temp);
     notifyDataSetChanged();
   }
