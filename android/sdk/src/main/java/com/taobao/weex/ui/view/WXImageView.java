@@ -19,7 +19,13 @@
 package com.taobao.weex.ui.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Keep;
@@ -28,6 +34,7 @@ import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 
 import com.taobao.weex.ui.component.WXImage;
@@ -37,6 +44,7 @@ import com.taobao.weex.utils.ImageDrawable;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 public class WXImageView extends ImageView implements WXGestureObservable,
@@ -53,6 +61,12 @@ public class WXImageView extends ImageView implements WXGestureObservable,
 
   public WXImageView(Context context) {
     super(context);
+    mPath = new Path();
+    // set odd mode
+    mPath.setFillType(Path.FillType.INVERSE_EVEN_ODD);
+
+    mPaint = new Paint();
+    mPaint.setAntiAlias(true);
   }
 
   @Override
@@ -258,5 +272,116 @@ public class WXImageView extends ImageView implements WXGestureObservable,
 
 
 
+
+  private Path mPath;
+
+  private Paint mPaint;
+
+  @Override
+  protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+    if(gif) {
+      canvas.save();
+      canvas.drawPath(mPath, mPaint);
+      canvas.restore();
+    }
+  }
+
+
+  @Override
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    if(gif) {
+      initPaintColor();
+      addRoundRectPath(w, h);
+    }
+  }
+
+  private void initPaintColor() {
+    int paintColor = getPaintColor(getParent());
+    if (Color.TRANSPARENT == paintColor) {
+      // get theme background color
+      TypedArray array = getContext().getTheme().obtainStyledAttributes(new int[]{
+              android.R.attr.colorBackground
+      });
+      paintColor = array.getColor(0, Color.TRANSPARENT);
+      array.recycle();
+    }
+
+    mPaint.setColor(paintColor);
+  }
+
+
+  /**
+   * @param vp parent view
+   * @return paint color
+   */
+  private int getPaintColor(ViewParent vp) {
+    if (null == vp) {
+      return Color.TRANSPARENT;
+    }
+
+    if (vp instanceof View) {
+      View parentView = (View) vp;
+      int color = getViewBackgroundColor(parentView);
+
+      if (Color.TRANSPARENT != color) {
+        return color;
+      } else {
+        getPaintColor(parentView.getParent());
+      }
+    }
+
+    return Color.TRANSPARENT;
+  }
+
+  /**
+   * @param view
+   * @return
+   */
+  private int getViewBackgroundColor(View view) {
+    Drawable drawable = view.getBackground();
+
+    if (null != drawable) {
+      Class<Drawable> drawableClass = (Class<Drawable>) drawable.getClass();
+      if (null == drawableClass) {
+        return Color.TRANSPARENT;
+      }
+
+      try {
+        Field field = drawableClass.getDeclaredField("mColorState");
+        field.setAccessible(true);
+        Object colorState = field.get(drawable);
+        Class colorStateClass = colorState.getClass();
+        Field colorStateField = colorStateClass.getDeclaredField("mUseColor");
+        colorStateField.setAccessible(true);
+        int viewColor = (int) colorStateField.get(colorState);
+        if (Color.TRANSPARENT != viewColor) {
+          return viewColor;
+        }
+      } catch (NoSuchFieldException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      }
+    }
+
+    return Color.TRANSPARENT;
+  }
+
+
+  private void addRoundRectPath(int w, int h) {
+    mPath.reset();
+
+    //add round rect
+    mPath.addRoundRect(new RectF(0, 0, w, h), borderRadius, Path.Direction.CCW);
+
+    //        Path brainPath = new Path();
+    //        brainPath.addRect(new RectF(0, 0, w, h), Path.Direction.CCW);
+    //        brainPath.addCircle(w / 2, h / 2, Math.min(w, h) / 2, Path.Direction.CW);
+    //
+    //        mPath.setFillType(Path.FillType.WINDING);
+    //        mPath.addPath(brainPath);
+  }
 
 }
