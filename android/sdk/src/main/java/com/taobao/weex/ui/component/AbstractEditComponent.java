@@ -947,7 +947,7 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
             fireEvent(Constants.Event.KEYBOARD, event);
           }
           if (!isShown) {
-            blur();
+//            blur();
           }
         }
       });
