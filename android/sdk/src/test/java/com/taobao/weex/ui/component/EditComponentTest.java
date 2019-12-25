@@ -18,7 +18,7 @@
  */
 package com.taobao.weex.ui.component;
 
-import com.taobao.weappplus_sdk.BuildConfig;
+import com.taobao.weex.BuildConfig;
 import com.taobao.weex.WXSDKInstanceTest;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.ui.SimpleComponentHolder;
@@ -87,11 +87,11 @@ public class EditComponentTest {
   AbstractEditComponent component;
 
   public static WXInput create() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (WXInput) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
+    return (WXInput) new SimpleComponentHolder(WXInput.class).createInstance(WXSDKInstanceTest.createInstance(),  WXDivTest.create(),null);
   }
 
   public static Textarea createTextarea() throws IllegalAccessException, InstantiationException, InvocationTargetException {
-    return (Textarea) new SimpleComponentHolder(Textarea.class).createInstance(WXSDKInstanceTest.createInstance(), new TestDomObject(), WXDivTest.create());
+    return (Textarea) new SimpleComponentHolder(Textarea.class).createInstance(WXSDKInstanceTest.createInstance(), WXDivTest.create(),null);
   }
 
 

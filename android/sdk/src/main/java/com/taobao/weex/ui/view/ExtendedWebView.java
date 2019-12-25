@@ -51,7 +51,7 @@ public class ExtendedWebView extends WebView {
                             .requestDisallowInterceptTouchEvent(true);
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    //嵌套Viewpager旿
+                    //嵌套Viewpager
                     getParent().getParent()
                             .requestDisallowInterceptTouchEvent(!isScrollX);
                     break;
@@ -60,7 +60,7 @@ public class ExtendedWebView extends WebView {
                             .requestDisallowInterceptTouchEvent(false);
             }
         } else {
-            //使webview可以双指缩放（前提是webview必须弿启缩放功能，并且加载的网页也支持缩放＿
+            //使webview可以双指缩放（前提是webview必须启缩放功能，并且加载的网页也支持缩放
             getParent().getParent().
                     requestDisallowInterceptTouchEvent(true);
         }

@@ -82,7 +82,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
   /**
    * Adapter for sliderview
    */
-  protected WXCirclePageAdapter mAdapter;
+  protected FsViewsPageAdapter mAdapter;
 
 
   protected OnPageChangeListener mPageChangeListener = new SliderPageChangeListener();
@@ -111,7 +111,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
     mViewPager.setLayoutParams(pagerParams);
     mViewPager.setOffscreenPageLimit(1);
     // init adapter
-    mAdapter = new WXCirclePageAdapter(false);
+    mAdapter = new FsViewsPageAdapter();
     mViewPager.setAdapter(mAdapter);
     // add to parent
 //    view.addView(mViewPager);
@@ -193,7 +193,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
     }
     mAdapter.addPageView(view,index);
 //    hackTwoItemsInfiniteScroll();
-    if (initIndex != -1 && mAdapter.getRealCount() > initIndex) {
+    if (initIndex != -1 && mAdapter.getCount() > initIndex) {
       if(initRunnable == null){
         initRunnable = new Runnable() {
           @Override
@@ -385,7 +385,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
   @WXComponentProp(name = Constants.Name.INDEX)
   public void setIndex(int index) {
     if (mViewPager != null && mAdapter != null) {
-      if (index >= mAdapter.getRealCount() || index < 0) {
+      if (index >= mAdapter.getCount() || index < 0) {
         initIndex = index;
         return;
       }
