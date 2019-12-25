@@ -38,7 +38,7 @@ public class FsViewsPageAdapter extends PagerAdapter {
     }
     @Override
     public int getItemPosition(@NonNull Object object) {
-        int ret = -1;
+        int ret = POSITION_NONE;
         int i = 0;
         for (View v :
                 pages) {
@@ -86,8 +86,8 @@ public class FsViewsPageAdapter extends PagerAdapter {
         if (v.getParent()!=null){
             ((ViewGroup)v.getParent()).removeView(v);
         }else{
-            view.addView(v);
         }
+        view.addView(v);
         return pages.get(position);
     }
 }
