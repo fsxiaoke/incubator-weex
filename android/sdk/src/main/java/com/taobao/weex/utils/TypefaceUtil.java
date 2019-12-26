@@ -45,7 +45,7 @@ public class TypefaceUtil {
   public static final String FONT_CACHE_DIR_NAME = "font-family";
   private final static String TAG = "TypefaceUtil";
   private final static Map<String, FontDO> sCacheMap = new HashMap<>(); //Key: fontFamilyName
-
+  private final static Map<String, Typeface> sTypeFaceCacheMap = new HashMap<>(); //Key: path
   public static final String ACTION_TYPE_FACE_AVAILABLE = "type_face_available";
 
   public static void putFontDO(String instanceId,FontDO fontDO) {
@@ -261,40 +261,49 @@ public class TypefaceUtil {
       if (!file.exists()) {
         return false;
       }
-      Typeface typeface = Typeface.createFromFile(path);
-      if (typeface != null) {
-        FontDO fontDo = sCacheMap.get(getFontFamilyKey(instanceId ,fontFamily));
-        if (fontDo != null) {
-          fontDo.setState(FontDO.STATE_SUCCESS);
-          fontDo.setTypeface(typeface);
-          if(WXEnvironment.isApkDebugable()) {
-            WXLogUtils.d(TAG, "load local font file success");
-          }
+//      if (typeface != null) {
+      FontDO fontDo = sCacheMap.get(getFontFamilyKey(instanceId ,fontFamily));
+      if (fontDo != null) {
+        fontDo.setState(FontDO.STATE_SUCCESS);
+        Typeface tf=sTypeFaceCacheMap.get(path);
+        if (tf!=null){
 
-          if(hasNetworkDowload) {
-            /**
-             * wxtext may be measured when font not load, when register broadcast receiver,
-             * this broadcast has been send, which cause textview not rendered right.
-             * delay broadcast ensure text will render right
-             * */
-            WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-                intent.putExtra("fontFamily", fontFamily);
-                LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
-              }
-            }, 100);
-          }else{
-            Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
-            intent.putExtra("fontFamily", fontFamily);
-            LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+        }else{
+          tf = Typeface.createFromFile(path);
+          if (tf==null){
+            WXLogUtils.e(TAG, "load local font file failed, can't create font.");
           }
-          return true;
+          sTypeFaceCacheMap.put(path,tf);
         }
-      } else {
-        WXLogUtils.e(TAG, "load local font file failed, can't create font.");
+        fontDo.setTypeface(tf);
+        if(WXEnvironment.isApkDebugable()) {
+          WXLogUtils.d(TAG, "load local font file success");
+        }
+
+        if(hasNetworkDowload) {
+          /**
+           * wxtext may be measured when font not load, when register broadcast receiver,
+           * this broadcast has been send, which cause textview not rendered right.
+           * delay broadcast ensure text will render right
+           * */
+          WXSDKManager.getInstance().getWXRenderManager().postOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+              intent.putExtra("fontFamily", fontFamily);
+              LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+            }
+          }, 100);
+        }else{
+          Intent intent = new Intent(ACTION_TYPE_FACE_AVAILABLE);
+          intent.putExtra("fontFamily", fontFamily);
+          LocalBroadcastManager.getInstance(WXEnvironment.getApplication()).sendBroadcast(intent);
+        }
+        return true;
       }
+//      } else {
+//        WXLogUtils.e(TAG, "load local font file failed, can't create font.");
+//      }
     } catch (Exception e) {
       WXLogUtils.e(TAG, e.toString());
     }
