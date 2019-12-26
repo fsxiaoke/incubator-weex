@@ -27,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
@@ -38,6 +39,7 @@ import android.view.ViewParent;
 import android.widget.ImageView;
 
 import com.taobao.weex.ui.component.WXImage;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 import com.taobao.weex.ui.view.gesture.WXGesture;
 import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 import com.taobao.weex.utils.ImageDrawable;
@@ -345,23 +347,29 @@ public class WXImageView extends ImageView implements WXGestureObservable,
       if (null == drawableClass) {
         return Color.TRANSPARENT;
       }
+      if(drawable instanceof BorderDrawable){
+          return ((BorderDrawable)drawable).getColor();
 
-      try {
-        Field field = drawableClass.getDeclaredField("mColorState");
-        field.setAccessible(true);
-        Object colorState = field.get(drawable);
-        Class colorStateClass = colorState.getClass();
-        Field colorStateField = colorStateClass.getDeclaredField("mUseColor");
-        colorStateField.setAccessible(true);
-        int viewColor = (int) colorStateField.get(colorState);
-        if (Color.TRANSPARENT != viewColor) {
-          return viewColor;
-        }
-      } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
+      }else if(drawable instanceof ColorDrawable){
+          try {
+              Field field = drawableClass.getDeclaredField("mColorState");
+              field.setAccessible(true);
+              Object colorState = field.get(drawable);
+              Class colorStateClass = colorState.getClass();
+              Field colorStateField = colorStateClass.getDeclaredField("mUseColor");
+              colorStateField.setAccessible(true);
+              int viewColor = (int) colorStateField.get(colorState);
+              if (Color.TRANSPARENT != viewColor) {
+                  return viewColor;
+              }
+          } catch (NoSuchFieldException e) {
+              e.printStackTrace();
+          } catch (IllegalAccessException e) {
+              e.printStackTrace();
+          }
       }
+
+
     }
 
     return Color.TRANSPARENT;
