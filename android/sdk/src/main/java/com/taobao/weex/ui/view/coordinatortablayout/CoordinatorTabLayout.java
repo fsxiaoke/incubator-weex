@@ -52,6 +52,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     private LinearLayout mBarLayout;
     private LinearLayout mPagerContainer;
     private TabLayout mTabLayout;
+    private LinearLayout mTabLayoutContainer;
     private ViewPager mViewPage;
 //    private ImageView mImageView;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
@@ -86,7 +87,8 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weex_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mBarLayout = (LinearLayout) findViewById(R.id.tabLayout);
+        mBarLayout = (LinearLayout) findViewById(R.id.appbarId);
+        mTabLayoutContainer = (LinearLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
 
@@ -100,10 +102,10 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
 
     public void addTabView(TabLayout v){
-        if(mBarLayout != null){
+        if(mTabLayoutContainer != null){
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
-            mBarLayout.addView(v,params);
+            mTabLayoutContainer.addView(v,params);
             mTabLayout = v;
             setupTabListener();
         }
