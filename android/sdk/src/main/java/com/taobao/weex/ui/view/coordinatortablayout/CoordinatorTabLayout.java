@@ -86,7 +86,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weex_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mBarLayout = (LinearLayout) findViewById(R.id.appbarId);
+        mBarLayout = (LinearLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
 
