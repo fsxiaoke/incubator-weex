@@ -20,19 +20,9 @@
 
 -->
 <com.taobao.weex.ui.component.facishare.FsTabLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-                                         android:id="@+id/tabLayout"
+
                                          android:layout_width="match_parent"
                                          android:layout_height="wrap_content"
-                                         android:layout_gravity="bottom"
-                                         android:background="#fafafa"
-                                         android:clipToPadding="true"
-                                         android:fillViewport="false"
-                                         app:layout_scrollFlags="scroll"
-                                         app:layout_collapseMode="pin"
-                                         app:tabPaddingStart="0dp"
-                                         app:tabPaddingEnd="0dp"
-                                         app:tabMinWidth="0dp"
-                                         android:orientation="vertical">
+                                         android:background="#fafafa">
 
 </com.taobao.weex.ui.component.facishare.FsTabLayout>
