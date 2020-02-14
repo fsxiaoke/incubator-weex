@@ -34,6 +34,7 @@ import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
 import com.taobao.weex.ui.view.WXBaseRefreshLayout;
+import com.taobao.weex.ui.view.WXFrameLayout;
 import com.taobao.weex.utils.WXViewUtils;
 
 import android.content.Context;
@@ -49,6 +50,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * Component for scroller. It also support features like
@@ -56,13 +58,13 @@ import android.widget.LinearLayout;
  */
 @Component(lazyload = false)
 
-public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout.OnTabSelectedListener,
+public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabLayout.OnTabSelectedListener,
         FsTabLayout.ScrollViewListener {
 
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-
+        mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
         if (getEvents().contains(Constants.Event.ON_TAB_SELECTED)) {
             fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
         }
@@ -85,9 +87,16 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-        if (getEvents().contains(Constants.Event.ON_TAB_RESELECTED)) {
-            fireEvent(Constants.Event.ON_TAB_RESELECTED, getTabEvent(tab));
+        mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
+        boolean set = mTabLayout.setCurrentPagerWithDropTab(tab.getPosition());
+        if(set){
+            fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
+        }else{
+            if (getEvents().contains(Constants.Event.ON_TAB_RESELECTED)) {
+                fireEvent(Constants.Event.ON_TAB_RESELECTED, getTabEvent(tab));
+            }
         }
+
     }
 
 
@@ -136,6 +145,7 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
 
     public FsTabLayout mTabLayout = null;
+    public FrameLayout mDropLayout = null;
 
     public FsTabComponent(WXSDKInstance instance, WXVContainer parent, String instanceId, boolean isLazy, BasicComponentData basicComponentData) {
         super(instance, parent, instanceId, isLazy, basicComponentData);
@@ -150,30 +160,47 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
     }
 
     @Override
-    protected TabLayout initComponentHostView(@NonNull Context context) {
+    protected RelativeLayout initComponentHostView(@NonNull Context context) {
 
-        mTabLayout = (FsTabLayout) LayoutInflater.from(context).inflate( R.layout.weex_tablayout,null);
+        RelativeLayout root = (RelativeLayout) LayoutInflater.from(context).inflate( R.layout.weex_tablayout,
+                null);
+        mTabLayout = root.findViewById(R.id.fs_tab);
+        mDropLayout = root.findViewById(R.id.drop_container);
 //        mTabLayout = new TabLayout(context);
         //tab可滚动
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         mTabLayout.addOnTabSelectedListener(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mTabLayout.setLayoutParams(params);
+        root.setLayoutParams(params);
         mTabLayout.setHandler(new Handler());
         mTabLayout.setOnScrollStateChangedListener(this);
-        return  mTabLayout;
+        return  root;
 
     }
+
 
     Runnable initRunnable = null;
     int initIndex = 0;
     @Override
-    public void addSubView(View child, int index) {
+    public void addSubView(final View child, int index) {
         if (child == null || mTabLayout == null) {
             return;
         }
 
         if (child instanceof WXBaseRefreshLayout) {
+            return;
+        }
+
+        if (child instanceof FsDropLayout){
+            mDropLayout.addView(child);
+            child.post(new Runnable() {
+                @Override
+                public void run() {
+                    mTabLayout.getChildAt(0).setPadding(0,0,child.getWidth(),0);
+                }
+            });
+
+            mTabLayout.setHaveDropTab(true);
             return;
         }
 
@@ -212,9 +239,25 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     @Override
     public void remove(WXComponent child, boolean destroy) {
+
+        if (child !=null && child instanceof FsDropTabComponent){
+            mDropLayout.removeView(child.getHostView());
+            mTabLayout.getChildAt(0).setPadding(0,0,0,0);
+
+            mTabLayout.setHaveDropTab(false);
+
+            if (destroy) {
+                child.destroy();
+            }
+            return;
+        }
+
         if (child == null || mChildren == null || mChildren.size() == 0) {
             return;
         }
+
+
+
 
         mChildren.remove(child);
         if(mTabLayout!=null) {
@@ -273,10 +316,13 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
     }
 
+    int tabSelectColor;
+
     @WXComponentProp(name = Constants.Name.TAB_SELECTED_COLOR)
     public void setTabSelectedColor(String color) {
         if(mTabLayout!=null){
-            mTabLayout.setSelectedTabIndicatorColor(Color.parseColor(color));
+            tabSelectColor = Color.parseColor(color);
+            mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);
         }
     }
 
@@ -287,13 +333,16 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
 
         if(mTabLayout!=null){
 
-            if (index >= mTabLayout.getTabCount()|| index < 0) {
-                initIndex = index;
+            if (index!=0 && (index >= mTabLayout.getTabCount()|| index < 0)) {
+                initIndex = index; //初始化index
+
+                //dropTab点击
+                mTabLayout.setCurrentPagerWithDropTab(index); //兼容viewpager比tab多的情况（有dropTab）
                 return;
             }
 
             TabLayout.Tab tab = mTabLayout.getTabAt(index);
-            if(tab != null){
+            if(tab != null && !tab.isSelected()){
                 tab.select();
             }
         }else{
@@ -301,6 +350,7 @@ public class FsTabComponent extends WXVContainer<TabLayout> implements TabLayout
         }
 
     }
+
 
     @WXComponentProp(name = Constants.Name.SCROLLABLE)
     public void setScrollable(boolean scrollable) {

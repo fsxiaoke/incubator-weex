@@ -74,7 +74,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
   /**
    * package
    **/
-  ViewPager mViewPager;
+  CustomViewPager mViewPager;
   /**
    * Circle indicator
    */
@@ -106,7 +106,7 @@ public class FsPagerDetail extends WXVContainer<ViewPager> {
 //    }
     LinearLayout.LayoutParams pagerParams = new LinearLayout.LayoutParams(
         LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-    mViewPager = new ViewPager(context);
+    mViewPager = new CustomViewPager(context);
 //    mViewPager.setCircle(isInfinite);
     mViewPager.setLayoutParams(pagerParams);
     mViewPager.setOffscreenPageLimit(1);

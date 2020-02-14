@@ -28,7 +28,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
+import com.taobao.weex.R;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
@@ -135,13 +138,13 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
             mTabLayout.addTopView(view);
         }
 
-        if(view instanceof TabLayout){
-            mTabLayout.addTabView((TabLayout) view);
+        if(view instanceof RelativeLayout){
+            mTabLayout.addTabView((RelativeLayout) view);
         }
 
-        if(view instanceof ViewPager){
+        if(view instanceof CustomViewPager){
 
-            mTabLayout.addPageView((ViewPager) view);
+            mTabLayout.addPageView((CustomViewPager) view);
         }
     }
 

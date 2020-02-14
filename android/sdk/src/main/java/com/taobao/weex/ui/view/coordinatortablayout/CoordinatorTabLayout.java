@@ -33,8 +33,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.taobao.weex.R;
+import com.taobao.weex.ui.component.facishare.CustomViewPager;
+import com.taobao.weex.ui.component.facishare.FsTabLayout;
 import com.taobao.weex.ui.view.coordinatortablayout.listener.LoadHeaderImagesListener;
 import com.taobao.weex.ui.view.coordinatortablayout.listener.OnTabSelectedListener;
 
@@ -51,9 +54,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 //    private ActionBar mActionbar;
     private LinearLayout mBarLayout;
     private LinearLayout mPagerContainer;
-    private TabLayout mTabLayout;
+    private FsTabLayout mTabLayout;
     private LinearLayout mTabLayoutContainer;
-    private ViewPager mViewPage;
+    private CustomViewPager mViewPage;
 //    private ImageView mImageView;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private LoadHeaderImagesListener mLoadHeaderImagesListener;
@@ -101,13 +104,16 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
 
 
-    public void addTabView(TabLayout v){
+    public void addTabView(RelativeLayout v){
         if(mTabLayoutContainer != null){
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            FsTabLayout tab = v.findViewById(R.id.fs_tab);
             mTabLayoutContainer.addView(v,params);
-            mTabLayout = v;
+            mTabLayout = tab;
+
             setupTabListener();
+            setupTabViewPager();
         }
     }
     public View getAppBar(){
@@ -120,7 +126,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         }
     }
 
-    public void addPageView(ViewPager v){
+    public void addPageView(CustomViewPager v){
         mPagerContainer = findViewById(R.id.vp);
         if(mPagerContainer != null){
             this.mViewPage = v;
@@ -128,6 +134,13 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             ((LinearLayout.LayoutParams) params).setMargins(0,0,0,0);
             mPagerContainer.addView(v, params);
             setupViewPageListener();
+            setupTabViewPager();
+        }
+    }
+
+    private void setupTabViewPager(){
+        if(mViewPage !=null && mTabLayout!=null){
+            mTabLayout.setViewPager(mViewPage);
         }
     }
 
@@ -229,6 +242,18 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                         if(!tab.isSelected()){
                             tab.select();
                         }
+                    }
+                    if(mTabLayout.isHaveDropTab()){
+                        int count = mViewPage.getAdapter().getCount();
+                        if(i==count -1){
+                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
+                        }else if(i == count -2){
+                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
+                        }else{
+                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+                        }
+                    }else{
+                        mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
                     }
                 }
 

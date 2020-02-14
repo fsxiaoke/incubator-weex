@@ -83,6 +83,7 @@ import com.taobao.weex.ui.component.WXSwitch;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVideo;
 import com.taobao.weex.ui.component.WXWeb;
+import com.taobao.weex.ui.component.facishare.FsDropTabComponent;
 import com.taobao.weex.ui.component.facishare.FsPagerDetail;
 import com.taobao.weex.ui.component.facishare.FsRecycleViewWithRefresh;
 import com.taobao.weex.ui.component.facishare.FsStickyPager;
@@ -471,6 +472,15 @@ public class WXSDKEngine implements Serializable {
               ),
               false,
               "pagetab"
+      );
+
+      registerComponent(
+              new SimpleComponentHolder(
+                      FsDropTabComponent.class,
+                      new FsDropTabComponent.Creator()
+              ),
+              false,
+              "pagedroptab"
       );
 
       registerComponent(

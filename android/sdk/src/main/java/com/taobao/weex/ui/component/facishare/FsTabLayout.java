@@ -19,8 +19,10 @@
 package com.taobao.weex.ui.component.facishare;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -36,6 +38,33 @@ public class FsTabLayout extends TabLayout {
 
     public FsTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+    }
+
+    private boolean haveDropTab;
+
+    public boolean isHaveDropTab(){
+        return haveDropTab;
+    }
+
+    private CustomViewPager mViewPager;
+    public void setViewPager(CustomViewPager pager){
+        mViewPager = pager;
+    }
+
+    public boolean setCurrentPagerWithDropTab(int index){
+        if(haveDropTab&& mViewPager!=null  && index!=mViewPager.getCurrentItem()&& index <mViewPager.getAdapter().getCount()){
+            if(index == mViewPager.getAdapter().getCount() -1) {
+                setSelectedTabIndicatorColor(Color.TRANSPARENT);//隐藏tab选中
+                mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
+            }
+            mViewPager.setCurrentItem(index);
+            return true;
+        }
+        return false;
+    }
+
+    public void setHaveDropTab(boolean have){
+        haveDropTab = have;
     }
 
 
