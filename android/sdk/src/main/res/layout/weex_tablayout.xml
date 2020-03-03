@@ -38,7 +38,7 @@
             android:id="@+id/drop_container"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="#cccccccc"
+            android:background="@android:color/transparent"
             android:gravity="center"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
