@@ -239,7 +239,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                 public void onPageSelected(int i) {
                     if(mTabLayout!=null){
                         TabLayout.Tab tab = mTabLayout.getTabAt(i);
-                        if(!tab.isSelected()){
+                        if(tab!=null && !tab.isSelected()){
                             tab.select();
                         }
                     }
