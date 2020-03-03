@@ -346,6 +346,8 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             TabLayout.Tab tab = mTabLayout.getTabAt(index);
             if(tab != null && !tab.isSelected()){
                 tab.select();
+            }else if(tab !=null){
+                mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
             }
         }else{
             initIndex = index;
