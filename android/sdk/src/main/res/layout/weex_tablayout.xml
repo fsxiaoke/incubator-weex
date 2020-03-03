@@ -22,6 +22,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#fafafa"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 <com.taobao.weex.ui.component.facishare.FsTabLayout
@@ -38,7 +39,6 @@
             android:id="@+id/drop_container"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
             android:gravity="center"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"

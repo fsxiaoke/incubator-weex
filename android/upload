@@ -1,0 +1,5 @@
+#!/bin/bash
+cp ../packages/weex-js-framework.js ./sdk/assets/weex-main-jsfm.js
+./gradlew weex_sdk:upload -PcompileType=weex_debug
+cp ../packages/weex-js-framework.min.js ./sdk/assets/weex-main-jsfm.js
+./gradlew weex_sdk:upload -PcompileType=weex_release
