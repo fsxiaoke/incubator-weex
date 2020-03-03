@@ -26,6 +26,7 @@ import com.taobao.weex.R;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.annotation.Component;
+import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.ui.ComponentCreator;
@@ -329,6 +330,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
 
 
     @WXComponentProp(name = Constants.Name.TAB_SELECTED_INDEX)
+    @JSMethod
     public void setTabSelectedIndex(int index) {
 
         if(mTabLayout!=null){
@@ -350,6 +352,9 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
         }
 
     }
+
+
+
 
 
     @WXComponentProp(name = Constants.Name.SCROLLABLE)
