@@ -126,7 +126,6 @@ public class FsDropTabComponent extends WXVContainer<FrameLayout>  {
             lp.width = width;
             lp.height = height;
         }
-
         ((ViewGroup.MarginLayoutParams) lp).setMargins(0, 0, 0, 0);
         return lp;
     }
