@@ -30,8 +30,7 @@
                                          android:layout_height="match_parent"
                                         app:tabPaddingStart="0dp"
                                         app:tabPaddingEnd="0dp"
-                                        app:tabMinWidth="0dp"
-                                         android:background="#fafafa">
+                                        app:tabMinWidth="0dp">
 
 </com.taobao.weex.ui.component.facishare.FsTabLayout>
     <FrameLayout
