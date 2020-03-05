@@ -40,6 +40,7 @@ import java.util.Date;
  * 采用内存映射文件写入，速度快
  * 每2M一个日志文件，写满为止，当达到最大size时会自动生成一个新的日志文件
  * 首次使用先调用start，之后外部只需要writelog即可，内部负责自动切换文件
+ * ADF
  */
 
 public class FsMMapWriter implements ILogWriter {
