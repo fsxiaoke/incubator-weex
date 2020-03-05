@@ -331,9 +331,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
 
     @JSMethod
     public void setTabSelectedIndex(int index) {
-
         tabSelectedIndex(index);
-
     }
 
 
