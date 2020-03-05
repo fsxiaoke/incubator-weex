@@ -221,7 +221,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
         }
 
 
-        if (initIndex != -1 && count > initIndex) {
+        if (initIndex != -1 &&  mTabLayout.getTabCount() > initIndex) {
             if(initRunnable == null){
                 initRunnable = new Runnable() {
                     @Override
@@ -329,9 +329,16 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
 
 
 
-    @WXComponentProp(name = Constants.Name.TAB_SELECTED_INDEX)
     @JSMethod
     public void setTabSelectedIndex(int index) {
+
+        tabSelectedIndex(index);
+
+    }
+
+
+    @WXComponentProp(name = Constants.Name.TAB_SELECTED_INDEX)
+    public void tabSelectedIndex(int index) {
 
         if(mTabLayout!=null){
 
