@@ -355,6 +355,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
                 tab.select();
             }else if(tab !=null){
                 mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
+                mTabLayout.setCurrentPagerWithDropTab(index);
             }
         }else{
             initIndex = index;
