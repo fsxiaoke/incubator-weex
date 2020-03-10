@@ -47,8 +47,8 @@ buildscript {
 
 
         doFirst {
-            def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
-            def verName = "1.0" + "_$suffix_ver"
+//            def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
+            def verName = gradle.version
             println("upload $project.name ver $verName")
             repositories.mavenDeployer.pom.version = "$verName"
             repositories.mavenDeployer.pom.artifactId = "$compileType"
@@ -57,7 +57,7 @@ buildscript {
         }
         doLast {
 //            def suffix_ver = 'git rev-parse HEAD'.execu
-            gradle.modifyLibVersion("$compileType")
+            gradle.modifyLibVersion("$compileType",gradle.version)
         }
     }
 

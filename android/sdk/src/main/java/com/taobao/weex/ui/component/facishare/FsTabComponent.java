@@ -227,6 +227,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
                     @Override
                     public void run() {
                         mTabLayout.getTabAt(initIndex).select();
+                        mTabLayout.setAllowedSwipeDirection();
                         initRunnable = null;
                     }
                 };
@@ -234,7 +235,6 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             mTabLayout.removeCallbacks(initRunnable);
             mTabLayout.postDelayed(initRunnable, 50);
         }
-
     }
 
 

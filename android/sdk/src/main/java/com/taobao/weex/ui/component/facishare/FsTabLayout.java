@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class FsTabLayout extends TabLayout {
@@ -65,6 +66,20 @@ public class FsTabLayout extends TabLayout {
 
     public void setHaveDropTab(boolean have){
         haveDropTab = have;
+        setAllowedSwipeDirection();
+    }
+
+
+    public void setAllowedSwipeDirection(){
+        if(haveDropTab){
+            if(getSelectedTabPosition() == getChildCount() -1) {
+                mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
+            }else{
+                mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+            }
+        }else{
+            mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+        }
     }
 
 
