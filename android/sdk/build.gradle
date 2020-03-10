@@ -56,10 +56,8 @@ buildscript {
 //            repositories.mavenDeployer.pom.packaging = "aar"
         }
         doLast {
-            def suffix_ver = 'git rev-parse HEAD'.execute().text.substring(0, 7)
-            def verName = "1.0" + "_$suffix_ver"
-            println("save $compileType ver $verName")
-            gradle.modifyLibVersion("$compileType", verName)
+//            def suffix_ver = 'git rev-parse HEAD'.execu
+            gradle.modifyLibVersion("$compileType")
         }
     }
 

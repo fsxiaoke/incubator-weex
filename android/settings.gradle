@@ -9,11 +9,11 @@ include ":commons"
 //include ":weex_debug"
 
 
-def modifyLibVersion(projectName, newVersion) {
+def modifyLibVersion(projectName) {
     File settings = new File(gradle.FS_DIR + "/libconfig.cfg")
     String content = FileUtil.getFileStr(settings)
     String reg = "\"$projectName\":\\s*\".*?\\..*?\""
-    String mycode = "\"$projectName\":\"$newVersion\""
+    String mycode = "\"$projectName\":\"$gradle.version\""
     println(reg + " " + mycode)
     content = content.replaceAll(reg, mycode)
     FileUtil.writeToFile(content.getBytes("utf-8"), settings)
@@ -25,3 +25,4 @@ gradle.ext.mavenDevUrl = "http://maven.firstshare.cn/artifactory/libs-snapshot-l
 gradle.ext.mavenUserName = "deployer"
 gradle.ext.mavenPwd = "fxiaoke"
 gradle.ext.FS_DIR="/users/tensix/Work/Gitlab/fs-android-debug"
+gradle.ext.version="1.0.24.1"

@@ -628,9 +628,9 @@ public abstract class BasicListComponent<T extends ViewGroup & ListComponentView
             removeOldSticky = true;
           }
         } else if(layoutManager instanceof StaggeredGridLayoutManager){
-          int [] firstItems= new int[3];
-          int firstVisiblePosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(firstItems)[0];
-          int lastVisiblePosition = ((StaggeredGridLayoutManager)  layoutManager).findLastVisibleItemPositions(firstItems)[0];
+//          int [] firstItems= new int[3];
+          int firstVisiblePosition = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null)[0];
+          int lastVisiblePosition = ((StaggeredGridLayoutManager)  layoutManager).findLastVisibleItemPositions(null)[0];
           int pos = mChildren.indexOf(cell);
 
           if (pos <= firstVisiblePosition || (cell.getStickyOffset() > 0 && firstVisiblePosition < pos && pos <= lastVisiblePosition  &&
