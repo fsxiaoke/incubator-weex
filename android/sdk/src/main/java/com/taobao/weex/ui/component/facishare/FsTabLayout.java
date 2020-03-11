@@ -71,14 +71,16 @@ public class FsTabLayout extends TabLayout {
 
 
     public void setAllowedSwipeDirection(){
-        if(haveDropTab){
-            if(getSelectedTabPosition() == getChildCount() -1) {
-                mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
-            }else{
+        if(mViewPager!=null) {
+            if (haveDropTab) {
+                if (getSelectedTabPosition() == getChildCount() - 1) {
+                    mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
+                } else {
+                    mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+                }
+            } else {
                 mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
             }
-        }else{
-            mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
         }
     }
 
