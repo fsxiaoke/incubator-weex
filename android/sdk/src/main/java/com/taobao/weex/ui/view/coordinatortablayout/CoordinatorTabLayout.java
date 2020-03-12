@@ -28,6 +28,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,9 +110,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT);
             FsTabLayout tab = v.findViewById(R.id.fs_tab);
+
             mTabLayoutContainer.addView(v,params);
             mTabLayout = tab;
-
             setupTabListener();
             setupTabViewPager();
         }
@@ -229,6 +230,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
     private void setupViewPageListener(){
         if(mViewPage!=null){
+            if(mTabLayout !=null){
+                mTabLayout.setAllowedSwipeDirection();
+            }
             mViewPage.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int i, float v, int i1) {
@@ -268,6 +272,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
     private void setupTabListener() {
         if(mTabLayout!=null) {
+            mTabLayout.setAllowedSwipeDirection();
             mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {

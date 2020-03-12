@@ -73,7 +73,7 @@ public class FsTabLayout extends TabLayout {
     public void setAllowedSwipeDirection(){
         if(mViewPager!=null) {
             if (haveDropTab) {
-                if (getSelectedTabPosition() == getChildCount() - 1) {
+                if (getSelectedTabPosition() == getTabCount() - 1) {
                     mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
                 } else {
                     mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);

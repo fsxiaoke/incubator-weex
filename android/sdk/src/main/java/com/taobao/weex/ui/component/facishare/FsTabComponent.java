@@ -235,6 +235,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             mTabLayout.removeCallbacks(initRunnable);
             mTabLayout.postDelayed(initRunnable, 50);
         }
+        mTabLayout.setAllowedSwipeDirection();
     }
 
 
