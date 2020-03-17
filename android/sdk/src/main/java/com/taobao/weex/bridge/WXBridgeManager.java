@@ -310,6 +310,8 @@ public class WXBridgeManager implements Callback, BactchExecutor {
       // use diff context reinit jsf
       if (isJSThread()) {
 
+        
+
         setJSFrameworkInit(false);
         WXModuleManager.resetAllModuleState();
         String jsf = "";
