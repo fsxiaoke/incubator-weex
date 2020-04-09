@@ -176,6 +176,11 @@ public class WXSDKEngine implements Serializable {
     }
   }
 
+  public  static void setLogSwitch(boolean on){
+    WXBridgeManager.BRIDGE_LOG_SWITCH_FS = on;
+  }
+
+
   public static interface WxInitedListener{
     void onWeexInited();
   }

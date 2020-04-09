@@ -60,7 +60,7 @@ public class HotRefreshManager {
     if (mWebSocket != null) {
       try {
         mWebSocket.close(1000, "activity finish!");
-      } catch (IOException e) {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }

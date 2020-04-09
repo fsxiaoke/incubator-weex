@@ -101,7 +101,10 @@ public class FsRecycleViewWithRefresh extends WXVContainer<AdvanceSwipeRefreshLa
             @Override
             public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
 //                Log.e("zds", "mTabLayout gettop: " + mTabLayout.getAppBar().getTop());
-                return mContainer.getChildAt(0).getTop()< 0;
+                if (mContainer != null)
+                    return mContainer.getChildAt(0).getTop() < 0;
+                else
+                    return true;
             }
         });
 
@@ -113,7 +116,7 @@ public class FsRecycleViewWithRefresh extends WXVContainer<AdvanceSwipeRefreshLa
         ViewGroup.LayoutParams lp;
         if (mParent == null) {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-            this.setMarginsSupportRTL(params, left, top, right, bottom);
+            setMarginsSupportRTL(params, left, top, right, bottom);
             lp = params;
         } else {
             lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);

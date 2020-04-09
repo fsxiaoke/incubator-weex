@@ -26,7 +26,6 @@ import android.util.Log;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.disk.FsLazyLruDiskCache;
-import com.taobao.weex.log.FsMMapWriter;
 import com.taobao.weex.log.ILogWriter;
 
 import java.io.File;
@@ -43,7 +42,7 @@ import java.util.List;
 
 public class WXLogUtils {
   public static FsLazyLruDiskCache s_logcache;
-  public static final String WEEX_TAG = "weex";
+  private static final String WEEX_TAG = "weex";
   public static final String WEEX_PERF_TAG = "weex_perf";
 
   private static final String CLAZZ_NAME_LOG_UTIL = "com.taobao.weex.devtools.common.LogUtil";
@@ -51,6 +50,8 @@ public class WXLogUtils {
   private static StringBuilder builder = new StringBuilder(50);
   private static HashMap<String, Class> clazzMaps = new HashMap<>(2);
   private static List<JsLogWatcher> jsLogWatcherList;
+  private static JsLogWatcher fsjsLogWatcher;
+
   private static LogWatcher sLogWatcher;
 
   public static ILogWriter s_logwriter;
@@ -141,6 +142,13 @@ public class WXLogUtils {
 
   public static void d(String tag, String msg) {
 
+//    WXBridgeManager.getInstance().
+
+    if (msg.endsWith("__ERROR") && fsjsLogWatcher != null) {
+      fsjsLogWatcher.onJsLog(Log.ERROR, msg);
+    }
+
+
     if(!TextUtils.isEmpty(tag) && !TextUtils.isEmpty(msg)){
       log(tag, msg, LogLevel.DEBUG);
 
@@ -177,7 +185,8 @@ public class WXLogUtils {
       writeFcLog(getFormatLog(tag,LogLevel.DEBUG.getName().substring(0,1).toUpperCase(),msg));
     }
   }
-  static boolean canWriteFclog(LogLevel loglevel){
+
+  private static boolean canWriteFclog(LogLevel loglevel) {
     return WXEnvironment.sLogLevel.compare(loglevel)>=0;
   }
   private static LogLevel getLogLevel(String level) {
@@ -322,6 +331,12 @@ public class WXLogUtils {
     }
   }
 
+
+  public static void setFsJsLogWatcher(JsLogWatcher watcher) {
+    fsjsLogWatcher = watcher;
+  }
+
+
   public static void setLogWatcher(LogWatcher watcher) {
     sLogWatcher = watcher;
   }
@@ -334,7 +349,8 @@ public class WXLogUtils {
     void onLog(String level, String tag, String msg);
   }
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-  public static String getFormatLog(String tag, String logLevel, String log) {
+
+  private static String getFormatLog(String tag, String logLevel, String log) {
     StringBuilder builder = new StringBuilder();
     builder.append(DATE_FORMAT.format(new Date()))
             .append("\u0001").append(Process.myPid()).append("-").append(Process.myTid())
@@ -344,7 +360,8 @@ public class WXLogUtils {
             .append("\n");
     return builder.toString();
   }
-  static void writeFcLog(String line){
+
+  private static void writeFcLog(String line) {
     if (s_logwriter!=null){
       s_logwriter.writelog(line);
     }
@@ -357,7 +374,7 @@ public class WXLogUtils {
     return sd+"/facishare/logs/weex";
   }
   /** 获取SD路径 **/
-  public static String getSDPath() {
+  private static String getSDPath() {
     // 判断sd卡是否存在
     if (isSD()) {
 
@@ -367,7 +384,7 @@ public class WXLogUtils {
     return "";
   }
   /** 判断sd是否存在**/ //如果有内置判断内置，如果无内置sd判断外置sd
-  public static boolean isSD()
+  private static boolean isSD()
   {
     if (Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
       return true;
