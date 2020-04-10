@@ -243,21 +243,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                 public void onPageSelected(int i) {
                     if(mTabLayout!=null){
                         TabLayout.Tab tab = mTabLayout.getTabAt(i);
-                        if(tab!=null && !tab.isSelected()){
+                        if(tab!=null && !tab.isSelected() ){
                             tab.select();
                         }
-                    }
-                    if(mTabLayout.isHaveDropTab()){
-                        int count = mViewPage.getAdapter().getCount();
-                        if(i==count -1){
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
-                        }else if(i == count -2){
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
-                        }else{
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
-                        }
-                    }else{
-                        mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
                     }
                 }
 
@@ -269,6 +257,8 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         }
 
     }
+
+
 
     private void setupTabListener() {
         if(mTabLayout!=null) {
@@ -282,7 +272,6 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                     if (mOnTabSelectedListener != null) {
                         mOnTabSelectedListener.onTabSelected(tab);
                     }
-
                 }
 
                 @Override
