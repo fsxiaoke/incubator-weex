@@ -60,7 +60,8 @@ public class FsTabLayout extends TabLayout {
             @Override
             public void onPageSelected(int i) {
                 if(isHaveDropTab()){
-                    int count = mRealTabCount;
+                    int aCount =  mViewPager.getAdapter().getCount();
+                    int count  = aCount > mCompCount? aCount:mCompCount;
                     if(count == 0){
                         count = mViewPager.getAdapter().getCount();
                     }
@@ -83,13 +84,15 @@ public class FsTabLayout extends TabLayout {
         });
     }
 
-    public int mRealTabCount;
+    public int mCompCount;
+    public int mRealCount;
 
     public void initTabCount(int componentCount){
+        mCompCount = componentCount;
         if(haveDropTab){
-            mRealTabCount = componentCount-1;
+            mRealCount = componentCount -1;
         }else{
-            mRealTabCount = componentCount;
+            mRealCount = componentCount;
         }
     }
 

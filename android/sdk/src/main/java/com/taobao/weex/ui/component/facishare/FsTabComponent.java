@@ -227,7 +227,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
 
         mTabLayout.initTabCount(childCount());
 
-        if (initIndex != -1 && mTabLayout.getTabCount() ==mTabLayout.mRealTabCount&& mTabLayout.getTabCount() > initIndex) {
+        if (initIndex != -1 && mTabLayout.getTabCount()==mTabLayout.mRealCount&& mTabLayout.getTabCount() > initIndex) {
             if(initRunnable == null){
                 initRunnable = new Runnable() {
                     @Override
@@ -253,7 +253,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             mTabLayout.getChildAt(0).setPadding(0,0,0,0);
 
             mTabLayout.setHaveDropTab(false);
-
+            mTabLayout.initTabCount(childCount());
             if (destroy) {
                 child.destroy();
             }

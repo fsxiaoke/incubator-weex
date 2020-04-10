@@ -25,4 +25,4 @@ gradle.ext.mavenDevUrl = "http://maven.firstshare.cn/artifactory/libs-snapshot-l
 gradle.ext.mavenUserName = "deployer"
 gradle.ext.mavenPwd = "fxiaoke"
 gradle.ext.FS_DIR="/users/tensix/Work/Gitlab/fs-android"
-gradle.ext.version = "1.0.24.28"
+gradle.ext.version = "1.0.24.30"
