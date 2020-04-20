@@ -50,11 +50,55 @@ public class FsTabLayout extends TabLayout {
     private CustomViewPager mViewPager;
     public void setViewPager(CustomViewPager pager){
         mViewPager = pager;
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if(isHaveDropTab()){
+                    int aCount =  mViewPager.getAdapter().getCount();
+                    int count  = aCount > mCompCount? aCount:mCompCount;
+                    if(count == 0){
+                        count = mViewPager.getAdapter().getCount();
+                    }
+                    if(i==count -1){
+                        mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
+                    }else if(i == count -2){
+                        mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
+                    }else{
+                        mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+                    }
+                }else{
+                    mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
     }
 
-    public boolean setCurrentPagerWithDropTab(int index){
-        if(haveDropTab&& mViewPager!=null  && index!=mViewPager.getCurrentItem()&& index <mViewPager.getAdapter().getCount()){
-            if(index == mViewPager.getAdapter().getCount() -1) {
+    public int mCompCount;
+    public int mRealCount;
+
+    public void initTabCount(int componentCount){
+        mCompCount = componentCount;
+        if(haveDropTab){
+            mRealCount = componentCount -1;
+        }else{
+            mRealCount = componentCount;
+        }
+    }
+
+    public boolean setCurrentPagerWithDropTab(int index,int componentCount){
+        if(haveDropTab&& mViewPager!=null  && index!=mViewPager.getCurrentItem()&& index <componentCount){
+            if(index == componentCount -1) {
                 setSelectedTabIndicatorColor(Color.TRANSPARENT);//隐藏tab选中
                 mViewPager.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
             }
