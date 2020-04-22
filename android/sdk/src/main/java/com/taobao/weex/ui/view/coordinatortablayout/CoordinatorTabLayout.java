@@ -266,8 +266,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    if (mViewPage != null && mViewPage.getCurrentItem() != tab.getPosition()) {
-                        mViewPage.setCurrentItem(tab.getPosition());
+                    int position = tab.getPosition();
+                    if (mViewPage != null && mViewPage.getCurrentItem() != tab.getPosition()&&mViewPage.getAdapter().getCount()>position) {
+                        mViewPage.setCurrentItem(position);
                     }
                     if (mOnTabSelectedListener != null) {
                         mOnTabSelectedListener.onTabSelected(tab);
