@@ -22,8 +22,12 @@ import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+
+import java.util.ArrayList;
 
 public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
 
@@ -51,9 +55,15 @@ public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
         super.setLayoutParams(params);
     }
 
+    private boolean isTop(WebView webView) {
+        return webView.getScrollY() == 0;
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+
+
+
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mPrevX = MotionEvent.obtain(ev).getX();
@@ -69,15 +79,59 @@ public class AdvanceSwipeRefreshLayout extends SwipeRefreshLayout {
         }
 
 
+
+
         boolean disallowIntercept = false;
         if (mOnPreInterceptTouchEventDelegate != null)
 
             disallowIntercept = mOnPreInterceptTouchEventDelegate.shouldDisallowInterceptTouchEvent(ev);
 
-        if (disallowIntercept) {
+
+        int x = (int) ev.getRawX();
+        int y = (int) ev.getRawY();
+        WebView view = getTouchTargetWebView(this,x,y); //判断当前touch的是否是webview，如果是看是否webview需要触发滚动
+        boolean webDo = view != null &&!isTop(view);
+//        if (view != null &&!isTop(view)) {
+//            return true;
+//        }
+
+        if (disallowIntercept||webDo) {
             return false;
         }
         return super.onInterceptTouchEvent(ev);
+    }
+
+
+    //(x,y)是否在view的区域内
+    private boolean isTouchPointInView(View view, int x, int y) {
+        if (view == null) {
+            return false;
+        }
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        int left = location[0];
+        int top = location[1];
+        int right = left + view.getMeasuredWidth();
+        int bottom = top + view.getMeasuredHeight();
+        //view.isClickable() &&
+        if (y >= top && y <= bottom && x >= left
+                && x <= right) {
+            return true;
+        }
+        return false;
+    }
+
+    private WebView getTouchTargetWebView(View view, int x, int y) {
+        WebView targetView = null;
+        // 判断view是否可以聚焦
+        ArrayList<View> TouchableViews = view.getTouchables();
+        for (View child : TouchableViews) {
+            if (isTouchPointInView(child, x, y) && child instanceof WebView) {
+                targetView = (WebView) child;
+                break;
+            }
+        }
+        return targetView;
     }
 
     public void setOnPreInterceptTouchEventDelegate(OnPreInterceptTouchEventDelegate listener) {
