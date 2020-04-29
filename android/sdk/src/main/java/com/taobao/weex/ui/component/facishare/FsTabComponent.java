@@ -200,7 +200,10 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             child.post(new Runnable() {
                 @Override
                 public void run() {
-                    mTabLayout.getChildAt(0).setPadding(0,0,child.getWidth(),0);
+                    View parent = mTabLayout.getChildAt(0);
+                    if(parent != null){
+                        parent.setPadding(0,0,child.getWidth(),0);
+                    }
                 }
             });
 
