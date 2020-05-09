@@ -20,6 +20,7 @@ package com.taobao.weex.ui.component.facishare;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -48,6 +49,7 @@ import com.taobao.weex.utils.WXUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Component for scroller. It also support features like
@@ -106,6 +108,17 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
             public boolean shouldDisallowInterceptTouchEvent(MotionEvent ev) {
                 Log.e("zds", "mTabLayout gettop: " + mTabLayout.getAppBar().getTop());
                 return mTabLayout.getAppBar().getTop() < 0;
+            }
+        });
+
+        mTabLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+                if (getEvents().contains(Constants.Event.SCROLL)) {
+                    Map<String, Object> event = new HashMap<>(1);
+                    event.put("offset", i);
+                    fireEvent(Constants.Event.SCROLL, event);
+                }
             }
         });
 

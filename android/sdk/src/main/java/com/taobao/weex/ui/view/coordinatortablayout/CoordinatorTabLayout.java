@@ -23,6 +23,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
@@ -53,7 +54,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     private Context mContext;
 //    private Toolbar mToolbar;
 //    private ActionBar mActionbar;
-    private LinearLayout mBarLayout;
+    private AppBarLayout mBarLayout;
     private LinearLayout mPagerContainer;
     private FsTabLayout mTabLayout;
     private LinearLayout mTabLayoutContainer;
@@ -91,7 +92,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weex_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mBarLayout = (LinearLayout) findViewById(R.id.appbarId);
+        mBarLayout = findViewById(R.id.appbarId);
         mTabLayoutContainer = (LinearLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
@@ -103,6 +104,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     }
 
 
+    public void addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener listener){
+        mBarLayout.addOnOffsetChangedListener(listener);
+    }
 
 
     public void addTabView(RelativeLayout v){
