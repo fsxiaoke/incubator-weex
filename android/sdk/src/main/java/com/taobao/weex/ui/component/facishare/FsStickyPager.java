@@ -112,12 +112,14 @@ public class FsStickyPager extends WXVContainer<AdvanceSwipeRefreshLayout> {
         });
 
         mTabLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            int lastOffset;
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
-                if (getEvents().contains(Constants.Event.SCROLL)) {
+                if (lastOffset != i && getEvents().contains(Constants.Event.SCROLL)) {
                     Map<String, Object> event = new HashMap<>(1);
                     event.put("offset", i);
                     fireEvent(Constants.Event.SCROLL, event);
+                    lastOffset = i;
                 }
             }
         });
