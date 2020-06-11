@@ -21,6 +21,7 @@ package com.taobao.weex.utils;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -56,6 +57,7 @@ public class WXFileUtils {
           return readStreamToString(fis);
         } catch (FileNotFoundException e) {
           e.printStackTrace();
+          WXLogUtils.e(Log.getStackTraceString(e));
         }
       } else {
         return loadAsset(path, context);
