@@ -93,6 +93,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
         mBarLayout = findViewById(R.id.appbarId);
+        mPagerContainer = findViewById(R.id.vp);
         mTabLayoutContainer = (LinearLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
@@ -121,6 +122,12 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             setupTabViewPager();
         }
     }
+
+    public void removeTabView(RelativeLayout v){
+        if(mTabLayoutContainer != null){
+            mTabLayoutContainer.removeView(v);
+        }
+    }
     public View getAppBar(){
         return mBarLayout;
     }
@@ -130,9 +137,25 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             mFeedRootLayout.addView(v);
         }
     }
+    public void removeTopView(View v){
+        if(mFeedRootLayout != null){
+            mFeedRootLayout.removeView(v);
+        }
+    }
+
+
+    public View removeAndGetTopView(){
+        if(mFeedRootLayout != null){
+
+           View view = mFeedRootLayout.getChildAt(0);
+            mFeedRootLayout.removeAllViews();
+           return view;
+        }
+        return null;
+    }
 
     public void addPageView(CustomViewPager v){
-        mPagerContainer = findViewById(R.id.vp);
+
         if(mPagerContainer != null){
             this.mViewPage = v;
             ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -141,6 +164,19 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             setupViewPageListener();
             setupTabViewPager();
         }
+    }
+    public void removePageView(CustomViewPager v){
+        if(mPagerContainer != null){
+            mPagerContainer.removeView(v);
+        }
+    }
+
+    /**
+     * 判断是否有导航或者tab
+     * @return
+     */
+    public boolean isTabOrPagerEmpty(){
+        return mPagerContainer.getChildCount()==0|| mTabLayoutContainer.getChildCount()==0;
     }
 
     private void setupTabViewPager(){
