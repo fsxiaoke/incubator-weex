@@ -46,6 +46,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.ViewUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +90,8 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
         mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
-        boolean set = mTabLayout.setCurrentPagerWithDropTab(tab.getPosition());
+        boolean set = mTabLayout.setCurrentPagerWithDropTab(tab.getPosition(),childCount());
+
         if(set){
             fireEvent(Constants.Event.ON_TAB_SELECTED, getTabEvent(tab));
         }else{
@@ -192,12 +194,16 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             return;
         }
 
+
         if (child instanceof FsDropLayout){
             mDropLayout.addView(child);
             child.post(new Runnable() {
                 @Override
                 public void run() {
-                    mTabLayout.getChildAt(0).setPadding(0,0,child.getWidth(),0);
+                    View parent = mTabLayout.getChildAt(0);
+                    if(parent != null){
+                        parent.setPadding(0,0,child.getWidth(),0);
+                    }
                 }
             });
 
@@ -221,12 +227,16 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
         }
 
 
-        if (initIndex != -1 &&  mTabLayout.getTabCount() > initIndex) {
+
+        mTabLayout.initTabCount(childCount());
+
+        if (initIndex != -1 && mTabLayout.getTabCount()==mTabLayout.mRealCount&& mTabLayout.getTabCount() > initIndex) {
             if(initRunnable == null){
                 initRunnable = new Runnable() {
                     @Override
                     public void run() {
                         mTabLayout.getTabAt(initIndex).select();
+                        mTabLayout.setAllowedSwipeDirection();
                         initRunnable = null;
                     }
                 };
@@ -234,7 +244,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             mTabLayout.removeCallbacks(initRunnable);
             mTabLayout.postDelayed(initRunnable, 50);
         }
-
+//        mTabLayout.setAllowedSwipeDirection();
     }
 
 
@@ -246,7 +256,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
             mTabLayout.getChildAt(0).setPadding(0,0,0,0);
 
             mTabLayout.setHaveDropTab(false);
-
+            mTabLayout.initTabCount(childCount());
             if (destroy) {
                 child.destroy();
             }
@@ -342,9 +352,9 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
 
             if (index!=0 && (index >= mTabLayout.getTabCount()|| index < 0)) {
                 initIndex = index; //初始化index
-
                 //dropTab点击
-                mTabLayout.setCurrentPagerWithDropTab(index); //兼容viewpager比tab多的情况（有dropTab）
+                mTabLayout.setCurrentPagerWithDropTab(index,childCount()); //兼容viewpager比tab多的情况（有dropTab）
+
                 return;
             }
 
@@ -353,7 +363,7 @@ public class FsTabComponent extends WXVContainer<RelativeLayout> implements TabL
                 tab.select();
             }else if(tab !=null){
                 mTabLayout.setSelectedTabIndicatorColor(tabSelectColor);//隐藏tab选中
-                mTabLayout.setCurrentPagerWithDropTab(index);
+                mTabLayout.setCurrentPagerWithDropTab(index,childCount());
             }
         }else{
             initIndex = index;

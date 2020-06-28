@@ -23,11 +23,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +54,7 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     private Context mContext;
 //    private Toolbar mToolbar;
 //    private ActionBar mActionbar;
-    private LinearLayout mBarLayout;
+    private AppBarLayout mBarLayout;
     private LinearLayout mPagerContainer;
     private FsTabLayout mTabLayout;
     private LinearLayout mTabLayoutContainer;
@@ -90,7 +92,8 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
         LayoutInflater.from(context).inflate(R.layout.weex_coordinatortablayout, this, true);
         initToolbar();
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingtoolbarlayout);
-        mBarLayout = (LinearLayout) findViewById(R.id.appbarId);
+        mBarLayout = findViewById(R.id.appbarId);
+        mPagerContainer = findViewById(R.id.vp);
         mTabLayoutContainer = (LinearLayout) findViewById(R.id.tabLayout);
         mFeedRootLayout = findViewById(R.id.feedRootLayout);
     }
@@ -102,6 +105,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
     }
 
 
+    public void addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener listener){
+        mBarLayout.addOnOffsetChangedListener(listener);
+    }
 
 
     public void addTabView(RelativeLayout v){
@@ -109,11 +115,17 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT);
             FsTabLayout tab = v.findViewById(R.id.fs_tab);
+
             mTabLayoutContainer.addView(v,params);
             mTabLayout = tab;
-
             setupTabListener();
             setupTabViewPager();
+        }
+    }
+
+    public void removeTabView(RelativeLayout v){
+        if(mTabLayoutContainer != null){
+            mTabLayoutContainer.removeView(v);
         }
     }
     public View getAppBar(){
@@ -125,9 +137,25 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             mFeedRootLayout.addView(v);
         }
     }
+    public void removeTopView(View v){
+        if(mFeedRootLayout != null){
+            mFeedRootLayout.removeView(v);
+        }
+    }
+
+
+    public View removeAndGetTopView(){
+        if(mFeedRootLayout != null){
+
+           View view = mFeedRootLayout.getChildAt(0);
+            mFeedRootLayout.removeAllViews();
+           return view;
+        }
+        return null;
+    }
 
     public void addPageView(CustomViewPager v){
-        mPagerContainer = findViewById(R.id.vp);
+
         if(mPagerContainer != null){
             this.mViewPage = v;
             ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -136,6 +164,19 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
             setupViewPageListener();
             setupTabViewPager();
         }
+    }
+    public void removePageView(CustomViewPager v){
+        if(mPagerContainer != null){
+            mPagerContainer.removeView(v);
+        }
+    }
+
+    /**
+     * 判断是否有导航或者tab
+     * @return
+     */
+    public boolean isTabOrPagerEmpty(){
+        return mPagerContainer.getChildCount()==0|| mTabLayoutContainer.getChildCount()==0;
     }
 
     private void setupTabViewPager(){
@@ -229,6 +270,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
     private void setupViewPageListener(){
         if(mViewPage!=null){
+            if(mTabLayout !=null){
+                mTabLayout.setAllowedSwipeDirection();
+            }
             mViewPage.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int i, float v, int i1) {
@@ -239,21 +283,9 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
                 public void onPageSelected(int i) {
                     if(mTabLayout!=null){
                         TabLayout.Tab tab = mTabLayout.getTabAt(i);
-                        if(tab!=null && !tab.isSelected()){
+                        if(tab!=null && !tab.isSelected() ){
                             tab.select();
                         }
-                    }
-                    if(mTabLayout.isHaveDropTab()){
-                        int count = mViewPage.getAdapter().getCount();
-                        if(i==count -1){
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.none);
-                        }else if(i == count -2){
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.left);
-                        }else{
-                            mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
-                        }
-                    }else{
-                        mViewPage.setAllowedSwipeDirection(CustomViewPager.SwipeDirection.all);
                     }
                 }
 
@@ -266,18 +298,21 @@ public class CoordinatorTabLayout extends CoordinatorLayout {
 
     }
 
+
+
     private void setupTabListener() {
         if(mTabLayout!=null) {
+            mTabLayout.setAllowedSwipeDirection();
             mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    if (mViewPage != null && mViewPage.getCurrentItem() != tab.getPosition()) {
-                        mViewPage.setCurrentItem(tab.getPosition());
+                    int position = tab.getPosition();
+                    if (mViewPage != null && mViewPage.getCurrentItem() != tab.getPosition()&&mViewPage.getAdapter().getCount()>position) {
+                        mViewPage.setCurrentItem(position);
                     }
                     if (mOnTabSelectedListener != null) {
                         mOnTabSelectedListener.onTabSelected(tab);
                     }
-
                 }
 
                 @Override

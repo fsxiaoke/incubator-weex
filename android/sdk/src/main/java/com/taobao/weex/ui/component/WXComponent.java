@@ -89,7 +89,6 @@ import com.taobao.weex.ui.animation.WXAnimationModule;
 import com.taobao.weex.ui.component.basic.WXBasicComponent;
 import com.taobao.weex.ui.component.binding.Statements;
 import com.taobao.weex.ui.component.list.WXCell;
-import com.taobao.weex.ui.component.list.template.jni.NativeRenderLayoutDirection;
 import com.taobao.weex.ui.component.list.template.jni.NativeRenderObjectUtils;
 import com.taobao.weex.ui.component.pesudo.OnActivePseudoListner;
 import com.taobao.weex.ui.component.pesudo.PesudoStatus;
@@ -134,8 +133,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class WXComponent<T extends View> extends WXBasicComponent implements IWXObject, IWXActivityStateListener, OnActivePseudoListner {
 
   public static final String PROP_FIXED_SIZE = "fixedSize";
-  public static final String PROP_FS_MATCH_PARENT = "m";
-  public static final String PROP_FS_WRAP_CONTENT = "w";
+  private static final String PROP_FS_MATCH_PARENT = "m";
+  private static final String PROP_FS_WRAP_CONTENT = "w";
   public static final String TYPE = "type";
   public static final String ROOT = "_root";
 
@@ -160,7 +159,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private int mPreRealRight = 0;
   private int mPreRealTop = 0;
   private int mStickyOffset = 0;
-  protected WXGesture mGesture;
+  WXGesture mGesture;
   private IFComponentHolder mHolder;
   private boolean isUsing = false;
   private List<OnClickListener> mHostClickListeners;
@@ -170,24 +169,24 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   private PesudoStatus mPesudoStatus;
   private boolean mIsDestroyed = false;
   private boolean mIsDisabled = false;
-  private int mType = TYPE_COMMON;
+  public int mType = TYPE_COMMON;
   private boolean mNeedLayoutOnAnimation = false;
   private String mLastBoxShadowId;
   public int mDeepInComponentTree = 0;
   public boolean mIsAddElementToTree = false;
   //for fix element case
-  public int interactionAbsoluteX=0,interactionAbsoluteY=0;
+  public int interactionAbsoluteX = 0, interactionAbsoluteY = 0;
   private boolean mHasAddFocusListener = false;
 
-  public WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
+  WXTracing.TraceInfo mTraceInfo = new WXTracing.TraceInfo();
 
   public static final int TYPE_COMMON = 0;
-  public static final int TYPE_VIRTUAL = 1;
+  private static final int TYPE_VIRTUAL = 1;
 
   private boolean waste = false;
   public boolean isIgnoreInteraction = false;
 
-  protected ContentBoxMeasurement contentBoxMeasurement;
+  ContentBoxMeasurement contentBoxMeasurement;
   private WXTransition mTransition;
   private GraphicSize mPseudoResetGraphicSize;
   @Nullable
@@ -265,7 +264,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void updateAttrs(WXComponent component) {
+  private void updateAttrs(WXComponent component) {
     if (component != null) {
       updateProperties(component.getAttrs());
     }
@@ -428,13 +427,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return null;
   }
 
-  public String getAttrByKey(String key) {
+  protected String getAttrByKey(String key) {
     return "default";
   }
 
   //Holding the animation bean when component is uninitialized
   public void postAnimation(WXAnimationModule.AnimationHolder holder) {
-    this.mAnimationHolder = holder;
+    mAnimationHolder = holder;
   }
 
   //This method will be removed once flatGUI is completed.
@@ -504,7 +503,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @param method
    * @param args
    */
-  protected void onInvokeUnknownMethod(String method, JSONArray args) {
+  private void onInvokeUnknownMethod(String method, JSONArray args) {
 
   }
 
@@ -573,7 +572,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   /**
    * find certain class type parent
    * */
-  public  Object findTypeParent(WXComponent component, Class type){
+  protected Object findTypeParent(WXComponent component, Class type) {
     if(component.getClass() == type){
       return component;
     }
@@ -594,7 +593,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mParent != null && mParent.isLazy();
   }
 
-  protected final void addFocusChangeListener(OnFocusChangeListener l){
+  final void addFocusChangeListener(OnFocusChangeListener l) {
     View view;
     if(l != null && (view = getRealView()) != null) {
       if( mFocusChangeListeners == null){
@@ -615,7 +614,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected final void addClickListener(OnClickListener l){
+  public final void addClickListener(OnClickListener l) {
     View view;
     if(l != null && (view = getRealView()) != null) {
       if(mHostClickListeners == null){
@@ -682,7 +681,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   public void applyLayoutOnly(){
     if(!isLazy()) {
       setSafeLayout(this);
-      setPadding(this.getPadding(), this.getBorder());
+      setPadding(getPadding(), getBorder());
     }
   }
 
@@ -882,7 +881,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected BorderDrawable getOrCreateBorder() {
+  private BorderDrawable getOrCreateBorder() {
     if (mBackgroundDrawable == null) {
       mBackgroundDrawable = new BorderDrawable();
       if (mHost != null) {
@@ -1055,8 +1054,8 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }else {
       float cssTop = getCSSLayoutTop();
       float cssLeft = getCSSLayoutLeft();
-      interactionAbsoluteX = (int)(this.isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
-      interactionAbsoluteY = (int)(this.isFixed() ? cssTop  : mParent.interactionAbsoluteY + cssTop);
+      interactionAbsoluteX = (int) (isFixed() ? cssLeft : mParent.interactionAbsoluteX + cssLeft);
+      interactionAbsoluteY = (int) (isFixed() ? cssTop : mParent.interactionAbsoluteY + cssTop);
     }
 
     if (null == getInstance().getApmForInstance().instanceRect){
@@ -1119,7 +1118,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     ViewGroup.LayoutParams lp;
     if (mParent == null) {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
-        this.setMarginsSupportRTL(params, left, top, right, bottom);
+      setMarginsSupportRTL(params, left, top, right, bottom);
         lp = params;
     } else {
         lp = mParent.getChildLayoutParams(this, host, width, height, left, right, top, bottom);
@@ -1135,7 +1134,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     params.width = width;
     params.height = height;
 
-    this.setMarginsSupportRTL(params, left, top, right, bottom);
+    setMarginsSupportRTL(params, left, top, right, bottom);
 
     host.setLayoutParams(params);
     mInstance.moveFixedView(host);
@@ -1146,7 +1145,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected void updateBoxShadow() {
+  private void updateBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
 //      WXLogUtils.w("BoxShadow", "box-shadow disabled");
       return;
@@ -1214,7 +1213,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected void clearBoxShadow() {
+  private void clearBoxShadow() {
     if (!BoxShadowUtil.isBoxShadowEnabled()) {
 //      WXLogUtils.w("BoxShadow", "box-shadow disabled");
       return;
@@ -1269,7 +1268,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-  protected void setAriaHidden(boolean isHidden) {
+  private void setAriaHidden(boolean isHidden) {
     View host = getHostView();
     if (host != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
       host.setImportantForAccessibility(isHidden ? View.IMPORTANT_FOR_ACCESSIBILITY_NO : View.IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -1283,7 +1282,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected void setRole(String roleKey) {
+  private void setRole(String roleKey) {
     View host = getHostView();
     String role = roleKey;
     if (host != null && !TextUtils.isEmpty(roleKey)) {
@@ -1494,11 +1493,11 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mHost;
   }
 
-  public int getAbsoluteY() {
+  protected int getAbsoluteY() {
     return mAbsoluteY;
   }
 
-  public int getAbsoluteX() {
+  int getAbsoluteX() {
     return mAbsoluteX;
   }
 
@@ -1675,7 +1674,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return null;
   }
 
-  public void setBackgroundImage(@NonNull String bgImage) {
+  private void setBackgroundImage(@NonNull String bgImage) {
     if ("".equals(bgImage.trim())) {
       getOrCreateBorder().setImage(null);
     } else {
@@ -1693,7 +1692,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void setBorderRadius(String key, float borderRadius) {
+  private void setBorderRadius(String key, float borderRadius) {
     if (borderRadius >= 0) {
       switch (key) {
         case Constants.Name.BORDER_RADIUS:
@@ -1716,7 +1715,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void setBorderWidth(String key, float borderWidth) {
+  private void setBorderWidth(String key, float borderWidth) {
     if (borderWidth >= 0) {
       switch (key) {
         case Constants.Name.BORDER_WIDTH:
@@ -1740,7 +1739,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void setBorderStyle(String key, String borderStyle) {
+  private void setBorderStyle(String key, String borderStyle) {
     if (!TextUtils.isEmpty(borderStyle)) {
       switch (key) {
         case Constants.Name.BORDER_STYLE:
@@ -1762,7 +1761,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  public void setBorderColor(String key, String borderColor) {
+  private void setBorderColor(String key, String borderColor) {
     if (!TextUtils.isEmpty(borderColor)) {
       int colorInt = WXResourceUtils.getColor(borderColor);
       if (colorInt != Integer.MIN_VALUE) {
@@ -1957,7 +1956,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mGestureType != null && mGestureType.contains(WXGestureType.toString());
   }
 
-  public boolean containsEvent(String event) {
+  boolean containsEvent(String event) {
     return getEvents().contains(event) || (mAppendEvents!=null && mAppendEvents.contains(event));
   }
 
@@ -2004,7 +2003,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     return mType;
   }
 
-  public boolean hasScrollParent(WXComponent component) {
+  private boolean hasScrollParent(WXComponent component) {
     if (component.getParent() == null) {
       return true;
     } else if (component.getParent() instanceof WXScroller) {
@@ -2068,7 +2067,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * @param clzName like ':active' or ':active:enabled'
    * @param status
    */
-  protected void setPseudoClassStatus(String clzName, boolean status) {
+  void setPseudoClassStatus(String clzName, boolean status) {
     WXStyle styles = getStyles();
     Map<String, Map<String, Object>> pesudoStyles = styles.getPesudoStyles();
 
@@ -2143,7 +2142,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
    * Sets whether or not to relayout page during animation, default is false
    */
   public void setNeedLayoutOnAnimation(boolean need) {
-    this.mNeedLayoutOnAnimation = need;
+    mNeedLayoutOnAnimation = need;
   }
 
   /**
@@ -2159,13 +2158,13 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     manager.setStyleHeight(getInstanceId(), getRef(), h);
   }
 
-  public static final int STATE_DOM_FINISH = 0;
-  public static final int STATE_UI_FINISH = 1;
-  public static final int STATE_ALL_FINISH = 2;
+  static final int STATE_DOM_FINISH = 0;
+  protected static final int STATE_UI_FINISH = 1;
+  static final int STATE_ALL_FINISH = 2;
   @IntDef({STATE_DOM_FINISH, STATE_UI_FINISH, STATE_ALL_FINISH})
   @Retention(RetentionPolicy.SOURCE)
   @Target(ElementType.PARAMETER)
-  public @interface RenderState {
+  @interface RenderState {
   }
 
   @CallSuper
@@ -2206,7 +2205,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
     }
   }
 
-  protected boolean isRippleEnabled() {
+  private boolean isRippleEnabled() {
     try {
       Object obj = getAttrs().get(Constants.Name.RIPPLE_ENABLED);
       return WXUtils.getBoolean(obj, false);
@@ -2281,7 +2280,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
   public void setTransition(WXTransition transition) {
-    this.mTransition = transition;
+    mTransition = transition;
   }
 
   public void addAnimationForElement(Map<String, Object> animMap) {
@@ -2350,7 +2349,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  public void updateNativeAttr(String key, Object value){
+  private void updateNativeAttr(String key, Object value) {
     if(key == null){
       return;
     }
@@ -2377,7 +2376,7 @@ public abstract class WXComponent<T extends View> extends WXBasicComponent imple
   }
 
 
-  public void updateNativeStyle(String key, Object value){
+  private void updateNativeStyle(String key, Object value) {
     if(key == null){
       return;
     }
