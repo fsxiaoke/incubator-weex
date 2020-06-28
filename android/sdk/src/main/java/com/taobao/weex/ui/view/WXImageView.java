@@ -377,10 +377,13 @@ public class WXImageView extends ImageView implements WXGestureObservable,
 
 
   private void addRoundRectPath(int w, int h) {
-    mPath.reset();
+    if(borderRadius!=null){
+      mPath.reset();
 
-    //add round rect
-    mPath.addRoundRect(new RectF(0, 0, w, h), borderRadius, Path.Direction.CCW);
+      //add round rect
+      mPath.addRoundRect(new RectF(0, 0, w, h), borderRadius, Path.Direction.CCW);
+    }
+
 
     //        Path brainPath = new Path();
     //        brainPath.addRect(new RectF(0, 0, w, h), Path.Direction.CCW);
