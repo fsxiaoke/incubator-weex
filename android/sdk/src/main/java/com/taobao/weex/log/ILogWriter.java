@@ -18,6 +18,8 @@
  */
 package com.taobao.weex.log;
 
+import com.taobao.weex.disk.FsLazyLruDiskCache;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -26,6 +28,7 @@ import java.io.IOException;
  */
 
 public interface ILogWriter {
+    void setFileCache(FsLazyLruDiskCache filecache);
     void start(String path/*log dir*/,String logfilePrefix,long mmapSize) throws IOException;
     boolean writelog(String line);
 }

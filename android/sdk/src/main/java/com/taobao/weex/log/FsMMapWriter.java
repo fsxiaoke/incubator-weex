@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.taobao.weex.disk.FsLazyLruDiskCache;
-import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.Closeable;
 import java.io.File;
@@ -53,7 +52,7 @@ public class FsMMapWriter implements ILogWriter {
     FileChannel mfc;
     MappedByteBuffer mbb;
     HandlerThread workerThread;
-
+    FsLazyLruDiskCache mFilecache;
     public Handler getWorkerHandler() {
         return workerHandler;
     }
@@ -72,6 +71,9 @@ public class FsMMapWriter implements ILogWriter {
 
     public void setIFileNameGenerater(IFileNameGenerater mIFileNameGenerater) {
         this.mIFileNameGenerater = mIFileNameGenerater;
+    }
+    public void setFileCache(FsLazyLruDiskCache filecache){
+        mFilecache=filecache;
     }
     void closeIO(Closeable io){
         try{
@@ -208,10 +210,10 @@ public class FsMMapWriter implements ILogWriter {
         String targetfile=null;
         if (lastTarget!=null){
             targetfile=lastTarget.getAbsolutePath();
-            WXLogUtils.s_logcache.updateItem(targetfile);
+            mFilecache.updateItem(targetfile);
         }else {
             targetfile=path+File.separator+hopefile+dateAppend+".dat";
-            WXLogUtils.s_logcache.addItem(targetfile);
+            mFilecache.addItem(targetfile);
         }
         this.mmapSize=mmapSize;
         open(targetfile);
@@ -255,7 +257,7 @@ public class FsMMapWriter implements ILogWriter {
                     ret=true;//到此处日志会丢失
                     break;
                 }
-                WXLogUtils.s_logcache.addItem(newf);
+                mFilecache.addItem(newf);
             }
             final byte[] toWrite=content;
 //            workerHandler.post(new Runnable() {

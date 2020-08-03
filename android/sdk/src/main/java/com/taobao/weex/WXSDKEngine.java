@@ -225,6 +225,7 @@ public class WXSDKEngine implements Serializable {
 
       WXLogUtils.s_logwriter = new FsMMapWriter();
       try {
+        WXLogUtils.s_logwriter.setFileCache(WXLogUtils.s_logcache);
         WXLogUtils.s_logwriter.start(WXLogUtils.getLogPath(),application.getPackageName(),FsMMapWriter.s_Default_mmapSize);
       } catch (IOException e) {
         e.printStackTrace();
