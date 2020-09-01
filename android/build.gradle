@@ -19,9 +19,8 @@
  
 buildscript {
     repositories {
-        
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -41,15 +40,13 @@ subprojects {
         }
     }
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenLocal()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
         if(project.hasProperty('external_repositories')){
             maven {
                 url external_repositories
             }
         }
-        maven {url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
         jcenter()
         maven {
             url 'https://maven.google.com'
