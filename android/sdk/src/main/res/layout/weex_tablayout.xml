@@ -30,6 +30,8 @@
                                          android:layout_height="match_parent"
                                         app:tabPaddingStart="0dp"
                                         app:tabIndicatorColor="#ff8000"
+                                        app:tabBackground="@android:color/transparent"
+                                        app:tabRippleColor="@android:color/transparent"
                                         app:tabPaddingBottom="1dp"
                                         app:tabPaddingEnd="0dp"
                                         app:tabMinWidth="0dp">
