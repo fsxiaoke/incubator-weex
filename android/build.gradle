@@ -60,11 +60,11 @@ subprojects {
         }
     }
     ext {
-        compileSdkVersion=26
-        buildToolsVersion="26.0.2"
+        compileSdkVersion=28
+        buildToolsVersion="28.0.3"
         minSdkVersion=14
-        targetSdkVersion=26
-        supportLibVersion="26.0.2"
+        targetSdkVersion=28
+        supportLibVersion="28.0.0"
         fastjsonLibVersion="1.1.46.android"
         //Default value for buildCpp is true
         buildCpp = !project.hasProperty("buildCpp") || buildCpp.equals("true")
