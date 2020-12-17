@@ -399,7 +399,16 @@ public class BoxShadowUtil {
       Rect newRect = new Rect(bounds);
       // Make the Canvas Rect bigger according to the padding.
       newRect.inset(-paddingX * 2, -paddingY * 2);
-      canvas.clipRect(newRect, Region.Op.REPLACE);
+      try {
+        if(WXEnvironment.sApplication.getApplicationInfo().targetSdkVersion > Build.VERSION_CODES.O){
+          canvas.clipRect(newRect);
+        }
+        else{
+          canvas.clipRect(newRect, Region.Op.REPLACE);
+        }
+      }catch (NullPointerException e) {
+        canvas.clipRect(newRect);
+      }
 
       Path contentPath = new Path();
       // the content area map must be aligned with bounds
